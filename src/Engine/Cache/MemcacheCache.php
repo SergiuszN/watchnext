@@ -2,39 +2,40 @@
 
 namespace WatchNext\Engine\Cache;
 
-use Memcache;
+use Memcached;
 
 class MemcacheCache implements CacheInterface {
-    private static ?Memcache $memcache = null;
+    private static ?Memcached $memcached = null;
 
     public function __construct() {
-        if (self::$memcache) {
+        if (self::$memcached) {
             return;
         }
 
-        self::$memcache = new Memcache();
+        self::$memcached = new Memcached();
+        self::$memcached->addServer(...explode(':', $_ENV['MEMCACHED_URL']));
     }
 
     public function get(string $key, callable $callback, ?int $ttl = null): mixed {
-        if (self::$memcache->get($key)) {
-            return self::$memcache->get($key);
+        if (self::$memcached->get($key)) {
+            return self::$memcached->get($key);
         }
 
         $data = $callback();
-        self::$memcache->set($key, $data, $ttl ?: 0);
+        self::$memcached->set($key, $data, $ttl ?: 0);
 
         return $data;
     }
 
     public function delete(string $key): void {
-        self::$memcache->delete($key);
+        self::$memcached->delete($key);
     }
 
     public function has(string $key): bool {
-        return self::$memcache->get($key) !== false;
+        return self::$memcached->get($key) !== false;
     }
 
     public function clearAll(): void {
-        self::$memcache->flush();
+        self::$memcached->flush();
     }
 }
