@@ -12,7 +12,7 @@ class Container {
     /**
      * @throws Exception
      */
-    public static function create(): void {
+    public function init(): void {
         if (self::$diContainer) {
             throw new Exception('Container already created!');
         }
@@ -39,9 +39,10 @@ class Container {
      * @param string|class-string<T> $id Entry name or a class name.
      *
      * @return mixed|T
-     * @throws Exception
+     * @noinspection PhpDocMissingThrowsInspection
      */
-    public static function get(string $id): mixed {
+    public function get(string $id): mixed {
+        /** @noinspection PhpUnhandledExceptionInspection */
         return self::$diContainer->get($id);
     }
 }

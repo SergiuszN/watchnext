@@ -12,7 +12,7 @@ use WatchNext\Engine\Response\TemplateResponse;
 class TemplateEngine {
     private static ?Environment $twig = null;
 
-    public static function init(): void {
+    public function __construct() {
         if (self::$twig) {
             return;
         }

@@ -13,7 +13,7 @@ class Database {
     /**
      * @throws Exception
      */
-    public static function init(): void {
+    public function __construct() {
         if (self::$connection) {
             return;
         }
@@ -23,7 +23,7 @@ class Database {
         self::$connection = DriverManager::getConnection($connectionParams);
     }
 
-    public static function getConnection(): Connection {
+    public function getConnection(): Connection {
         return self::$connection;
     }
 }
