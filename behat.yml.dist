@@ -1,0 +1,19 @@
+default:
+    suites:
+        default:
+            paths:    [ docs/features ]
+            contexts:
+                - App\Tests\Behat\UserContext
+                - App\Tests\Behat\ExerciseContext
+                - App\Tests\Behat\MuscleContext
+                - App\Tests\Behat\GearContext
+                - App\Tests\Behat\PlanContext
+                - App\Tests\Behat\TrainingContext
+                - App\Tests\Behat\TrainingSetContext
+                - App\Tests\Behat\UserTrainingSetContext
+
+    extensions:
+        FriendsOfBehat\SymfonyExtension:
+                    kernel:
+                        class: App\Kernel
+                    bootstrap: 'tests/bootstrap.php'
