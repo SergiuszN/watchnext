@@ -10,11 +10,12 @@ use WatchNext\Engine\Event\ExceptionEvent;
 use WatchNext\Engine\Event\KernelEventRegistration;
 use WatchNext\Engine\Event\RequestEvent;
 use WatchNext\Engine\Event\ResponseEvent;
+use WatchNext\Engine\Logger;
 use WatchNext\Engine\Response\JsonResponse;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Router\RouterDispatcher;
 use WatchNext\Engine\Router\RouterDispatcherStatusEnum;
-use WatchNext\Engine\TemplateEngine;
+use WatchNext\Engine\Template\TemplateEngine;
 
 class HttpDispatcher {
     /**
@@ -38,6 +39,8 @@ class HttpDispatcher {
 
                 $this->render($response);
             } catch (Throwable $throwable) {
+                (new Logger())->error($throwable);
+
                 $eventDispatcher->dispatch(new ExceptionEvent($throwable));
                 throw $throwable;
             }

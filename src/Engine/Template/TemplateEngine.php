@@ -1,6 +1,6 @@
 <?php
 
-namespace WatchNext\Engine;
+namespace WatchNext\Engine\Template;
 
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -19,8 +19,8 @@ class TemplateEngine {
             return;
         }
 
-        $loader = new FilesystemLoader(__DIR__ . '/../../templates');
-        $cache = $_ENV['APP_ENV'] === 'dev' ? false : __DIR__ . '/../../var/cache/template-cache';
+        $loader = new FilesystemLoader(__DIR__ . '/../../../templates');
+        $cache = $_ENV['APP_ENV'] === 'dev' ? false : __DIR__ . '/../../../var/cache/template-cache';
         $debug = $_ENV['APP_ENV'] === 'dev';
 
         self::$twig = new Environment($loader, [
@@ -54,5 +54,6 @@ class TemplateEngine {
 
     private function addDefaultGlobals(): void {
         $this->addGlobal('flashbag', new FlashBag());
+        $this->addGlobal('t', new Language());
     }
 }

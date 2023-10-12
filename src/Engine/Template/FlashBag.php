@@ -1,6 +1,6 @@
 <?php
 
-namespace WatchNext\Engine;
+namespace WatchNext\Engine\Template;
 
 class FlashBag {
     private const KEY = 'main.flash.bag';

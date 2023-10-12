@@ -5,7 +5,14 @@ namespace WatchNext\Engine;
 use DI\Container as DIContainer;
 use DI\ContainerBuilder;
 use Exception;
+use WatchNext\Engine\Cache\CacheInterface;
+use WatchNext\Engine\Cache\MemcacheCache;
+use WatchNext\Engine\Database\Database;
 use WatchNext\Engine\Event\EventDispatcher;
+use WatchNext\Engine\Router\RouteGenerator;
+use WatchNext\Engine\Template\FlashBag;
+use WatchNext\Engine\Template\Language;
+use WatchNext\Engine\Template\TemplateEngine;
 use function DI\autowire;
 
 class Container {
@@ -54,15 +61,16 @@ class Container {
             'root.dir' => realpath(__DIR__ . '/../../'),
 
             Container::class => fn () => new Container(),
-            \WatchNext\Engine\Database\Database::class => fn () => new \WatchNext\Engine\Database\Database(),
+            Database::class => fn () => new Database(),
             TemplateEngine::class => fn () => new TemplateEngine(),
 
-            \WatchNext\Engine\Cache\CacheInterface::class => fn () => new \WatchNext\Engine\Cache\MemcacheCache(),
-            \WatchNext\Engine\Router\RouteGenerator::class => autowire(\WatchNext\Engine\Router\RouteGenerator::class),
+            CacheInterface::class => fn () => new MemcacheCache(),
+            RouteGenerator::class => autowire(RouteGenerator::class),
 
             Logger::class => fn() => new Logger(),
             FlashBag::class => fn () => new FlashBag(),
             EventDispatcher::class => fn () => new EventDispatcher(),
+            Language::class => fn () => new Language(),
         ];
     }
 }

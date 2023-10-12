@@ -1,11 +1,11 @@
 <?php
 
-namespace WatchNext\Engine;
+namespace WatchNext\Engine\Cache;
 
 class VarDirectory {
 
     public function init(): void {
-        $dir = __DIR__ . '/../../var';
+        $dir = __DIR__ . '/../../../var';
 
         if (!file_exists($dir)) {
             mkdir($dir);

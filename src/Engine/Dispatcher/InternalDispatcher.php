@@ -3,10 +3,9 @@
 namespace WatchNext\Engine\Dispatcher;
 
 use Exception;
+use WatchNext\Engine\Cache\VarDirectory;
 use WatchNext\Engine\Container;
 use WatchNext\Engine\Env;
-use WatchNext\Engine\Event\KernelEventRegistration;
-use WatchNext\Engine\VarDirectory;
 
 class InternalDispatcher {
     /**
