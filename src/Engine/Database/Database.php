@@ -1,6 +1,6 @@
 <?php
 
-namespace WatchNext\Engine;
+namespace WatchNext\Engine\Database;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
