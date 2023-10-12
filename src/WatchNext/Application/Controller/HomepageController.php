@@ -1,6 +1,6 @@
 <?php
 
-namespace WatchNext\App\Application\Controller;
+namespace WatchNext\WatchNext\Application\Controller;
 
 use WatchNext\Engine\Response\JsonResponse;
 use WatchNext\Engine\Response\TemplateResponse;

@@ -14,6 +14,8 @@ class CliDispatcher {
         (new InternalDispatcher())->dispatch();
 
         $commands = require __DIR__ . '/../../../config/cli.php';
+        $commands = array_merge($commands, $this->getKernelCliCommands());
+
         global $argv;
         $selectedCommandName = $argv[1];
 
@@ -28,5 +30,13 @@ class CliDispatcher {
 
         echo "There no command with name '$selectedCommandName'\n";
         die();
+    }
+
+    private function getKernelCliCommands(): array {
+        return [
+            'cache:clear' => \WatchNext\Engine\Cli\CacheClearCommand::class,
+            'migrations:generate' => \WatchNext\Engine\Cli\MigrationsGenerateCommand::class,
+            'migrations:migrate' => \WatchNext\Engine\Cli\MigrationsMigrateCommand::class,
+        ];
     }
 }

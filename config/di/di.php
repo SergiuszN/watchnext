@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'WatchNext\App\Application\Controller\*' => DI\autowire(),
+    'WatchNext\WatchNext\Application\Controller\*' => DI\autowire(),
 ];
