@@ -5,6 +5,7 @@ namespace WatchNext\Engine;
 use DI\Container as DIContainer;
 use DI\ContainerBuilder;
 use Exception;
+use WatchNext\Engine\Event\EventDispatcher;
 use function DI\autowire;
 
 class Container {
@@ -52,13 +53,16 @@ class Container {
         return [
             'root.dir' => realpath(__DIR__ . '/../../'),
 
-            \WatchNext\Engine\Container::class => fn () => new \WatchNext\Engine\Container(),
+            Container::class => fn () => new Container(),
             \WatchNext\Engine\Database\Database::class => fn () => new \WatchNext\Engine\Database\Database(),
-            \WatchNext\Engine\TemplateEngine::class => fn () => new \WatchNext\Engine\TemplateEngine(),
+            TemplateEngine::class => fn () => new TemplateEngine(),
 
             \WatchNext\Engine\Cache\CacheInterface::class => fn () => new \WatchNext\Engine\Cache\MemcacheCache(),
             \WatchNext\Engine\Router\RouteGenerator::class => autowire(\WatchNext\Engine\Router\RouteGenerator::class),
-            \WatchNext\Engine\Logger::class => fn() => new \WatchNext\Engine\Logger(),
+
+            Logger::class => fn() => new Logger(),
+            FlashBag::class => fn () => new FlashBag(),
+            EventDispatcher::class => fn () => new EventDispatcher(),
         ];
     }
 }

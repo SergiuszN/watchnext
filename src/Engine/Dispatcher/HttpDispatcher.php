@@ -3,7 +3,13 @@
 namespace WatchNext\Engine\Dispatcher;
 
 use Exception;
-use JetBrains\PhpStorm\NoReturn;
+use Throwable;
+use WatchNext\Engine\Container;
+use WatchNext\Engine\Event\EventDispatcher;
+use WatchNext\Engine\Event\ExceptionEvent;
+use WatchNext\Engine\Event\KernelEventRegistration;
+use WatchNext\Engine\Event\RequestEvent;
+use WatchNext\Engine\Event\ResponseEvent;
 use WatchNext\Engine\Response\JsonResponse;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Router\RouterDispatcher;
@@ -12,16 +18,29 @@ use WatchNext\Engine\TemplateEngine;
 
 class HttpDispatcher {
     /**
-     * @throws Exception
+     * @throws Exception|Throwable
      */
     public function dispatch(): void {
         (new InternalDispatcher())->dispatch();
+        (new KernelEventRegistration())->register();
+        session_start();
+
+        $eventDispatcher = new EventDispatcher();
 
         $route = (new RouterDispatcher())->dispatch();
+        $eventDispatcher->dispatch(new RequestEvent());
 
         if ($route->status === RouterDispatcherStatusEnum::FOUND) {
-            $response = (new $route->class())->{$route->action}();
-            $this->render($response);
+
+            try {
+                $response = (new Container())->get($route->class)->{$route->action}();
+                $eventDispatcher->dispatch(new ResponseEvent());
+
+                $this->render($response);
+            } catch (Throwable $throwable) {
+                $eventDispatcher->dispatch(new ExceptionEvent($throwable));
+                throw $throwable;
+            }
 
             die();
         } else {

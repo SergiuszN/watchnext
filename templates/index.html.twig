@@ -9,6 +9,9 @@
 </head>
 <body>
 <h1>Yeeee thats a twig baby!</h1>
+{% for flash in flashbag.getAllByLabels(['error', 'info', 'success']) %}
+    <h2>{{ flash.message }}</h2>
+{% endfor %}
 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium ad alias aspernatur assumenda consectetur
     deserunt distinctio dolor dolorem enim, expedita inventore nihil odit porro quos, rerum sunt tempore! Nostrum,
     temporibus.</p>

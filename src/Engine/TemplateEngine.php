@@ -7,6 +7,8 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Twig\Loader\FilesystemLoader;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 use WatchNext\Engine\Response\TemplateResponse;
 
 class TemplateEngine {
@@ -25,6 +27,8 @@ class TemplateEngine {
             'cache' => $cache,
             'debug' => $debug,
         ]);
+
+        $this->addDefaultGlobals();
     }
 
     /**
@@ -34,5 +38,21 @@ class TemplateEngine {
      */
     public function render(TemplateResponse $templateResponse): string {
         return self::$twig->render($templateResponse->template, $templateResponse->params);
+    }
+
+    public function addGlobal(string $name, $value): void {
+        self::$twig->addGlobal($name, $value);
+    }
+
+    public function addFilter(TwigFilter $filter): void {
+        self::$twig->addFilter($filter);
+    }
+
+    public function addFunction(TwigFunction $function): void {
+        self::$twig->addFunction($function);
+    }
+
+    private function addDefaultGlobals(): void {
+        $this->addGlobal('flashbag', new FlashBag());
     }
 }
