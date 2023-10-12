@@ -19,7 +19,7 @@ class RouterDispatcher {
                 $r->addRoute(...$route);
             }
         }, [
-            'cacheFile' => __DIR__ . '/../../../var/router.cache.php',
+            'cacheFile' => __DIR__ . '/../../../var/cache/router.cache.php',
             'cacheDisabled' => $_ENV['APP_ENV'] === 'dev',
         ]);
 

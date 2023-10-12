@@ -18,7 +18,7 @@ class TemplateEngine {
         }
 
         $loader = new FilesystemLoader(__DIR__ . '/../../templates');
-        $cache = $_ENV['APP_ENV'] === 'dev' ? false : __DIR__ . '/../../var/template-cache';
+        $cache = $_ENV['APP_ENV'] === 'dev' ? false : __DIR__ . '/../../var/cache/template-cache';
         $debug = $_ENV['APP_ENV'] === 'dev';
 
         self::$twig = new Environment($loader, [

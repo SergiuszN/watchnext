@@ -5,6 +5,7 @@ namespace WatchNext\Engine;
 use DI\Container as DIContainer;
 use DI\ContainerBuilder;
 use Exception;
+use function DI\autowire;
 
 class Container {
     private static ?DIContainer $diContainer = null;
@@ -19,14 +20,15 @@ class Container {
 
         $env = $_ENV['APP_ENV'];
 
+        $kernelConfig = $this->getKernelDI();
         $baseConfig = require __DIR__ . '/../../config/di/di.php';
         $envConfig = require __DIR__ . "/../../config/di/di.{$env}.php";
 
         $builder = new ContainerBuilder();
-        $builder->addDefinitions(array_merge($baseConfig, $envConfig));
+        $builder->addDefinitions(array_merge($kernelConfig, $baseConfig, $envConfig));
 
         if ($env === 'prod') {
-            $builder->enableCompilation(__DIR__ . '/../../var/di-cache');
+            $builder->enableCompilation(__DIR__ . '/../../cache/var/di-cache');
         }
 
         self::$diContainer = $builder->build();
@@ -44,5 +46,19 @@ class Container {
     public function get(string $id): mixed {
         /** @noinspection PhpUnhandledExceptionInspection */
         return self::$diContainer->get($id);
+    }
+
+    private function getKernelDI(): array {
+        return [
+            'root.dir' => realpath(__DIR__ . '/../../'),
+
+            \WatchNext\Engine\Container::class => fn () => new \WatchNext\Engine\Container(),
+            \WatchNext\Engine\Database\Database::class => fn () => new \WatchNext\Engine\Database\Database(),
+            \WatchNext\Engine\TemplateEngine::class => fn () => new \WatchNext\Engine\TemplateEngine(),
+
+            \WatchNext\Engine\Cache\CacheInterface::class => fn () => new \WatchNext\Engine\Cache\MemcacheCache(),
+            \WatchNext\Engine\Router\RouteGenerator::class => autowire(\WatchNext\Engine\Router\RouteGenerator::class),
+            \WatchNext\Engine\Logger::class => fn() => new \WatchNext\Engine\Logger(),
+        ];
     }
 }

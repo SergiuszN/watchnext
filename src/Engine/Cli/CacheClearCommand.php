@@ -10,7 +10,7 @@ class CacheClearCommand implements CliCommandInterface {
         $output = new CliOutput();
 
         $output->write('Clearing the filesystem cache...');
-        $cacheFolder = realpath(__DIR__ . '/../../../var') . '/*';
+        $cacheFolder = realpath(__DIR__ . '/../../../var/cache') . '/*';
         exec("rm -rf $cacheFolder");
         $output->writeln(' OK');
 
