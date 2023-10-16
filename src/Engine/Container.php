@@ -7,6 +7,7 @@ use DI\ContainerBuilder;
 use Exception;
 use WatchNext\Engine\Database\Database;
 use WatchNext\Engine\Event\EventDispatcher;
+use WatchNext\Engine\Mail\Mailer;
 use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Session\Auth;
 use WatchNext\Engine\Session\FlashBag;
@@ -70,6 +71,7 @@ class Container {
             Logger::class => fn() => fn () => new Logger(),
             EventDispatcher::class => fn () => new EventDispatcher(),
             Language::class => fn () => new Language(),
+            Mailer::class => fn () => new Mailer(),
 
             FlashBag::class => fn () => new FlashBag(),
             Auth::class => fn () => fn () => new Auth(),
