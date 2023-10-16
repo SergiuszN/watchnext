@@ -34,3 +34,8 @@ services:
     image: memcached
     ports:
       - '11211:11211'
+  node:
+    container_name: watchnext_node
+    build: config/docker/node
+    volumes:
+      - './:/var/app'

@@ -3,6 +3,7 @@ DOCKER_COMP = docker-compose
 
 # Docker containers
 PHP_CONT = $(DOCKER_COMP) exec php
+NODE_CONT = $(DOCKER_COMP) exec node
 PHP_RUN = $(DOCKER_COMP) run php
 
 # Executables
@@ -10,6 +11,7 @@ PHP      = $(PHP_CONT) php
 COMPOSER = $(PHP_CONT) composer
 SYMFONY  = $(PHP_CONT) bin/console
 TESTS	 = $(PHP_CONT) bin/phpunit
+NPM	     = $(NODE_CONT) npm
 
 # Misc
 .DEFAULT_GOAL = help
@@ -38,10 +40,28 @@ logs: ## Show live logs
 sh: ## Connect to the PHP FPM container
 	@$(PHP_CONT) bash
 
+node:
+	@$(NODE_CONT) bash
+
 ## —— Project ————————————————————————————————————————————————————————————————
 pull: ## Build project after pull
 	@$(PHP_CONT) sh -c "\
 			composer install; \
+		"
+
+npminstall:
+	@$(NODE_CONT) sh -c "\
+			npm install; \
+		"
+
+npmwatch:
+	@$(NODE_CONT) sh -c "\
+			npm run watch; \
+		"
+
+npmbuild:
+	@$(NODE_CONT) sh -c "\
+			npm run build; \
 		"
 
 #push: ## Check project before push

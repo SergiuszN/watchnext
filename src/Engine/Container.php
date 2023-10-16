@@ -12,6 +12,7 @@ use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Session\Auth;
 use WatchNext\Engine\Session\FlashBag;
 use WatchNext\Engine\Session\Security;
+use WatchNext\Engine\Template\Asset;
 use WatchNext\Engine\Template\Language;
 use WatchNext\Engine\Template\TemplateEngine;
 use function DI\autowire;
@@ -65,6 +66,7 @@ class Container {
             Container::class => fn () => new Container(),
             Database::class => fn () => new Database(),
             TemplateEngine::class => fn () => new TemplateEngine(),
+            Asset::class => autowire(Asset::class),
 
             RouteGenerator::class => autowire(RouteGenerator::class),
 

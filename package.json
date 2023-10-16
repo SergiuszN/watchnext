@@ -1,0 +1,23 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "node build.js",
+    "watch": "nodemon --watch templates/_js --watch templates/_css build.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "esbuild": "^0.19.4",
+    "esbuild-stylus-loader": "^0.4.2",
+    "stylus": "^0.60.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

@@ -10,6 +10,7 @@ use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 use WatchNext\Engine\Config;
+use WatchNext\Engine\Container;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Session\CSFR;
 use WatchNext\Engine\Session\FlashBag;
@@ -60,5 +61,6 @@ class TemplateEngine {
         $this->addGlobal('flashbag', new FlashBag());
         $this->addGlobal('t', new Language());
         $this->addGlobal('csfr', new CSFR());
+        $this->addGlobal('asset', (new Container())->get(Asset::class));
     }
 }

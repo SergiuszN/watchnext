@@ -10,3 +10,7 @@
 /.php-cs-fixer.php
 /.php-cs-fixer.cache
 /.deptrac.cache
+
+package-lock.json
+/public/dist/*
+/node_modules

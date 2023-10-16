@@ -6,15 +6,18 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+
+    {% block css %}
+        <link rel="stylesheet" href="{{ asset.path('/dist/dependency.css', false, true) }}">
+        <link rel="stylesheet" href="{{ asset.path('/dist/app.css', false, true) }}">
+    {% endblock %}
 </head>
 <body>
-<h1>Yeeee thats a twig baby!</h1>
-{% for flash in flashbag.getAllByLabels(['error', 'info', 'success']) %}
-    <h2>{{ flash.message }}</h2>
-{% endfor %}
-<h3>Translated message {{ t.trans('test.trans.key') }}</h3>
-<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium ad alias aspernatur assumenda consectetur
-    deserunt distinctio dolor dolorem enim, expedita inventore nihil odit porro quos, rerum sunt tempore! Nostrum,
-    temporibus.</p>
+{% block body %}{% endblock %}
+
+{% block js %}
+    <script src="{{ asset.path('/dist/dependency.js', false, true) }}"></script>
+    <script src="{{ asset.path('/dist/app.js', false, true) }}"></script>
+{% endblock %}
 </body>
 </html>
