@@ -4,15 +4,20 @@ namespace WatchNext\Engine\Dispatcher;
 
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
+use WatchNext\Engine\Cache\VarDirectory;
 use WatchNext\Engine\Cli\CliCommandInterface;
 use WatchNext\Engine\Config;
+use WatchNext\Engine\Container;
+use WatchNext\Engine\Env;
 
 class CliDispatcher {
     /**
      * @throws Exception
      */
     #[NoReturn] public function dispatch(): void {
-        (new InternalDispatcher())->dispatch();
+        (new Env())->load();
+        (new VarDirectory())->init();
+        (new Container())->init();
 
         $commands = (new Config())->get('cli.php');
         $commands = array_merge($commands, $this->getKernelCliCommands());

@@ -4,7 +4,10 @@ namespace WatchNext\Engine\Dispatcher;
 
 use Exception;
 use Throwable;
+use WatchNext\Engine\Cache\VarDirectory;
 use WatchNext\Engine\Container;
+use WatchNext\Engine\DevTools;
+use WatchNext\Engine\Env;
 use WatchNext\Engine\Event\EventDispatcher;
 use WatchNext\Engine\Event\ExceptionEvent;
 use WatchNext\Engine\Event\KernelEventRegistration;
@@ -23,29 +26,49 @@ class HttpDispatcher {
      * @throws Exception|Throwable
      */
     public function dispatch(): void {
-        $tick = microtime(true);
+        (new Env())->load();
+
+        $devTools = new DevTools();
+        $devTools->start();
+
+        (new VarDirectory())->init();
+        $devTools->add('var-checked');
+
+        (new Container())->init();
+        $devTools->add('booted');
+
+        (new KernelEventRegistration())->register();
+        $devTools->add('events-registered');
 
         $container = new Container();
-
-        (new InternalDispatcher())->dispatch();
-        (new KernelEventRegistration())->register();
-        (new Security())->init();
+        $container->get(Security::class)->init();
+        $devTools->add('security-started');
 
         $eventDispatcher = new EventDispatcher();
-
         $route = $container->get(RouterDispatcher::class)->dispatch();
+        $devTools->add('routing-dispatched', $route);
+
         $eventDispatcher->dispatch(new RequestEvent());
+        $devTools->add('kernel-request-dispatched');
 
         if ($route->status === RouterDispatcherStatusEnum::FOUND) {
 
             try {
+                $devTools->add('controller-started');
+
                 $controller = (new Container())->get($route->class);
                 $response = $controller->{$route->action}(...$route->vars);
+
+                $devTools->add('controller-finished');
+
                 $eventDispatcher->dispatch(new ResponseEvent());
+
+                $devTools->add('kernel-response-dispatched');
 
                 $this->render($response);
 
-                var_dump((microtime(true) - $tick) * 1000);
+                $devTools->add('twig-rendered');
+                $devTools->end();
             } catch (Throwable $throwable) {
                 (new Logger())->error($throwable);
 

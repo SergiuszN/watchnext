@@ -18,17 +18,21 @@ class FileSystemCache implements CacheInterface {
         }
     }
 
-    private function read(): void {
+    private function _read(): void {
         $data = file_get_contents($this->cachePath);
         $this->storage = !empty($data) ? unserialize($data) : [];
     }
 
-    private function save(): void {
+    private function _save(): void {
         file_put_contents($this->cachePath, serialize($this->storage));
     }
 
+    public function read(string $key): mixed {
+        return $this->has($key) ? $this->storage[$key]['data'] : null;
+    }
+
     public function get(string $key, callable $callback, ?int $ttl = null): mixed {
-        $this->read();
+        $this->_read();
 
         if ($this->has($key, false)) {
             return $this->storage[$key]['data'];
@@ -37,39 +41,39 @@ class FileSystemCache implements CacheInterface {
         $this->storage[$key]['data'] = $callback();
         $this->storage[$key]['ttl'] = $ttl ? $ttl + time() : self::TTL_4000;
 
-        $this->save();
+        $this->_save();
 
         return $this->storage[$key]['data'];
     }
 
     public function set(string $key, mixed $data, ?int $ttl = null): mixed {
-        $this->read();
+        $this->_read();
 
         $this->storage[$key]['data'] = $data;
         $this->storage[$key]['ttl'] = $ttl ? $ttl + time() : self::TTL_4000;
 
-        $this->save();
+        $this->_save();
 
         return $this->storage[$key]['data'];
     }
 
     public function delete(string $key): void {
-        $this->read();
+        $this->_read();
         unset($this->storage[$key]);
-        $this->save();
+        $this->_save();
     }
 
     public function has(string $key, bool $read = true): bool {
         if ($read) {
-            $this->read();
+            $this->_read();
         }
 
         return isset($this->storage[$key]) && $this->storage[$key]['ttl'] > time();
     }
 
     public function clearAll(): void {
-        $this->read();
+        $this->_read();
         $this->storage = [];
-        $this->save();
+        $this->_save();
     }
 }

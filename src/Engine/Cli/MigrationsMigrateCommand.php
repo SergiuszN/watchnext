@@ -141,7 +141,7 @@ class MigrationsMigrateCommand implements CliCommandInterface {
         $config = new Config();
         $basePath = "{$config->getRootPath()}/config/migrations";
         $files = scandir($basePath);
-        $files = array_diff($files, ['..', '.']);
+        $files = array_filter($files, fn ($path) => str_starts_with($path, 'm_'));
         $this->migrations = [];
 
         foreach ($files as $file) {

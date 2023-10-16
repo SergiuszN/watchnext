@@ -2,11 +2,13 @@
 
 return [
     'user' => [
-        'class' => stdClass::class,
-        'table.name' => 'user',
-        'id' => '`id`',
-        'login' => '`login`',
-        'password' => '`password`',
+        'table_name' => 'user',
+        'id' => 'id',
+        'login' => 'login',
+        'password' => 'password',
+        'remember_me_key' => 'remember_me_key',
+        'remember_me_token' => 'remember_me_token',
+        'roles' => 'roles'
     ],
     'roles' => [
         // ---------------- users -----------------

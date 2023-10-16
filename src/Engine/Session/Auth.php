@@ -2,27 +2,16 @@
 
 namespace WatchNext\Engine\Session;
 
-use WatchNext\Engine\Database\Database;
-
-class Auth {
-    public function __construct(Security $security, Database $database) {
-
+readonly class Auth {
+    public function __construct() {
     }
 
     public function getUser(): mixed {
         return isset($_SESSION['main.auth.user']) ? unserialize($_SESSION['main.auth.user']) : null;
     }
 
-    public function authorize($user): void {
-        $_SESSION['main.auth.user'] = serialize($user);
-    }
-
-    public function tryAuthorizeFromCookie(): void {
-
-    }
-
     public function update($user): void {
-        $this->authorize($user);
+        $_SESSION['main.auth.user'] = serialize($user);
     }
 
     public function unathorize(): void {

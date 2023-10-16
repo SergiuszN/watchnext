@@ -67,13 +67,13 @@ class Container {
 
             RouteGenerator::class => autowire(RouteGenerator::class),
 
-            Logger::class => fn() => new Logger(),
+            Logger::class => fn() => fn () => new Logger(),
             EventDispatcher::class => fn () => new EventDispatcher(),
             Language::class => fn () => new Language(),
 
             FlashBag::class => fn () => new FlashBag(),
-            Auth::class => fn () => autowire(Auth::class),
-            Security::class => fn () => new Security(),
+            Auth::class => fn () => fn () => new Auth(),
+            Security::class => autowire(Security::class),
         ];
     }
 }

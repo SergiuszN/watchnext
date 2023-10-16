@@ -32,7 +32,7 @@ readonly class RouterDispatcher {
                 [$class, $action, $routeName] = explode('::', $routeInfo[1]);
                 $_SERVER['REQUEST_ROUTE'] = $routeName;
 
-                return new DispatchedRoute(RouterDispatcherStatusEnum::FOUND, $class, $action, $routeInfo[2]);
+                return new DispatchedRoute(RouterDispatcherStatusEnum::FOUND, $routeName, $class, $action, $routeInfo[2]);
         }
 
         throw new Exception('This code must not be ever runed!');
@@ -62,7 +62,7 @@ readonly class RouterDispatcher {
             }
         }, [
             'cacheFile' => "{$config->getCachePath()}/router.cache.php",
-            'cacheDisabled' => $_ENV['APP_ENV'] === 'dev',
+            'cacheDisabled' => $_ENV['APP_ENV'] !== 'prod',
         ]);
     }
 
