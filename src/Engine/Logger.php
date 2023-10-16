@@ -17,8 +17,9 @@ class Logger implements LoggerInterface {
         $env = $_ENV['APP_ENV'];
         $logLevel = $env === 'prod' ? Level::Error : Level::Debug;
 
+        $config = new Config();
         self::$logger = new \Monolog\Logger('main');
-        self::$logger->pushHandler(new StreamHandler(__DIR__ . "/../../var/log/{$env}.log", $logLevel));
+        self::$logger->pushHandler(new StreamHandler("{$config->getLogPath()}/{$env}.log", $logLevel));
     }
 
     public function emergency(\Stringable|string $message, array $context = []): void {

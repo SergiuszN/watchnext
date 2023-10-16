@@ -27,16 +27,17 @@ class Container {
         }
 
         $env = $_ENV['APP_ENV'];
+        $config = new Config();
 
         $kernelConfig = $this->getKernelDI();
-        $baseConfig = require __DIR__ . '/../../config/di/di.php';
-        $envConfig = require __DIR__ . "/../../config/di/di.{$env}.php";
+        $baseConfig = $config->get('di/di.php');
+        $envConfig = $config->get("di/di.{$env}.php");
 
         $builder = new ContainerBuilder();
         $builder->addDefinitions(array_merge($kernelConfig, $baseConfig, $envConfig));
 
         if ($env === 'prod') {
-            $builder->enableCompilation(__DIR__ . '/../../var/cache/di-cache');
+            $builder->enableCompilation("{$config->getCachePath()}/di-cache");
         }
 
         self::$diContainer = $builder->build();
@@ -58,7 +59,7 @@ class Container {
 
     private function getKernelDI(): array {
         return [
-            'root.dir' => realpath(__DIR__ . '/../../'),
+            'root.dir' => (new Config())->getRootPath(),
 
             Container::class => fn () => new Container(),
             Database::class => fn () => new Database(),
@@ -71,7 +72,7 @@ class Container {
             Language::class => fn () => new Language(),
 
             FlashBag::class => fn () => new FlashBag(),
-            Auth::class => fn () => new Auth(),
+            Auth::class => fn () => autowire(Auth::class),
             Security::class => fn () => new Security(),
         ];
     }

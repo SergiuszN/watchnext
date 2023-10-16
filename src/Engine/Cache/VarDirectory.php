@@ -2,10 +2,12 @@
 
 namespace WatchNext\Engine\Cache;
 
+use WatchNext\Engine\Config;
+
 class VarDirectory {
 
     public function init(): void {
-        $dir = __DIR__ . '/../../../var';
+        $dir = (new Config())->getRootPath() . '/var';
 
         if (!file_exists($dir)) {
             mkdir($dir);

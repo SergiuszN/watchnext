@@ -6,6 +6,7 @@ use Exception;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use WatchNext\Engine\Cache\CacheInterface;
+use WatchNext\Engine\Config;
 use function FastRoute\cachedDispatcher;
 
 readonly class RouterDispatcher {
@@ -51,14 +52,16 @@ readonly class RouterDispatcher {
     }
 
     private function getDispatcher(): Dispatcher {
-        return cachedDispatcher(function (RouteCollector $r) {
-            $routes = require __DIR__ . '/../../../config/routing/routing.php';
+        $config = new Config();
+
+        return cachedDispatcher(function (RouteCollector $r) use ($config) {
+            $routes = $config->get('routing/routing.php');
 
             foreach ($routes as $name => $route) {
                 $r->addRoute($route[0], $route[1], $route[2] . '::' . $name);
             }
         }, [
-            'cacheFile' => __DIR__ . '/../../../var/cache/router.cache.php',
+            'cacheFile' => "{$config->getCachePath()}/router.cache.php",
             'cacheDisabled' => $_ENV['APP_ENV'] === 'dev',
         ]);
     }

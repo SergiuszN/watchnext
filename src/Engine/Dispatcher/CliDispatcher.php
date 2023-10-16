@@ -5,6 +5,7 @@ namespace WatchNext\Engine\Dispatcher;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use WatchNext\Engine\Cli\CliCommandInterface;
+use WatchNext\Engine\Config;
 
 class CliDispatcher {
     /**
@@ -13,7 +14,7 @@ class CliDispatcher {
     #[NoReturn] public function dispatch(): void {
         (new InternalDispatcher())->dispatch();
 
-        $commands = require __DIR__ . '/../../../config/cli.php';
+        $commands = (new Config())->get('cli.php');
         $commands = array_merge($commands, $this->getKernelCliCommands());
 
         global $argv;

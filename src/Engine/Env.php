@@ -6,7 +6,7 @@ use Dotenv\Dotenv;
 
 class Env {
     public function load(): void {
-        $dotenv = Dotenv::createImmutable(realpath(__DIR__ . '/../../'));
+        $dotenv = Dotenv::createImmutable((new Config())->getRootPath());
         $dotenv->load();
     }
 }

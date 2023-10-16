@@ -2,9 +2,11 @@
 
 namespace WatchNext\Engine\Event;
 
+use WatchNext\Engine\Config;
+
 class KernelEventRegistration {
     public function register(): void {
-        $events = require __DIR__ . '/../../../config/eventListeners.php';
+        $events = (new Config())->get('eventListeners.php');
         $eventDispatcher = new EventDispatcher();
 
         foreach ($events['kernel.request'] as $requestEvent) {

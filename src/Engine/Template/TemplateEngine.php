@@ -9,6 +9,7 @@ use Twig\Error\SyntaxError;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
+use WatchNext\Engine\Config;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Session\CSFR;
 use WatchNext\Engine\Session\FlashBag;
@@ -21,8 +22,9 @@ class TemplateEngine {
             return;
         }
 
-        $loader = new FilesystemLoader(__DIR__ . '/../../../templates');
-        $cache = $_ENV['APP_ENV'] === 'dev' ? false : __DIR__ . '/../../../var/cache/template-cache';
+        $config = new Config();
+        $loader = new FilesystemLoader($config->getRootPath() . '/templates');
+        $cache = $_ENV['APP_ENV'] === 'dev' ? false : $config->getCachePath() . '/template-cache';
         $debug = $_ENV['APP_ENV'] === 'dev';
 
         self::$twig = new Environment($loader, [

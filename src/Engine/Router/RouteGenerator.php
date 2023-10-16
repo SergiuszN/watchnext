@@ -2,13 +2,15 @@
 
 namespace WatchNext\Engine\Router;
 
+use WatchNext\Engine\Config;
+
 class RouteGenerator {
     private static ?array $routes = null;
 
     /** @noinspection PhpUnhandledExceptionInspection */
     public function make(string $name, array $params, bool $absolute = false): string {
         if (self::$routes === null) {
-            self::$routes = require __DIR__ . '/../../../config/routing/routing.php';
+            self::$routes = (new Config())->get('routing/routing.php');
         }
 
         if (!isset(self::$routes[$name])) {

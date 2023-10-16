@@ -2,6 +2,8 @@
 
 namespace WatchNext\Engine\Template;
 
+use WatchNext\Engine\Config;
+
 class Language {
     private static ?array $config = null;
     private static array $translations = [];
@@ -12,20 +14,13 @@ class Language {
             return;
         }
 
-        self::$config = require __DIR__ . '/../../../config/translation.php';
+        self::$config = (new Config())->get('translation.php');
         $this->setLang($_SESSION['kernel.lang'] ?? self::$config['defaultLanguage']);
     }
 
     public function setLang(string $lang): void {
         $this->lang = $lang;
-
-        $translationFilePath = __DIR__ . "/../../../config/tranlsations/messages.{$this->lang}.php";
-
-        if (!file_exists($translationFilePath)) {
-            throw new \Exception("There no messages.{$this->lang}.php file!");
-        }
-
-        self::$translations = require $translationFilePath;
+        self::$translations = (new Config())->get("translations/messages.{$this->lang}.php");
     }
 
     public function trans(string $key): string {

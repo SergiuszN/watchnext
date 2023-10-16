@@ -2,15 +2,18 @@
 
 namespace WatchNext\Engine\Cache;
 
+use WatchNext\Engine\Config;
+
 class FileSystemCache implements CacheInterface {
     private string $cachePath;
     private array $storage = [];
     private const TTL_4000 = 64085164120;
 
     public function __construct() {
-        $this->cachePath = __DIR__ . '/../../../var/cache/file-cache.cache';
+        $config = new Config();
+        $this->cachePath = "{$config->getCachePath()}/file-cache.cache";
 
-        if (file_exists(!$this->cachePath)) {
+        if (!file_exists($this->cachePath)) {
             touch($this->cachePath);
         }
     }

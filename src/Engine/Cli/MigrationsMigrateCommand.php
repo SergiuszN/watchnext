@@ -5,6 +5,7 @@ namespace WatchNext\Engine\Cli;
 use Doctrine\DBAL\Connection;
 use WatchNext\Engine\Cli\IO\CliInput;
 use WatchNext\Engine\Cli\IO\CliOutput;
+use WatchNext\Engine\Config;
 use WatchNext\Engine\Container;
 use WatchNext\Engine\Database\Database;
 use WatchNext\Engine\Database\Migration;
@@ -137,7 +138,8 @@ class MigrationsMigrateCommand implements CliCommandInterface {
     }
 
     private function loadAvailableMigrations(): void {
-        $basePath = realpath(__DIR__ . '/../../../config/migrations');
+        $config = new Config();
+        $basePath = "{$config->getRootPath()}/config/migrations";
         $files = scandir($basePath);
         $files = array_diff($files, ['..', '.']);
         $this->migrations = [];
