@@ -13,11 +13,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
     "esbuild": "^0.19.4",
     "esbuild-stylus-loader": "^0.4.2",
     "stylus": "^0.60.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
   }
 }
