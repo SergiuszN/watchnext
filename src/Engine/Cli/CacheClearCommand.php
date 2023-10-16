@@ -2,7 +2,7 @@
 
 namespace WatchNext\Engine\Cli;
 
-use WatchNext\Engine\Cache\MemcacheCache;
+use WatchNext\Engine\Cache\MemcachedCache;
 use WatchNext\Engine\Cli\IO\CliOutput;
 
 class CacheClearCommand implements CliCommandInterface {
@@ -15,7 +15,7 @@ class CacheClearCommand implements CliCommandInterface {
         $output->writeln(' OK');
 
         $output->write('Clearing the memcache cache...');
-        (new MemcacheCache())->clearAll();
+        (new MemcachedCache())->clearAll();
         $output->writeln(' OK');
 
         $output->writeln('Done!');

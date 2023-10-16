@@ -29,11 +29,8 @@ services:
     image: mailhog/mailhog
     ports:
       - '8025:8025'
-  redis:
-    container_name: watchnext_redis
-    image: redis
-    environment:
-      REDIS_PORT_NUMBER: 6379
-      REDIS_PASSWORD: 12345678
+  memcached:
+    container_name: watchnext_memcached
+    image: memcached
     ports:
-      - '6379:6379'
+      - '11211:11211'

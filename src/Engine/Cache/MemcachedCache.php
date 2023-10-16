@@ -4,7 +4,7 @@ namespace WatchNext\Engine\Cache;
 
 use Memcached;
 
-class MemcacheCache implements CacheInterface {
+class MemcachedCache implements CacheInterface {
     private static ?Memcached $memcached = null;
 
     public function __construct() {
@@ -22,7 +22,13 @@ class MemcacheCache implements CacheInterface {
         }
 
         $data = $callback();
-        self::$memcached->set($key, $data, $ttl ?: 0);
+        self::$memcached->set($key, $data, $ttl > 0 ? $ttl : 0);
+
+        return $data;
+    }
+
+    public function set(string $key, mixed $data, ?int $ttl = null): mixed {
+        self::$memcached->set($key, $data, $ttl > 0 ? $ttl : 0);
 
         return $data;
     }

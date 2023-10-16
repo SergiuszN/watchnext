@@ -5,12 +5,12 @@ namespace WatchNext\Engine;
 use DI\Container as DIContainer;
 use DI\ContainerBuilder;
 use Exception;
-use WatchNext\Engine\Cache\CacheInterface;
-use WatchNext\Engine\Cache\MemcacheCache;
 use WatchNext\Engine\Database\Database;
 use WatchNext\Engine\Event\EventDispatcher;
 use WatchNext\Engine\Router\RouteGenerator;
-use WatchNext\Engine\Template\FlashBag;
+use WatchNext\Engine\Session\Auth;
+use WatchNext\Engine\Session\FlashBag;
+use WatchNext\Engine\Session\Security;
 use WatchNext\Engine\Template\Language;
 use WatchNext\Engine\Template\TemplateEngine;
 use function DI\autowire;
@@ -36,7 +36,7 @@ class Container {
         $builder->addDefinitions(array_merge($kernelConfig, $baseConfig, $envConfig));
 
         if ($env === 'prod') {
-            $builder->enableCompilation(__DIR__ . '/../../cache/var/di-cache');
+            $builder->enableCompilation(__DIR__ . '/../../var/cache/di-cache');
         }
 
         self::$diContainer = $builder->build();
@@ -64,13 +64,15 @@ class Container {
             Database::class => fn () => new Database(),
             TemplateEngine::class => fn () => new TemplateEngine(),
 
-            CacheInterface::class => fn () => new MemcacheCache(),
             RouteGenerator::class => autowire(RouteGenerator::class),
 
             Logger::class => fn() => new Logger(),
-            FlashBag::class => fn () => new FlashBag(),
             EventDispatcher::class => fn () => new EventDispatcher(),
             Language::class => fn () => new Language(),
+
+            FlashBag::class => fn () => new FlashBag(),
+            Auth::class => fn () => new Auth(),
+            Security::class => fn () => new Security(),
         ];
     }
 }
