@@ -59,7 +59,7 @@ class DevTools {
         $this->storage->set('dev.tools', $requests);
     }
 
-    public function end(): void {
+    public function end(bool $render): void {
         if (!$this->enabled) {
             return;
         }
@@ -71,7 +71,9 @@ class DevTools {
 
         $this->storage->set('dev.tools', $requests);
 
-        $this->render();
+        if ($render) {
+            $this->render();
+        }
     }
 
     public function render(): void {

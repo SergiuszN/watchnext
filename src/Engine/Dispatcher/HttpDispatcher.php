@@ -66,13 +66,16 @@ class HttpDispatcher {
                 $devTools->add('kernel-response-dispatched');
 
                 $this->render($response);
-
-                $devTools->add('twig-rendered');
-                $devTools->end();
             } catch (Throwable $throwable) {
                 (new Logger())->error($throwable);
-
                 $eventDispatcher->dispatch(new ExceptionEvent($throwable));
+
+                if ($_ENV['APP_ENV'] === 'dev') {
+                    $devTools->add('error', $throwable);
+                    $devTools->end(true);
+                    die();
+                }
+
                 throw $throwable;
             }
 
@@ -84,11 +87,15 @@ class HttpDispatcher {
 
     private function render($response): void {
         $responseClass = get_class($response);
+        $devTools = new DevTools();
 
         switch ($responseClass) {
             case TemplateResponse::class:
                 /** @var $response TemplateResponse */
                 echo (new TemplateEngine())->render($response);
+
+                $devTools->add('twig-rendered');
+                $devTools->end(true);
 
                 break;
             case JsonResponse::class:
@@ -96,6 +103,8 @@ class HttpDispatcher {
                 http_response_code($response->httpCode);
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode($response->data);
+
+                $devTools->end(false);
 
                 break;
             default:
