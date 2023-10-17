@@ -2,6 +2,8 @@
 
 namespace WatchNext\Engine\Session;
 
+use InvalidArgumentException;
+
 class FlashBag {
     private const KEY = 'main.flash.bag';
 
@@ -9,6 +11,11 @@ class FlashBag {
         $this->init();
 
         $_SESSION[self::KEY][] = ['label' => $label, 'message' => $message];
+    }
+
+    public function addValidationErrors(InvalidArgumentException $invalidArgumentException): void {
+        [$input, $message] = explode(':', $invalidArgumentException->getMessage(), 2);
+        $this->add("error.$input", $message);
     }
 
     public function getAll(): array {

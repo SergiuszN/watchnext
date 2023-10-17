@@ -8,7 +8,7 @@ class RouteGenerator {
     private static ?array $routes = null;
 
     /** @noinspection PhpUnhandledExceptionInspection */
-    public function make(string $name, array $params, bool $absolute = false): string {
+    public function make(string $name, array $params = [], bool $absolute = false): string {
         if (self::$routes === null) {
             self::$routes = (new Config())->get('routing/routing.php');
         }

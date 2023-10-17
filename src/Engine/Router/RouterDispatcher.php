@@ -7,10 +7,11 @@ use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use WatchNext\Engine\Cache\CacheInterface;
 use WatchNext\Engine\Config;
+use WatchNext\Engine\Request\Request;
 use function FastRoute\cachedDispatcher;
 
 readonly class RouterDispatcher {
-    public function __construct(private CacheInterface $cache) {
+    public function __construct(private CacheInterface $cache, private Request $request) {
     }
 
     /**
@@ -32,7 +33,17 @@ readonly class RouterDispatcher {
                 [$class, $action, $routeName] = explode('::', $routeInfo[1]);
                 $_SERVER['REQUEST_ROUTE'] = $routeName;
 
-                return new DispatchedRoute(RouterDispatcherStatusEnum::FOUND, $routeName, $class, $action, $routeInfo[2]);
+                $dispatcherRoute = new DispatchedRoute(
+                    RouterDispatcherStatusEnum::FOUND,
+                    $routeName,
+                    $class,
+                    $action,
+                    $routeInfo[2]
+                );
+
+                $this->request->setRoute($dispatcherRoute);
+
+                return $dispatcherRoute;
         }
 
         throw new Exception('This code must not be ever runed!');

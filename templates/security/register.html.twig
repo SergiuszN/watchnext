@@ -1,0 +1,33 @@
+{% extends 'index.html.twig' %}
+
+{% block body %}
+    <h1>Register</h1>
+    <p>
+        Yep, we do not collect or use email, no spam forever!
+        But remember to save your credential into password manager
+        as that is the only way to access your account
+    </p>
+
+    <form action="" method="post">
+        <div>
+            <label for="login">Login:</label>
+            {% for flash in flash.getAllByLabel('error.login') %}
+                <p style="color: red">{{ flash.message }}</p>
+            {% endfor %}
+            <input type="text" id="login" name="login" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            {% for flash in flash.getAllByLabel('error.password') %}
+                <p style="color: red">{{ flash.message }}</p>
+            {% endfor %}
+            <input type="password" name="password" id="password" required>
+        </div>
+        <div>
+            <button type="submit">Register</button>
+        </div>
+        <div>
+            <a href="{{ route.make('security_login') }}">Already have one?</a>
+        </div>
+    </form>
+{% endblock %}

@@ -15,7 +15,9 @@ use WatchNext\Engine\Event\RequestEvent;
 use WatchNext\Engine\Event\ResponseEvent;
 use WatchNext\Engine\Logger;
 use WatchNext\Engine\Response\JsonResponse;
+use WatchNext\Engine\Response\RedirectResponse;
 use WatchNext\Engine\Response\TemplateResponse;
+use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Router\RouterDispatcher;
 use WatchNext\Engine\Router\RouterDispatcherStatusEnum;
 use WatchNext\Engine\Session\Security;
@@ -32,70 +34,70 @@ class HttpDispatcher {
         $devTools->start();
 
         (new VarDirectory())->init();
-        $devTools->add('var-checked');
-
         (new Container())->init();
-        $devTools->add('booted');
-
         (new KernelEventRegistration())->register();
-        $devTools->add('events-registered');
+
+        $devTools->add('container.booted');
 
         $container = new Container();
         $container->get(Security::class)->init();
-        $devTools->add('security-started');
+
+        $devTools->add('security.booted');
 
         $eventDispatcher = new EventDispatcher();
         $route = $container->get(RouterDispatcher::class)->dispatch();
-        $devTools->add('routing-dispatched', $route);
+
+        $devTools->add('route.dispatched', $route);
 
         $eventDispatcher->dispatch(new RequestEvent());
-        $devTools->add('kernel-request-dispatched');
+
+        $devTools->add('request.events.dispatched');
 
         if ($route->status === RouterDispatcherStatusEnum::FOUND) {
 
             try {
-                $devTools->add('controller-started');
-
                 $controller = (new Container())->get($route->class);
                 $response = $controller->{$route->action}(...$route->vars);
 
-                $devTools->add('controller-finished');
+                $devTools->add('controller.dispatched');
 
                 $eventDispatcher->dispatch(new ResponseEvent());
 
-                $devTools->add('kernel-response-dispatched');
+                $devTools->add('response.events.dispatched');
 
-                $this->render($response);
+                $this->render($response, $devTools);
             } catch (Throwable $throwable) {
                 (new Logger())->error($throwable);
                 $eventDispatcher->dispatch(new ExceptionEvent($throwable));
-
-                if ($_ENV['APP_ENV'] === 'dev') {
-                    $devTools->add('error', $throwable);
-                    $devTools->end(true);
-                    die();
-                }
 
                 throw $throwable;
             }
 
             die();
         } else {
+            $devTools->end(false);
             throw new \HttpException('Not found', 404);
         }
     }
 
-    private function render($response): void {
+    private function render($response, DevTools $devTools): void {
         $responseClass = get_class($response);
-        $devTools = new DevTools();
 
         switch ($responseClass) {
             case TemplateResponse::class:
                 /** @var $response TemplateResponse */
                 echo (new TemplateEngine())->render($response);
 
-                $devTools->add('twig-rendered');
+                $devTools->add('twig.rendered');
                 $devTools->end(true);
+
+                break;
+            case RedirectResponse::class:
+                /** @var $response RedirectResponse */
+                $location = (new RouteGenerator())->make($response->route, $response->params);
+                header("Location: $location");
+
+                $devTools->end(false);
 
                 break;
             case JsonResponse::class:

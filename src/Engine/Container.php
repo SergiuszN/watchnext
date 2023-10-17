@@ -8,6 +8,7 @@ use Exception;
 use WatchNext\Engine\Database\Database;
 use WatchNext\Engine\Event\EventDispatcher;
 use WatchNext\Engine\Mail\Mailer;
+use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Session\Auth;
 use WatchNext\Engine\Session\FlashBag;
@@ -40,6 +41,7 @@ class Container {
 
         if ($env === 'prod') {
             $builder->enableCompilation("{$config->getCachePath()}/di-cache");
+            $builder->writeProxiesToFile(true, "{$config->getCachePath()}/di-cache/proxies");
         }
 
         self::$diContainer = $builder->build();
@@ -67,6 +69,7 @@ class Container {
             Database::class => fn () => new Database(),
             TemplateEngine::class => fn () => new TemplateEngine(),
             Asset::class => autowire(Asset::class),
+            Request::class => fn () => new Request(),
 
             RouteGenerator::class => autowire(RouteGenerator::class),
 

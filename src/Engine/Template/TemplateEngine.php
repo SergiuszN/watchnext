@@ -12,6 +12,7 @@ use Twig\TwigFunction;
 use WatchNext\Engine\Config;
 use WatchNext\Engine\Container;
 use WatchNext\Engine\Response\TemplateResponse;
+use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Session\CSFR;
 use WatchNext\Engine\Session\FlashBag;
 
@@ -58,9 +59,10 @@ class TemplateEngine {
     }
 
     private function addDefaultGlobals(): void {
-        $this->addGlobal('flashbag', new FlashBag());
+        $this->addGlobal('flash', new FlashBag());
         $this->addGlobal('t', new Language());
         $this->addGlobal('csfr', new CSFR());
         $this->addGlobal('asset', (new Container())->get(Asset::class));
+        $this->addGlobal('route', new RouteGenerator());
     }
 }

@@ -14,7 +14,8 @@ class m_1697444488_User extends Migration {
                 `created_at` DATETIME NOT NULL DEFAULT NOW(),
                 `remember_me_key` CHAR(16) NULL,
                 `remember_me_token` CHAR(60) NULL,
-                `roles` TEXT NULL
+                `roles` TEXT NOT NULL,
+                UNIQUE KEY(`login`) 
             )"
         );
     }

@@ -1,0 +1,9 @@
+<?php
+
+namespace WatchNext\WatchNext\Domain\User;
+
+interface UserRepository {
+    public function save(User $user): void;
+    public function find(int $id): ?User;
+    public function doesExist(string $login): bool;
+}

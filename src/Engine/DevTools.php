@@ -31,6 +31,8 @@ class DevTools {
 
         $requests[self::$id] = [
             'id' => self::$id,
+            'method' => $_SERVER['REQUEST_METHOD'],
+            'uri' => $_SERVER['REQUEST_URI'],
             'started' => microtime(true) * 1000000,
             'events' => [],
         ];
@@ -79,21 +81,25 @@ class DevTools {
     public function render(): void {
         $requests = $this->storage->read('dev.tools') ?? [];
 
-        $microtime = $requests[self::$id]['executed_in'];
-        $time = $microtime / 1000000;
+        echo "<hr style='margin-top: 100px'>";
 
-        echo "<hr>";
-        echo "Request: {$_SERVER['REQUEST_METHOD']} to {$_SERVER['REQUEST_URI']}<br>";
-        echo "Executed in: {$microtime} (microseconds)  / {$time} (seconds)<br><br>";
+        foreach ($requests as $request) {
+            $microtime = $request['executed_in'];
+            $time = $microtime / 1000000;
 
-        foreach ($requests[self::$id]['events'] as $event) {
-            echo "Event: {$event['event']}, Executed in {$event['executed_in']} (microseconds)<br>";
+            echo '--------------------------------------------------------------------<br>';
+            echo "Request: {$request['method']} to {$request['uri']}<br>";
+            echo "Executed in: {$microtime} (microseconds)  / {$time} (seconds)<br><br>";
 
-            if ($event['data']) {
-                echo "Event data: <br>";
-                echo '<pre>';
-                var_dump($event['data']);
-                echo '</pre>';
+            foreach ($request['events'] as $event) {
+                echo "Event: {$event['event']}, Executed in {$event['executed_in']} (microseconds)<br>";
+
+                if ($event['data']) {
+                    echo "Event data: <br>";
+                    echo '<pre>';
+                    var_dump($event['data']);
+                    echo '</pre>';
+                }
             }
         }
     }
