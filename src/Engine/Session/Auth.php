@@ -2,20 +2,17 @@
 
 namespace WatchNext\Engine\Session;
 
-readonly class Auth {
-    public function __construct() {
+use WatchNext\WatchNext\Domain\User\User;
+
+class Auth {
+    private static ?User $user;
+
+    public function init(): void {
+        self::$user = isset($_SESSION['main.auth.user']) ? unserialize($_SESSION['main.auth.user']) : null;
     }
 
-    public function getUser(): mixed {
-        return isset($_SESSION['main.auth.user']) ? unserialize($_SESSION['main.auth.user']) : null;
-    }
-
-    public function update($user): void {
-        $_SESSION['main.auth.user'] = serialize($user);
-    }
-
-    public function unathorize(): void {
-        unset($_SESSION['main.auth.user']);
+    public function getUser(): ?User {
+        return self::$user;
     }
 
     public function isAuth(): bool {

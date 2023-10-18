@@ -35,4 +35,8 @@ class Request {
     public function post(string $name, mixed $defaultValue = null): mixed {
         return $this->post[$name] ?? $defaultValue;
     }
+
+    public function getRoute(): ?DispatchedRoute {
+        return self::$route;
+    }
 }

@@ -1,15 +1,6 @@
 <?php
 
 return [
-    'user' => [
-        'table_name' => 'user',
-        'id' => 'id',
-        'login' => 'login',
-        'password' => 'password',
-        'remember_me_key' => 'remember_me_key',
-        'remember_me_token' => 'remember_me_token',
-        'roles' => 'roles'
-    ],
     'roles' => [
         // ---------------- users -----------------
         'ROLE_ADMIN' => [

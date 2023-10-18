@@ -1,0 +1,57 @@
+{% extends 'index.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-4"></div>
+            <div class="col-12 col-md-4 mt-5">
+                <h1>{{ t.trans('security.register.title') }}</h1>
+
+                {% include 'component/flash.html.twig' %}
+
+                <form action="" method="post">
+                    <div class="mb-3 mt-3">
+                        <label class="form-label visually-hidden"
+                               for="login">{{ t.trans('security.register.form.login') }}</label>
+                        {% for flash in flash.getAllByLabel('error.login') %}
+                            <p style="color: red">{{ flash.message }}</p>
+                        {% endfor %}
+                        <input class="form-control" type="text" id="login" name="login" required
+                               placeholder="{{ t.trans('security.register.form.login') }}"
+                               value="{{ request.post('login') }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label visually-hidden"
+                               for="password">{{ t.trans('security.register.form.password') }}</label>
+                        {% for flash in flash.getAllByLabel('error.password') %}
+                            <p style="color: red">{{ flash.message }}</p>
+                        {% endfor %}
+                        <input class="form-control" type="password" name="password" id="password" required
+                               placeholder="{{ t.trans('security.register.form.password') }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label visually-hidden"
+                               for="password-repeat">{{ t.trans('security.register.form.repeatPassword') }}</label>
+                        <input class="form-control" type="password" name="password-repeat" id="password-repeat" required
+                               placeholder="{{ t.trans('security.register.form.repeatPassword') }}">
+                    </div>
+                    <div class="mb-3 d-grid">
+                        <p class="form-text">
+                            <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+                            {{ t.trans('security.register.form.loginEmailAlert') }}
+                        </p>
+
+                        <button class="btn btn-primary" type="submit">{{ t.trans('security.register.title') }}</button>
+                    </div>
+                    <div class="mb-3 text-center">
+                        {{ t.trans('security.register.toLogin') }}
+                        <a href="{{ route.make('security_login') }}">
+                            {{ t.trans('security.register.toLoginButton') }}
+                        </a>
+                    </div>
+                </form>
+            </div>
+            <div class="col-12 col-md-4"></div>
+        </div>
+    </div>
+{% endblock %}

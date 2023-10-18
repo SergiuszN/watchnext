@@ -3,6 +3,10 @@
 namespace WatchNext\Engine;
 
 use WatchNext\Engine\Cache\FileSystemCache;
+use WatchNext\Engine\Request\Request;
+use WatchNext\Engine\Router\DispatchedRoute;
+use WatchNext\Engine\Session\Auth;
+use WatchNext\WatchNext\Domain\User\User;
 
 class DevTools {
     private bool $enabled;
@@ -68,6 +72,9 @@ class DevTools {
 
         $requests = $this->storage->read('dev.tools') ?? [];
 
+        $requests[self::$id]['max_memory'] = memory_get_peak_usage(false);
+        $requests[self::$id]['user'] = (new Auth())->getUser();
+        $requests[self::$id]['route'] = (new Request())->getRoute();
         $requests[self::$id]['ended'] = microtime(true) * 1000000;
         $requests[self::$id]['executed_in'] = $requests[self::$id]['ended'] - $requests[self::$id]['started'];
 
@@ -83,13 +90,30 @@ class DevTools {
 
         echo "<hr style='margin-top: 100px'>";
 
-        foreach ($requests as $request) {
+        foreach (array_reverse($requests) as $request) {
             $microtime = $request['executed_in'];
+            $memoryMB = $request['max_memory'] / 1000000;
             $time = $microtime / 1000000;
 
             echo '--------------------------------------------------------------------<br>';
             echo "Request: {$request['method']} to {$request['uri']}<br>";
-            echo "Executed in: {$microtime} (microseconds)  / {$time} (seconds)<br><br>";
+
+            if ($request['route']) {
+                /** @var DispatchedRoute $route */
+                $route = $request['route'];
+                echo "Route: {$route->routeName}<br>";
+            }
+
+            if ($request['user']) {
+                /** @var User $user */
+                $user = $request['user'];
+                echo "Logged user: {$user->getId()}<br>";
+            } else {
+                echo "No user logged<br>";
+            }
+
+            echo "Executed in: {$microtime} (microseconds)  / {$time} (seconds)<br>";
+            echo "Memory used: {$memoryMB} Mb<br><br>";
 
             foreach ($request['events'] as $event) {
                 echo "Event: {$event['event']}, Executed in {$event['executed_in']} (microseconds)<br>";

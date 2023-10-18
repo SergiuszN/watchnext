@@ -23,8 +23,14 @@ class Language {
         self::$translations = (new Config())->get("translations/messages.{$this->lang}.php");
     }
 
-    public function trans(string $key): string {
-        return self::$translations[$key] ?? '';
+    public function trans(string $key, array $params = []): string {
+        $translation = self::$translations[$key] ?? $key;
+
+        foreach ($params as $paramKey => $paramValue) {
+            $translation = str_replace($paramKey, $paramValue, $translation);
+        }
+
+        return $translation;
     }
 
     public function getLang(): string {

@@ -1,0 +1,44 @@
+{% extends 'index.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-4"></div>
+            <div class="col-12 col-md-4 mt-5">
+                <h1>{{ t.trans('security.login.title') }}</h1>
+
+                {% include 'component/flash.html.twig' %}
+
+                <form action="" method="post">
+                    <div class="mb-3 mt-3">
+                        <label class="form-label visually-hidden" for="login">{{ t.trans('security.login.form.login') }}</label>
+                        {% for flash in flash.getAllByLabel('error.login') %}
+                            <p style="color: red">{{ flash.message }}</p>
+                        {% endfor %}
+                        <input class="form-control" type="text" id="login" name="login" required placeholder="{{ t.trans('security.login.form.login') }}" value="{{ request.post('login') }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label visually-hidden" for="password">{{ t.trans('security.login.form.password') }}</label>
+                        {% for flash in flash.getAllByLabel('error.password') %}
+                            <p style="color: red">{{ flash.message }}</p>
+                        {% endfor %}
+                        <input class="form-control" type="password" name="password" id="password" required placeholder="{{ t.trans('security.login.form.password') }}">
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="remember-me" name="remember-me" checked />
+                            <label class="form-check-label" for="remember-me">{{ t.trans('security.login.form.rememberMe') }}</label>
+                        </div>
+                    </div>
+                    <div class="mb-3 d-grid">
+                        <button class="btn btn-primary" type="submit">{{ t.trans('security.login.form.submit') }}</button>
+                    </div>
+                    <div class="mb-3 text-center">
+                        {{ t.trans('security.login.form.notAMember') }} <a href="{{ route.make('security_register') }}">{{ t.trans('security.login.form.register') }}</a>
+                    </div>
+                </form>
+            </div>
+            <div class="col-12 col-md-4"></div>
+        </div>
+    </div>
+{% endblock %}

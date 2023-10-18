@@ -11,6 +11,7 @@ use Twig\TwigFilter;
 use Twig\TwigFunction;
 use WatchNext\Engine\Config;
 use WatchNext\Engine\Container;
+use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Session\CSFR;
@@ -64,5 +65,6 @@ class TemplateEngine {
         $this->addGlobal('csfr', new CSFR());
         $this->addGlobal('asset', (new Container())->get(Asset::class));
         $this->addGlobal('route', new RouteGenerator());
+        $this->addGlobal('request', new Request());
     }
 }

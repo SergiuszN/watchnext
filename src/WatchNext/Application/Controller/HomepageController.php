@@ -9,6 +9,10 @@ class HomepageController {
     }
 
     public function index(): TemplateResponse {
-        return new TemplateResponse('index.html.twig');
+        return new TemplateResponse('page/homepage/index.html.twig');
+    }
+
+    public function app(): TemplateResponse {
+        return new TemplateResponse('page/homepage/app.html.twig');
     }
 }

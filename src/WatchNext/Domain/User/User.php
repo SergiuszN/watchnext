@@ -32,6 +32,14 @@ class User {
         return $this->id;
     }
 
+    public function getPassword(): string {
+        return $this->password;
+    }
+
+    public function getRememberMeToken(): ?string {
+        return $this->rememberMeToken;
+    }
+
     public function rememberMe(string $key, string $token): void {
         $this->rememberMeKey = $key;
         $this->rememberMeToken = $token;

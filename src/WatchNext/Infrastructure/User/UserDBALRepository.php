@@ -16,7 +16,7 @@ class UserDBALRepository implements UserRepository {
 
     public function save(User $user): void {
         if ($user->getId() === null) {
-             $this->connection->prepare("
+            $this->connection->prepare("
                 INSERT INTO `user`(
                     `login`, 
                     `password`,
@@ -59,9 +59,29 @@ class UserDBALRepository implements UserRepository {
 
     public function doesExist(string $login): bool {
         return $this->connection->prepare("
-            SELECT COUNT(`id`) FROM `user` WHERE `login` = :login
+            SELECT COUNT(`id`) FROM `user` WHERE `login` = :login LIMIT 1
         ")
             ->executeQuery(['login' => $login])
             ->fetchOne() > 0;
+    }
+
+    public function findByLogin(string $login): ?User {
+        $data = $this->connection->prepare("
+            SELECT * FROM user WHERE login = :login LIMIT 1
+        ")
+            ->executeQuery(['login' => $login])
+            ->fetchAssociative();
+
+        return $data ? User::fromDatabase($data) : null;
+    }
+
+    public function findByRememberMeKey(string $rememberMeKey): ?User {
+        $data = $this->connection->prepare("
+            SELECT * FROM user WHERE remember_me_key = :remember_me_key LIMIT 1
+        ")
+            ->executeQuery(['remember_me_key' => $rememberMeKey])
+            ->fetchAssociative();
+
+        return $data ? User::fromDatabase($data) : null;
     }
 }

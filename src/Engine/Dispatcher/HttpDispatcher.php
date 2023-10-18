@@ -20,6 +20,7 @@ use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Router\RouterDispatcher;
 use WatchNext\Engine\Router\RouterDispatcherStatusEnum;
+use WatchNext\Engine\Session\Auth;
 use WatchNext\Engine\Session\Security;
 use WatchNext\Engine\Template\TemplateEngine;
 
@@ -29,11 +30,11 @@ class HttpDispatcher {
      */
     public function dispatch(): void {
         (new Env())->load();
+        (new VarDirectory())->init();
 
         $devTools = new DevTools();
         $devTools->start();
 
-        (new VarDirectory())->init();
         (new Container())->init();
         (new KernelEventRegistration())->register();
 
@@ -47,7 +48,7 @@ class HttpDispatcher {
         $eventDispatcher = new EventDispatcher();
         $route = $container->get(RouterDispatcher::class)->dispatch();
 
-        $devTools->add('route.dispatched', $route);
+        $devTools->add('route.dispatched');
 
         $eventDispatcher->dispatch(new RequestEvent());
 
