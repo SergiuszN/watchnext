@@ -46,6 +46,7 @@ class CliDispatcher {
             'migrations:generate' => \WatchNext\Engine\Cli\MigrationsGenerateCommand::class,
             'migrations:migrate' => \WatchNext\Engine\Cli\MigrationsMigrateCommand::class,
             'translations:reorder' => \WatchNext\Engine\Cli\TranslatorOrderKeysCommand::class,
+            'translations:check' => \WatchNext\Engine\Cli\TranslatorCheckCommand::class,
         ];
     }
 }
