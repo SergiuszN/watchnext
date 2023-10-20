@@ -7,4 +7,6 @@ return [
     'security_register' => [['GET', 'POST'], '/register', \WatchNext\WatchNext\Application\Controller\SecurityController::class . '::' . 'register'],
     'security_login' => [['GET', 'POST'], '/login', \WatchNext\WatchNext\Application\Controller\SecurityController::class . '::' . 'login'],
     'security_logout' => ['GET', '/logout', \WatchNext\WatchNext\Application\Controller\SecurityController::class . '::' . 'logout'],
+    'security_not_found' => ['GET', '/not-found', \WatchNext\WatchNext\Application\Controller\SecurityController::class . '::' . 'notFound'],
+    'security_access_denied' => ['GET', '/access-denied', \WatchNext\WatchNext\Application\Controller\SecurityController::class . '::' . 'accessDenied'],
 ];

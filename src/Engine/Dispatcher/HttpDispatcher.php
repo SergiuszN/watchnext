@@ -17,12 +17,15 @@ use WatchNext\Engine\Logger;
 use WatchNext\Engine\Response\JsonResponse;
 use WatchNext\Engine\Response\RedirectResponse;
 use WatchNext\Engine\Response\TemplateResponse;
+use WatchNext\Engine\Router\AccessDeniedException;
 use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Router\RouterDispatcher;
 use WatchNext\Engine\Router\RouterDispatcherStatusEnum;
 use WatchNext\Engine\Session\Auth;
 use WatchNext\Engine\Session\Security;
+use WatchNext\Engine\Session\SecurityFirewall;
 use WatchNext\Engine\Template\TemplateEngine;
+use WatchNext\WatchNext\Application\Controller\SecurityController;
 
 class HttpDispatcher {
     /**
@@ -55,8 +58,10 @@ class HttpDispatcher {
         $devTools->add('request.events.dispatched');
 
         if ($route->status === RouterDispatcherStatusEnum::FOUND) {
-
             try {
+                $firewall = $container->get(SecurityFirewall::class);
+                $firewall->throwIfPathNotAccessible($_SERVER['REQUEST_URI']);
+
                 $controller = (new Container())->get($route->class);
                 $response = $controller->{$route->action}(...$route->vars);
 
@@ -67,7 +72,12 @@ class HttpDispatcher {
                 $devTools->add('response.events.dispatched');
 
                 $this->render($response, $devTools);
-            } catch (Throwable $throwable) {
+            }
+            catch (AccessDeniedException $accessDeniedException) {
+                $securityController = $container->get(SecurityController::class);
+                $this->render($securityController->accessDenied(), $devTools);
+            }
+            catch (Throwable $throwable) {
                 (new Logger())->error($throwable);
                 $eventDispatcher->dispatch(new ExceptionEvent($throwable));
 
@@ -76,8 +86,8 @@ class HttpDispatcher {
 
             die();
         } else {
-            $devTools->end(false);
-            throw new \HttpException('Not found', 404);
+            $securityController = $container->get(SecurityController::class);
+            $this->render($securityController->notFound(), $devTools);
         }
     }
 

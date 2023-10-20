@@ -41,6 +41,9 @@ class TranslatorCheckCommand implements CliCommandInterface {
             $diff = array_diff_key($baseTranslations, $translations);
             $output->writeln('Found ' . count($diff) . ' missed keys');
             foreach ($diff as $key => $value) {
+                $value = str_replace("'", "\'", $value);
+                $value = str_replace(["\r", "\n"], '', $value);
+
                 $newFile .= "\t'{$key}' => '#!Change ME: {$value}',\n";
             }
 

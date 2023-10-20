@@ -66,4 +66,12 @@ readonly class SecurityController {
         $this->security->unathorize();
         return new RedirectResponse('security_login');
     }
+
+    public function accessDenied(): RedirectResponse {
+        return new RedirectResponse('security_login');
+    }
+
+    public function notFound(): TemplateResponse {
+        return new TemplateResponse('page/security/not_found.html.twig');
+    }
 }

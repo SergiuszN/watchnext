@@ -65,4 +65,8 @@ class User {
             'roles' => json_encode($this->roles),
         ];
     }
+
+    public function getRoles(): array {
+        return $this->roles;
+    }
 }

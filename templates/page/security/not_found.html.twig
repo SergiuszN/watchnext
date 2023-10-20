@@ -1,0 +1,9 @@
+{% extends 'index.html.twig' %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1>{{ t.trans('security.notFound.header')|raw }}</h1>
+        <p>{{ t.trans('security.notFound.text') }}</p>
+        <a href="{{ route.make('homepage_index') }}">{{ t.trans('security.notFound.takeMeFromHere') }}</a>
+    </div>
+{% endblock %}

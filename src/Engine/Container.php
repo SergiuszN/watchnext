@@ -18,6 +18,7 @@ use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Session\Auth;
 use WatchNext\Engine\Session\FlashBag;
 use WatchNext\Engine\Session\Security;
+use WatchNext\Engine\Session\SecurityFirewall;
 use WatchNext\Engine\Template\Asset;
 use WatchNext\Engine\Template\Language;
 use WatchNext\Engine\Template\TemplateEngine;
@@ -84,8 +85,9 @@ class Container {
             Mailer::class => fn() => new Mailer(),
 
             FlashBag::class => fn() => new FlashBag(),
-            Auth::class => fn() => fn() => new Auth(),
+            Auth::class => fn() => new Auth(),
             Security::class => autowire(Security::class),
+            SecurityFirewall::class => autowire(SecurityFirewall::class),
 
             CacheClearCommand::class => autowire(CacheClearCommand::class),
             MigrationsGenerateCommand::class => autowire(MigrationsGenerateCommand::class),

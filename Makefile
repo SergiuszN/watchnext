@@ -64,6 +64,12 @@ npmbuild:
 			npm run build; \
 		"
 
+trans:
+	@$(PHP_CONT) sh -c "\
+			php console.php translations:check --base=en; \
+			php console.php translations:reorder; \
+		"
+
 #push: ## Check project before push
 #	$(MAKE)	fix-cs
 #	$(MAKE) dep-trac
