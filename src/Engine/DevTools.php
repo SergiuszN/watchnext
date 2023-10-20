@@ -62,6 +62,9 @@ class DevTools {
             'data' => $data,
         ];
 
+        $requests[self::$id]['ended'] = microtime(true) * 1000000;
+        $requests[self::$id]['executed_in'] = $requests[self::$id]['ended'] - $requests[self::$id]['started'];
+
         $this->storage->set('dev.tools', $requests);
     }
 
@@ -88,7 +91,7 @@ class DevTools {
     public function render(): void {
         $requests = $this->storage->read('dev.tools') ?? [];
 
-        echo "<hr style='margin-top: 100px'>";
+        echo "<hr style='margin-top: 1000px'>";
 
         foreach (array_reverse($requests) as $request) {
             $microtime = $request['executed_in'];
@@ -98,13 +101,13 @@ class DevTools {
             echo '--------------------------------------------------------------------<br>';
             echo "Request: {$request['method']} to {$request['uri']}<br>";
 
-            if ($request['route']) {
+            if (isset($request['route'])) {
                 /** @var DispatchedRoute $route */
                 $route = $request['route'];
                 echo "Route: {$route->routeName}<br>";
             }
 
-            if ($request['user']) {
+            if (isset($request['user'])) {
                 /** @var User $user */
                 $user = $request['user'];
                 echo "Logged user: {$user->getId()}<br>";
