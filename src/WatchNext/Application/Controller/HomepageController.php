@@ -14,13 +14,7 @@ class HomepageController {
     }
 
     public function app(): TemplateResponse {
-
-        echo "<pre>";
-        var_dump('ROLE_USER_VIEW');
-        var_dump($this->firewall->isGranted('ROLE_USER_VIEW'));
-
-
-        echo "</pre>";
+        $this->firewall->throwIfNotGranted('ROLE_HOMEPAGE_APP');
 
         return new TemplateResponse('page/homepage/app.html.twig');
     }
