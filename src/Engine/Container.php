@@ -5,6 +5,11 @@ namespace WatchNext\Engine;
 use DI\Container as DIContainer;
 use DI\ContainerBuilder;
 use Exception;
+use Twig\Cache\CacheInterface;
+use WatchNext\Engine\Cli\CacheClearCommand;
+use WatchNext\Engine\Cli\MigrationsGenerateCommand;
+use WatchNext\Engine\Cli\MigrationsMigrateCommand;
+use WatchNext\Engine\Cli\TranslatorOrderKeysCommand;
 use WatchNext\Engine\Database\Database;
 use WatchNext\Engine\Event\EventDispatcher;
 use WatchNext\Engine\Mail\Mailer;
@@ -65,22 +70,27 @@ class Container {
         return [
             'root.dir' => (new Config())->getRootPath(),
 
-            Container::class => fn () => new Container(),
-            Database::class => fn () => new Database(),
-            TemplateEngine::class => fn () => new TemplateEngine(),
+            Container::class => fn() => new Container(),
+            Database::class => fn() => new Database(),
+            TemplateEngine::class => fn() => new TemplateEngine(),
             Asset::class => autowire(Asset::class),
-            Request::class => fn () => new Request(),
+            Request::class => fn() => new Request(),
 
             RouteGenerator::class => autowire(RouteGenerator::class),
 
-            Logger::class => fn() => fn () => new Logger(),
-            EventDispatcher::class => fn () => new EventDispatcher(),
-            Language::class => fn () => new Language(),
-            Mailer::class => fn () => new Mailer(),
+            Logger::class => fn() => fn() => new Logger(),
+            EventDispatcher::class => fn() => new EventDispatcher(),
+            Language::class => fn() => new Language(),
+            Mailer::class => fn() => new Mailer(),
 
-            FlashBag::class => fn () => new FlashBag(),
-            Auth::class => fn () => fn () => new Auth(),
+            FlashBag::class => fn() => new FlashBag(),
+            Auth::class => fn() => fn() => new Auth(),
             Security::class => autowire(Security::class),
+
+            CacheClearCommand::class => autowire(CacheClearCommand::class),
+            MigrationsGenerateCommand::class => autowire(MigrationsGenerateCommand::class),
+            MigrationsMigrateCommand::class => autowire(MigrationsMigrateCommand::class),
+            TranslatorOrderKeysCommand::class => autowire(TranslatorOrderKeysCommand::class),
         ];
     }
 }

@@ -17,7 +17,9 @@ class CliDispatcher {
     #[NoReturn] public function dispatch(): void {
         (new Env())->load();
         (new VarDirectory())->init();
-        (new Container())->init();
+
+        $container = new Container();
+        $container->init();
 
         $commands = (new Config())->get('cli.php');
         $commands = array_merge($commands, $this->getKernelCliCommands());
@@ -28,7 +30,7 @@ class CliDispatcher {
         foreach ($commands as $commandName => $commandClass) {
             if ($commandName === $selectedCommandName) {
                 /** @var CliCommandInterface $command */
-                $command = new $commandClass();
+                $command = $container->get($commandClass);
                 $command->execute();
                 die();
             }
@@ -43,6 +45,7 @@ class CliDispatcher {
             'cache:clear' => \WatchNext\Engine\Cli\CacheClearCommand::class,
             'migrations:generate' => \WatchNext\Engine\Cli\MigrationsGenerateCommand::class,
             'migrations:migrate' => \WatchNext\Engine\Cli\MigrationsMigrateCommand::class,
+            'translations:reorder' => \WatchNext\Engine\Cli\TranslatorOrderKeysCommand::class,
         ];
     }
 }
