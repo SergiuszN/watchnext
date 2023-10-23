@@ -15,6 +15,10 @@ class Auth {
         return self::$user;
     }
 
+    public function getUserId(): ?int {
+        return self::$user?->getId();
+    }
+
     public function isAuth(): bool {
         return isset($_SESSION['main.auth.user']);
     }

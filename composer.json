@@ -8,6 +8,7 @@
     },
     "require": {
         "ext-memcached": "*",
+        "ext-curl": "*",
         "php-di/php-di": "^7.0",
         "vlucas/phpdotenv": "^5.5",
         "nikic/fast-route": "^1.3",

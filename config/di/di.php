@@ -6,4 +6,5 @@ return [
     \WatchNext\WatchNext\Application\Controller\SecurityController::class => \DI\autowire(\WatchNext\WatchNext\Application\Controller\SecurityController::class),
 
     \WatchNext\WatchNext\Domain\User\UserRepository::class => \DI\autowire(\WatchNext\WatchNext\Infrastructure\User\UserDBALRepository::class),
+    \WatchNext\WatchNext\Domain\Item\ItemRepository::class => \DI\autowire(\WatchNext\WatchNext\Infrastructure\Item\ItemDBALRepository::class),
 ];

@@ -19,11 +19,16 @@ return [
 
         'ROLE_USER_GR' => [
             'ROLE_HOMEPAGE_GR',
+            'ROLE_ITEM_GR',
         ],
 
         // ---------------- actions ----------------
         'ROLE_HOMEPAGE_GR' => [
             'ROLE_HOMEPAGE_APP',
+        ],
+
+        'ROLE_ITEM_GR' => [
+            'ROLE_ITEM_ADD',
         ]
     ],
     'access_control' => [

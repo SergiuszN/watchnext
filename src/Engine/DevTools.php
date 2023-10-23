@@ -62,6 +62,7 @@ class DevTools {
             'data' => $data,
         ];
 
+        $requests[self::$id]['max_memory'] = memory_get_peak_usage(false);
         $requests[self::$id]['ended'] = microtime(true) * 1000000;
         $requests[self::$id]['executed_in'] = $requests[self::$id]['ended'] - $requests[self::$id]['started'];
 
@@ -91,7 +92,7 @@ class DevTools {
     public function render(): void {
         $requests = $this->storage->read('dev.tools') ?? [];
 
-        echo "<hr style='margin-top: 1000px'>";
+        echo "<hr style='margin-top: 100px'>";
 
         foreach (array_reverse($requests) as $request) {
             $microtime = $request['executed_in'];

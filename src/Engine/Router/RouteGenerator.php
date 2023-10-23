@@ -45,4 +45,8 @@ class RouteGenerator {
 
         return !$absolute ? $route : $_ENV['SITE_URL'] . $route;
     }
+
+    public function startsFrom(string $patch): bool {
+        return str_starts_with($patch, $_SERVER['REQUEST_ROUTE']);
+    }
 }

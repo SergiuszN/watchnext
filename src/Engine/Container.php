@@ -5,7 +5,6 @@ namespace WatchNext\Engine;
 use DI\Container as DIContainer;
 use DI\ContainerBuilder;
 use Exception;
-use Twig\Cache\CacheInterface;
 use WatchNext\Engine\Cli\CacheClearCommand;
 use WatchNext\Engine\Cli\MigrationsGenerateCommand;
 use WatchNext\Engine\Cli\MigrationsMigrateCommand;

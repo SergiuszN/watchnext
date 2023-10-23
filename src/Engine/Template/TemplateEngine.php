@@ -14,6 +14,7 @@ use WatchNext\Engine\Container;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Router\RouteGenerator;
+use WatchNext\Engine\Session\Auth;
 use WatchNext\Engine\Session\CSFR;
 use WatchNext\Engine\Session\FlashBag;
 
@@ -66,5 +67,6 @@ class TemplateEngine {
         $this->addGlobal('asset', (new Container())->get(Asset::class));
         $this->addGlobal('route', new RouteGenerator());
         $this->addGlobal('request', new Request());
+        $this->addGlobal('auth', new Auth());
     }
 }

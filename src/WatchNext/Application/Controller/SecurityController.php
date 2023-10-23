@@ -5,7 +5,6 @@ namespace WatchNext\WatchNext\Application\Controller;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Response\RedirectResponse;
 use WatchNext\Engine\Response\TemplateResponse;
-use WatchNext\Engine\Session\Auth;
 use WatchNext\Engine\Session\FlashBag;
 use WatchNext\Engine\Session\Security;
 use WatchNext\Engine\Template\Language;

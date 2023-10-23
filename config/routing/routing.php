@@ -9,4 +9,6 @@ return [
     'security_logout' => ['GET', '/logout', \WatchNext\WatchNext\Application\Controller\SecurityController::class . '::' . 'logout'],
     'security_not_found' => ['GET', '/not-found', \WatchNext\WatchNext\Application\Controller\SecurityController::class . '::' . 'notFound'],
     'security_access_denied' => ['GET', '/access-denied', \WatchNext\WatchNext\Application\Controller\SecurityController::class . '::' . 'accessDenied'],
+
+    'item_add' => [['GET', 'POST'], '/item/add', \WatchNext\WatchNext\Application\Controller\ItemController::class . '::' . 'add'],
 ];

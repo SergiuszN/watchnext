@@ -40,6 +40,14 @@ class User {
         return $this->rememberMeToken;
     }
 
+    public function getRoles(): array {
+        return $this->roles;
+    }
+
+    public function getLogin(): string {
+        return $this->login;
+    }
+
     public function rememberMe(string $key, string $token): void {
         $this->rememberMeKey = $key;
         $this->rememberMeToken = $token;
@@ -64,9 +72,5 @@ class User {
             'remember_me_token' => $this->rememberMeToken,
             'roles' => json_encode($this->roles),
         ];
-    }
-
-    public function getRoles(): array {
-        return $this->roles;
     }
 }

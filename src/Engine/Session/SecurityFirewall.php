@@ -36,6 +36,10 @@ class SecurityFirewall {
     public function isGranted(string $role, ?User $user = null): bool {
         $userRoles = $user ? $user->getRoles() : self::$loggedUserRoles;
 
+        if (!is_array($userRoles)) {
+            return false;
+        }
+
         if (in_array($role, $userRoles)) {
             return true;
         }
@@ -54,6 +58,10 @@ class SecurityFirewall {
     }
 
     public function throwIfPathNotAccessible(string $uri): void {
+        if (self::$access === null) {
+            return;
+        }
+
         foreach (self::$access as $pattern => $roles) {
             if (str_starts_with($uri, $pattern)) {
                 foreach ($roles as $role) {

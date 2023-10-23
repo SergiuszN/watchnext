@@ -17,7 +17,7 @@ class UserDBALRepository implements UserRepository {
     public function save(User $user): void {
         if ($user->getId() === null) {
             $this->connection->prepare("
-                INSERT INTO `user`(
+                INSERT INTO `user` (
                     `login`, 
                     `password`,
                     `created_at`,
@@ -67,7 +67,7 @@ class UserDBALRepository implements UserRepository {
 
     public function findByLogin(string $login): ?User {
         $data = $this->connection->prepare("
-            SELECT * FROM user WHERE login = :login LIMIT 1
+            SELECT * FROM `user` WHERE `login` = :login LIMIT 1
         ")
             ->executeQuery(['login' => $login])
             ->fetchAssociative();
@@ -77,7 +77,7 @@ class UserDBALRepository implements UserRepository {
 
     public function findByRememberMeKey(string $rememberMeKey): ?User {
         $data = $this->connection->prepare("
-            SELECT * FROM user WHERE remember_me_key = :remember_me_key LIMIT 1
+            SELECT * FROM `user` WHERE `remember_me_key` = :remember_me_key LIMIT 1
         ")
             ->executeQuery(['remember_me_key' => $rememberMeKey])
             ->fetchAssociative();
