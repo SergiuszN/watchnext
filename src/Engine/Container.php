@@ -34,6 +34,10 @@ class Container {
             throw new Exception('Container already created!');
         }
 
+        $this->build();
+    }
+
+    private function build(): void {
         $env = $_ENV['APP_ENV'];
         $config = new Config();
 
@@ -50,6 +54,10 @@ class Container {
         }
 
         self::$diContainer = $builder->build();
+    }
+
+    public function warmup(): void {
+        $this->build();
     }
 
     /**

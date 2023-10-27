@@ -79,6 +79,10 @@ readonly class RouterDispatcher {
         ]);
     }
 
+    public function warmup(): void {
+        $this->getDispatcher();
+    }
+
     private function getUri(): string {
         $uri = $_SERVER['REQUEST_URI'];
 

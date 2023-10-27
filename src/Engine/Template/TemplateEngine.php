@@ -2,6 +2,7 @@
 
 namespace WatchNext\Engine\Template;
 
+use Exception;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -46,6 +47,14 @@ class TemplateEngine {
      */
     public function render(TemplateResponse $templateResponse): string {
         return self::$twig->render($templateResponse->template, $templateResponse->params);
+    }
+
+    public function warmup(string $template): void {
+        try {
+            self::$twig->render($template);
+        } catch (Exception $exception) {
+            // Silence is golden
+        }
     }
 
     public function addGlobal(string $name, $value): void {

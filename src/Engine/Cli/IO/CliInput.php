@@ -13,14 +13,14 @@ class CliInput {
         $this->input = implode(' ', $argv);
     }
 
-    public function getOption(string $name): string {
-        preg_match('/--' . $name . '=([^ ]+)/', $this->input, $option);
+    public function getOption(string $name): ?string {
+        preg_match('/--(' . $name . ')=?([^ ]+)?/', $this->input, $option);
 
         if (empty($option)) {
             throw new \Exception("There no $name option!");
         }
 
-        return $option[1];
+        return $option[2] ?? null;
     }
 
     public function isOptionExist(string $name): bool {
