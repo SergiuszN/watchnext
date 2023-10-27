@@ -6,6 +6,7 @@ use WatchNext\Engine\Router\DispatchedRoute;
 
 class Request {
     static private ?DispatchedRoute $route = null;
+    static private array $params = [];
     private array $server;
     private array $get;
     private array $post;
@@ -18,6 +19,10 @@ class Request {
 
     public function setRoute(DispatchedRoute $route): void {
         self::$route = $route;
+    }
+
+    public function setParams(array $params): void {
+        self::$params = $params;
     }
 
     public function getMethod(): string {
@@ -38,5 +43,9 @@ class Request {
 
     public function getRoute(): ?DispatchedRoute {
         return self::$route;
+    }
+
+    public function getParam(string $name, mixed $defaultValue = null): mixed {
+        return self::$params[$name] ?? $defaultValue;
     }
 }

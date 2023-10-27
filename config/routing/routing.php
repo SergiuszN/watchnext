@@ -11,4 +11,7 @@ return [
     'security_access_denied' => ['GET', '/access-denied', \WatchNext\WatchNext\Application\Controller\SecurityController::class . '::' . 'accessDenied'],
 
     'item_add' => [['GET', 'POST'], '/item/add', \WatchNext\WatchNext\Application\Controller\ItemController::class . '::' . 'add'],
+
+    'catalog_show' => ['GET', '/catalog/{catalog}', \WatchNext\WatchNext\Application\Controller\CatalogController::class . '::' . 'show'],
+    'catalog_show_page' => ['GET', '/catalog/{catalog}/{page}', \WatchNext\WatchNext\Application\Controller\CatalogController::class . '::' . 'show'],
 ];

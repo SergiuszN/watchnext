@@ -3,6 +3,7 @@
 namespace WatchNext\Engine;
 
 use WatchNext\Engine\Cache\FileSystemCache;
+use WatchNext\Engine\Database\Database;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Router\DispatchedRoute;
 use WatchNext\Engine\Session\Auth;
@@ -11,6 +12,7 @@ use WatchNext\WatchNext\Domain\User\User;
 class DevTools {
     private bool $enabled;
     private FileSystemCache $storage;
+    private ?Database $database;
 
     private static string $id = '';
 
@@ -21,6 +23,10 @@ class DevTools {
 
         $this->enabled = $_ENV['APP_ENV'] === 'dev';
         $this->storage = new FileSystemCache();
+
+        if ($this->enabled) {
+            $this->database = new Database();
+        }
     }
 
     public function start(): void {
@@ -39,6 +45,7 @@ class DevTools {
             'uri' => $_SERVER['REQUEST_URI'],
             'started' => microtime(true) * 1000000,
             'events' => [],
+            'database' => [],
         ];
 
         $this->storage->set('dev.tools', $requests);
@@ -79,6 +86,7 @@ class DevTools {
         $requests[self::$id]['max_memory'] = memory_get_peak_usage(false);
         $requests[self::$id]['user'] = (new Auth())->getUser();
         $requests[self::$id]['route'] = (new Request())->getRoute();
+        $requests[self::$id]['database'] = $this->database?->getLogs();
         $requests[self::$id]['ended'] = microtime(true) * 1000000;
         $requests[self::$id]['executed_in'] = $requests[self::$id]['ended'] - $requests[self::$id]['started'];
 
@@ -116,6 +124,13 @@ class DevTools {
                 echo "No user logged<br>";
             }
 
+            if (!empty($request['database'])) {
+                $countOfQueries = count($request['database']);
+                $timeOfQueries = round(array_sum(array_map(fn ($log) => $log['time'], $request['database'])) * 1000000);
+
+                echo "Database queries: {$countOfQueries} in $timeOfQueries (microseconds)<br>";
+            }
+
             echo "Executed in: {$microtime} (microseconds)  / {$time} (seconds)<br>";
             echo "Memory used: {$memoryMB} Mb<br><br>";
 
@@ -128,6 +143,19 @@ class DevTools {
                     var_dump($event['data']);
                     echo '</pre>';
                 }
+            }
+
+            foreach ($request['database'] as $query) {
+                echo "<br>";
+                $microtime = round($query['time'] * 1000000);
+                echo "Query ($microtime microseconds): <br>";
+                echo '<pre>';
+                var_dump($query['query']);
+                echo '</pre>';
+                echo "Params: <br>";
+                echo '<pre>';
+                var_dump($query['params']);
+                echo '</pre>';
             }
         }
     }

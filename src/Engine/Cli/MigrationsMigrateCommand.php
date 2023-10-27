@@ -2,7 +2,6 @@
 
 namespace WatchNext\Engine\Cli;
 
-use Doctrine\DBAL\Connection;
 use WatchNext\Engine\Cli\IO\CliInput;
 use WatchNext\Engine\Cli\IO\CliOutput;
 use WatchNext\Engine\Config;
@@ -11,7 +10,7 @@ use WatchNext\Engine\Database\Database;
 use WatchNext\Engine\Database\Migration;
 
 class MigrationsMigrateCommand implements CliCommandInterface {
-    private Connection $connection;
+    private Database $database;
     private CliInput $input;
     private CliOutput $output;
     private array $migrations;
@@ -20,7 +19,7 @@ class MigrationsMigrateCommand implements CliCommandInterface {
 
     public function __construct() {
         $this->container = new Container();
-        $this->connection = $this->container->get(Database::class)->getConnection();
+        $this->database = $this->container->get(Database::class);
         $this->input = new CliInput();
         $this->output = new CliOutput();
     }
@@ -54,7 +53,7 @@ class MigrationsMigrateCommand implements CliCommandInterface {
 
         usort($migrationsToMigrate, fn($left, $right) => $left['version'] <=> $right['version']);
 
-        $statement = $this->connection->prepare("
+        $statement = $this->database->prepare("
             INSERT INTO `migrations`(`version`, `name`, `executed_at`) VALUES (:version, :name, NOW());
         ");
 
@@ -63,10 +62,10 @@ class MigrationsMigrateCommand implements CliCommandInterface {
             $migrationClass = "Migrations\\{$migration['name']}";
 
             /** @var Migration $migrationObject */
-            $migrationObject = new $migrationClass($this->container, $this->connection);
+            $migrationObject = new $migrationClass($this->container, $this->database);
             $migrationObject->up();
 
-            $statement->executeStatement(['version' => $migration['version'], 'name' => $migration['name']]);
+            $statement->execute(['version' => $migration['version'], 'name' => $migration['name']]);
         }
     }
 
@@ -77,7 +76,7 @@ class MigrationsMigrateCommand implements CliCommandInterface {
 
         usort($migrationsToMigrate, fn($left, $right) => $right['version'] <=> $left['version']);
 
-        $statement = $this->connection->prepare("
+        $statement = $this->database->prepare("
             DELETE FROM `migrations` WHERE `version`=:version;
         ");
 
@@ -86,30 +85,30 @@ class MigrationsMigrateCommand implements CliCommandInterface {
             $migrationClass = "Migrations\\{$migration['name']}";
 
             /** @var Migration $migrationObject */
-            $migrationObject = new $migrationClass($this->container, $this->connection);
+            $migrationObject = new $migrationClass($this->container, $this->database);
             $migrationObject->down();
 
-            $statement->executeStatement(['version' => $migration['version']]);
+            $statement->execute(['version' => $migration['version']]);
         }
     }
 
     /** @noinspection PhpUnhandledExceptionInspection */
     private function createMigrationsTableIfNotExist(): void {
-        $database = $this->connection->getDatabase();
+        $database = $this->database->getDatabase();
 
-        $result = $this->connection
+        $result = $this->database
             ->prepare("
                 SELECT count(*) AS cnt
                 FROM information_schema.tables
                 WHERE table_schema = :database
                 AND table_name = 'migrations'
             ")
-            ->executeQuery(['database' => $database]);
+            ->execute(['database' => $database]);
 
-        $count = (int) $result->fetchAssociative()['cnt'];
+        $count = (int) $result->fetchSingle();
 
         if ($count === 0) {
-            $this->connection->executeStatement("
+            $this->database->execute("
                 CREATE TABLE `migrations` (
                     version INT,
                     name VARCHAR(255),
@@ -123,11 +122,10 @@ class MigrationsMigrateCommand implements CliCommandInterface {
 
     /** @noinspection PhpUnhandledExceptionInspection */
     private function getCurrentVersion(): int {
-        return (int) $this->connection
-            ->executeQuery("
-                SELECT MAX(version) AS current_version FROM `migrations` WHERE 1;
-            ")
-            ->fetchAssociative()['current_version'];
+        return (int) $this->database
+            ->prepare("SELECT MAX(version) AS current_version FROM `migrations` WHERE 1;")
+            ->execute()
+            ->fetchSingle();
     }
 
     private function getLastVersionInFiles(): int {
@@ -159,8 +157,8 @@ class MigrationsMigrateCommand implements CliCommandInterface {
     }
 
     private function loadMigratedMigrations() {
-        $result = $this->connection->executeQuery("SELECT * FROM `migrations` WHERE 1;");
-        $migrated = $result->fetchAllAssociative();
+        $result = $this->database->prepare("SELECT * FROM `migrations` WHERE 1;")->execute();
+        $migrated = $result->fetchAll();
 
         $this->migrated = [];
         foreach ($migrated as $migration) {

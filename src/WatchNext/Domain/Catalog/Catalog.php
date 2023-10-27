@@ -76,6 +76,7 @@ class Catalog {
      */
     public static function fromDatabase(array $item): Catalog {
         $model = new Catalog();
+        $model->id = (int) $item['id'];
         $model->owner = (int) $item['owner'];
         $model->shared = (bool) $item['shared'];
         $model->default = (bool) $item['default'];

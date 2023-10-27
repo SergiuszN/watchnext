@@ -20,6 +20,7 @@ return [
         'ROLE_USER_GR' => [
             'ROLE_HOMEPAGE_GR',
             'ROLE_ITEM_GR',
+            'ROLE_CATALOG_GR',
         ],
 
         // ---------------- actions ----------------
@@ -29,6 +30,10 @@ return [
 
         'ROLE_ITEM_GR' => [
             'ROLE_ITEM_ADD',
+        ],
+
+        'ROLE_CATALOG_GR' => [
+            'ROLE_CATALOG_SHOW'
         ]
     ],
     'access_control' => [

@@ -32,6 +32,7 @@ readonly class RouterDispatcher {
             case Dispatcher::FOUND:
                 [$class, $action, $routeName] = explode('::', $routeInfo[1]);
                 $_SERVER['REQUEST_ROUTE'] = $routeName;
+                $_SERVER['REQUEST_ROUTE_PARAMS'] = $routeInfo[2];
 
                 $dispatcherRoute = new DispatchedRoute(
                     RouterDispatcherStatusEnum::FOUND,
@@ -42,6 +43,7 @@ readonly class RouterDispatcher {
                 );
 
                 $this->request->setRoute($dispatcherRoute);
+                $this->request->setParams($routeInfo[2]);
 
                 return $dispatcherRoute;
         }

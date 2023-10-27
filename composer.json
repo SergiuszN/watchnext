@@ -9,15 +9,14 @@
     "require": {
         "ext-memcached": "*",
         "ext-curl": "*",
+        "ext-pdo": "*",
         "php-di/php-di": "^7.0",
         "vlucas/phpdotenv": "^5.5",
         "nikic/fast-route": "^1.3",
         "twig/twig": "^3.0",
-        "doctrine/dbal": "^3.7",
         "monolog/monolog": "^3.4",
         "webmozart/assert": "^1.11",
-        "league/event": "^3.0",
-        "symfony/mailer": "^6.3"
+        "league/event": "^3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^10"

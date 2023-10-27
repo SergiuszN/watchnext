@@ -1,0 +1,27 @@
+{% if pagination.count > 1 %}
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            {% if request.getParam('page', 1) != 1 %}
+                <li class="page-item"><a class="page-link" href="{{ route.makePage(1) }}"><i class="fa-solid fa-angles-left"></i></a></li>
+            {% endif %}
+
+            {% if request.getParam('page', 1) > 1 %}
+                <li class="page-item"><a class="page-link" href="{{ route.makePage(request.getParam('page', 1)-1) }}"><i class="fa-solid fa-angle-left"></i></a></li>
+            {% endif %}
+
+            {% for page in 1..pagination.count %}
+                {% if page > request.getParam('page', 1) - 5 and page < request.getParam('page', 1) + 5 %}
+                    <li class="page-item {% if request.getParam('page', 1) == page %}active{% endif %}"><a class="page-link" href="{{ route.makePage(page) }}">{{ page }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if request.getParam('page', 1) < pagination.count %}
+                <li class="page-item"><a class="page-link" href="{{ route.makePage(request.getParam('page', 1)+1) }}"><i class="fa-solid fa-angle-right"></i></a></li>
+            {% endif %}
+
+            {% if request.getParam('page', 1) != pagination.count %}
+                <li class="page-item"><a class="page-link" href="{{ route.makePage(pagination.count) }}"><i class="fa-solid fa-angles-right"></i></a></li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}

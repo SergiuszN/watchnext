@@ -18,10 +18,10 @@ use WatchNext\Engine\Response\JsonResponse;
 use WatchNext\Engine\Response\RedirectResponse;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Router\AccessDeniedException;
+use WatchNext\Engine\Router\NotFoundException;
 use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Router\RouterDispatcher;
 use WatchNext\Engine\Router\RouterDispatcherStatusEnum;
-use WatchNext\Engine\Session\Auth;
 use WatchNext\Engine\Session\Security;
 use WatchNext\Engine\Session\SecurityFirewall;
 use WatchNext\Engine\Template\TemplateEngine;
@@ -76,6 +76,14 @@ class HttpDispatcher {
             catch (AccessDeniedException $accessDeniedException) {
                 $securityController = $container->get(SecurityController::class);
                 $this->render($securityController->accessDenied(), $devTools);
+
+                die();
+            }
+            catch (NotFoundException $notFoundException) {
+                $securityController = $container->get(SecurityController::class);
+                $this->render($securityController->notFound(), $devTools);
+
+                die();
             }
             catch (Throwable $throwable) {
                 (new Logger())->error($throwable);
