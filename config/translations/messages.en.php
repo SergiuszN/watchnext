@@ -25,4 +25,5 @@ return [
 	'user.password.assert.areNotTheSame' => 'Two password must be are the same',
 	'user.password.assert.minLength' => 'Password must be at least 8 symbol long',
 	'user.password.assert.sameAsLogin' => 'Login and password can\'t be the same',
+    'command.createDefaultUserCatalog.defaultCatalog' => 'My Catalog',
 ];

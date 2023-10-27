@@ -22,7 +22,10 @@ use WatchNext\Engine\Session\FlashBag;
 class TemplateEngine {
     private static ?Environment $twig = null;
 
-    public function __construct() {
+    /**
+     * @throws Exception
+     */
+    public function __construct(Container $container) {
         if (self::$twig) {
             return;
         }
@@ -37,7 +40,8 @@ class TemplateEngine {
             'debug' => $debug,
         ]);
 
-        $this->addDefaultGlobals();
+        $this->addDefaultGlobals($container);
+        $this->addUserGlobals($config, $container);
     }
 
     /**
@@ -69,13 +73,23 @@ class TemplateEngine {
         self::$twig->addFunction($function);
     }
 
-    private function addDefaultGlobals(): void {
+    private function addDefaultGlobals(Container $container): void {
         $this->addGlobal('flash', new FlashBag());
         $this->addGlobal('t', new Language());
         $this->addGlobal('csfr', new CSFR());
-        $this->addGlobal('asset', (new Container())->get(Asset::class));
+        $this->addGlobal('asset', $container->get(Asset::class));
         $this->addGlobal('route', new RouteGenerator());
         $this->addGlobal('request', new Request());
         $this->addGlobal('auth', new Auth());
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function addUserGlobals(Config $config, Container $container): void {
+        $globals = $config->get('twigGlobals.php');
+        foreach ($globals as $name => $globalClass) {
+            $this->addGlobal($name, $container->get($globalClass));
+        }
     }
 }

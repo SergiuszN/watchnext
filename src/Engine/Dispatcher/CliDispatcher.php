@@ -16,7 +16,7 @@ class CliDispatcher {
      */
     #[NoReturn] public function dispatch(): void {
         (new Env())->load();
-        (new VarDirectory())->init();
+        (new VarDirectory())->check();
 
         $container = new Container();
         $container->init();

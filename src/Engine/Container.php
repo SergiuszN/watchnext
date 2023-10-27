@@ -10,8 +10,7 @@ use WatchNext\Engine\Cli\MigrationsGenerateCommand;
 use WatchNext\Engine\Cli\MigrationsMigrateCommand;
 use WatchNext\Engine\Cli\TranslatorOrderKeysCommand;
 use WatchNext\Engine\Database\Database;
-use WatchNext\Engine\Event\EventDispatcher;
-use WatchNext\Engine\Mail\Mailer;
+use WatchNext\Engine\Event\EventManager;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Session\Auth;
@@ -37,6 +36,9 @@ class Container {
         $this->build();
     }
 
+    /**
+     * @throws Exception
+     */
     private function build(): void {
         $env = $_ENV['APP_ENV'];
         $config = new Config();
@@ -56,6 +58,9 @@ class Container {
         self::$diContainer = $builder->build();
     }
 
+    /**
+     * @throws Exception
+     */
     public function warmup(): void {
         $this->build();
     }
@@ -80,21 +85,19 @@ class Container {
 
             Container::class => fn() => new Container(),
             Database::class => fn() => new Database(),
-            TemplateEngine::class => fn() => new TemplateEngine(),
+            TemplateEngine::class => autowire(TemplateEngine::class),
             Asset::class => autowire(Asset::class),
             Request::class => fn() => new Request(),
 
             RouteGenerator::class => autowire(RouteGenerator::class),
 
             Logger::class => fn() => fn() => new Logger(),
-            EventDispatcher::class => fn() => new EventDispatcher(),
             Language::class => fn() => new Language(),
-            Mailer::class => fn() => new Mailer(),
-
             FlashBag::class => fn() => new FlashBag(),
             Auth::class => fn() => new Auth(),
             Security::class => autowire(Security::class),
             SecurityFirewall::class => autowire(SecurityFirewall::class),
+            EventManager::class => autowire(EventManager::class),
 
             CacheClearCommand::class => autowire(CacheClearCommand::class),
             MigrationsGenerateCommand::class => autowire(MigrationsGenerateCommand::class),

@@ -49,4 +49,26 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository {
 
         return $data ? Catalog::fromDatabase($data) : null;
     }
+
+    /**
+     * @throws Exception
+     */
+    public function findDefaultForUser(?int $ownerId): ?Catalog {
+        $data = $this->database->prepare("SELECT * FROM `catalog` WHERE owner=:id AND `default`=1 LIMIT 1")
+            ->execute(['id' => $ownerId])
+            ->fetch();
+
+        return $data ? Catalog::fromDatabase($data) : null;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function findAllForUser(?int $userId): array {
+        $data = $this->database->prepare("SELECT * FROM `catalog` WHERE owner=:id")
+            ->execute(['id' => $userId])
+            ->fetchAll();
+
+        return array_map(fn ($r) => Catalog::fromDatabase($r), $data);
+    }
 }

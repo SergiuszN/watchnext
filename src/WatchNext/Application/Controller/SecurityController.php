@@ -2,6 +2,7 @@
 
 namespace WatchNext\WatchNext\Application\Controller;
 
+use WatchNext\Engine\Event\EventManager;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Response\RedirectResponse;
 use WatchNext\Engine\Response\TemplateResponse;
@@ -10,6 +11,7 @@ use WatchNext\Engine\Session\Security;
 use WatchNext\Engine\Template\Language;
 use WatchNext\WatchNext\Domain\User\Form\UserLoginForm;
 use WatchNext\WatchNext\Domain\User\Form\UserRegisterForm;
+use WatchNext\WatchNext\Domain\User\Query\UserCreatedQuery;
 use WatchNext\WatchNext\Domain\User\User;
 use WatchNext\WatchNext\Domain\User\UserRepository;
 
@@ -19,7 +21,8 @@ readonly class SecurityController {
         private UserRepository $userRepository,
         private Language $language,
         private Security $security,
-        private FlashBag $flashBag
+        private FlashBag $flashBag,
+        private EventManager $eventManager
     ) {
     }
 
@@ -30,6 +33,8 @@ readonly class SecurityController {
             $password = password_hash($form->password, PASSWORD_DEFAULT);
             $user = new User($form->login, $password, ['ROLE_USER']);
             $this->userRepository->save($user);
+
+            $this->eventManager->dispatch(new UserCreatedQuery($user->getId()));
 
             $this->flashBag->add('success', $this->language->trans('security.register.success'));
             return new RedirectResponse('security_login');

@@ -17,6 +17,16 @@ class Catalog {
     /** @var array|Item[] */
     private array $items = [];
 
+    public static function create(string $name, int $ownerId, bool $isDefault = false, bool $isShared = false): Catalog
+    {
+        return (new Catalog())
+            ->setName($name)
+            ->setOwner($ownerId)
+            ->setCreatedAt(new DateTimeImmutable())
+            ->setDefault($isDefault)
+            ->setShared($isShared);
+    }
+
     public function getId(): ?int {
         return $this->id;
     }
@@ -89,8 +99,8 @@ class Catalog {
     public function toDatabase(): array {
         return [
             'owner' => $this->owner,
-            'shared' => $this->shared,
-            'default' => $this->default,
+            'shared' => (int) $this->shared,
+            'default' => (int) $this->default,
             'name' => $this->name,
             'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
         ];

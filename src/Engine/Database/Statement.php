@@ -20,11 +20,11 @@ readonly class Statement {
     }
 
     public function fetch(): ?array {
-        return $this->PDOStatement->fetch();
+        return $this->PDOStatement->fetch() ?: null;
     }
 
-    public function fetchAll(): ?array {
-        return $this->PDOStatement->fetchAll();
+    public function fetchAll(): array {
+        return $this->PDOStatement->fetchAll() ?: [];
     }
 
     public function fetchSingle(): mixed {

@@ -11,5 +11,7 @@ return [
     \WatchNext\WatchNext\Domain\Catalog\CatalogRepository::class => \DI\autowire(\WatchNext\WatchNext\Infrastructure\PDORepository\CatalogPDORepository::class),
 
     \WatchNext\WatchNext\Domain\Catalog\CatalogVoter::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\CatalogVoter::class),
-    \WatchNext\WatchNext\Domain\Catalog\CatalogMenuLoader::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\CatalogMenuLoader::class)
+    \WatchNext\WatchNext\Domain\Catalog\CatalogMenuLoader::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\CatalogMenuLoader::class),
+
+    \WatchNext\WatchNext\Domain\Catalog\Command\CreateDefaultUserCatalogCommand::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\Command\CreateDefaultUserCatalogCommand::class)
 ];

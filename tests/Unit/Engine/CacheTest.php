@@ -21,7 +21,7 @@ class CacheTest extends TestCase {
 
         self::assertFalse(file_exists($varPath));
 
-        (new VarDirectory())->init();
+        (new VarDirectory())->check();
 
         self::assertTrue(file_exists($varPath));
         self::assertTrue(file_exists($varPath . '/cache'));

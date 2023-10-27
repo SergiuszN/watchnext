@@ -4,15 +4,15 @@ namespace WatchNext\Engine\Dispatcher;
 
 use Exception;
 use Throwable;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use WatchNext\Engine\Cache\VarDirectory;
+use WatchNext\Engine\Config;
 use WatchNext\Engine\Container;
 use WatchNext\Engine\DevTools;
 use WatchNext\Engine\Env;
-use WatchNext\Engine\Event\EventDispatcher;
-use WatchNext\Engine\Event\ExceptionEvent;
-use WatchNext\Engine\Event\KernelEventRegistration;
-use WatchNext\Engine\Event\RequestEvent;
-use WatchNext\Engine\Event\ResponseEvent;
+use WatchNext\Engine\Event\EventManager;
 use WatchNext\Engine\Logger;
 use WatchNext\Engine\Response\JsonResponse;
 use WatchNext\Engine\Response\RedirectResponse;
@@ -28,38 +28,33 @@ use WatchNext\Engine\Template\TemplateEngine;
 use WatchNext\WatchNext\Application\Controller\SecurityController;
 
 class HttpDispatcher {
+    private Container $container;
+
     /**
      * @throws Exception|Throwable
      */
     public function dispatch(): void {
         (new Env())->load();
-        (new VarDirectory())->init();
+        (new VarDirectory())->check();
 
         $devTools = new DevTools();
         $devTools->start();
 
-        (new Container())->init();
-        (new KernelEventRegistration())->register();
-
+        $this->container = new Container();
+        $this->container->init();
         $devTools->add('container.booted');
 
-        $container = new Container();
-        $container->get(Security::class)->init();
-
+        $this->container->get(Security::class)->init();
         $devTools->add('security.booted');
 
-        $eventDispatcher = new EventDispatcher();
-        $route = $container->get(RouterDispatcher::class)->dispatch();
-
+        $route = $this->container->get(RouterDispatcher::class)->dispatch();
         $devTools->add('route.dispatched');
 
-        $eventDispatcher->dispatch(new RequestEvent());
-
-        $devTools->add('request.events.dispatched');
+        $this->container->get(EventManager::class)->init(new Config());
 
         if ($route->status === RouterDispatcherStatusEnum::FOUND) {
             try {
-                $firewall = $container->get(SecurityFirewall::class);
+                $firewall = $this->container->get(SecurityFirewall::class);
                 $firewall->throwIfPathNotAccessible($_SERVER['REQUEST_URI']);
 
                 $controller = (new Container())->get($route->class);
@@ -67,45 +62,45 @@ class HttpDispatcher {
 
                 $devTools->add('controller.dispatched');
 
-                $eventDispatcher->dispatch(new ResponseEvent());
-
-                $devTools->add('response.events.dispatched');
-
                 $this->render($response, $devTools);
             }
             catch (AccessDeniedException $accessDeniedException) {
-                $securityController = $container->get(SecurityController::class);
+                $securityController = $this->container->get(SecurityController::class);
                 $this->render($securityController->accessDenied(), $devTools);
 
                 die();
             }
             catch (NotFoundException $notFoundException) {
-                $securityController = $container->get(SecurityController::class);
+                $securityController = $this->container->get(SecurityController::class);
                 $this->render($securityController->notFound(), $devTools);
 
                 die();
             }
             catch (Throwable $throwable) {
                 (new Logger())->error($throwable);
-                $eventDispatcher->dispatch(new ExceptionEvent($throwable));
-
                 throw $throwable;
             }
 
             die();
         } else {
-            $securityController = $container->get(SecurityController::class);
+            $securityController = $this->container->get(SecurityController::class);
             $this->render($securityController->notFound(), $devTools);
         }
     }
 
+    /**
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws LoaderError
+     * @throws Exception
+     */
     private function render($response, DevTools $devTools): void {
         $responseClass = get_class($response);
 
         switch ($responseClass) {
             case TemplateResponse::class:
                 /** @var $response TemplateResponse */
-                echo (new TemplateEngine())->render($response);
+                echo $this->container->get(TemplateEngine::class)->render($response);
 
                 $devTools->add('twig.rendered');
                 $devTools->end(true);

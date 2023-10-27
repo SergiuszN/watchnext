@@ -1,0 +1,8 @@
+<div class="list-group">
+    {% for menuCatalog in catalogMenu.get() %}
+        <a href="{{ route.make('catalog_show', {'catalog': menuCatalog.id}) }}"
+           class="list-group-item list-group-item-action {% if catalog is defined and catalog.id == menuCatalog.id %}active{% endif %}">
+                {{ menuCatalog.name }}
+        </a>
+    {% endfor %}
+</div>

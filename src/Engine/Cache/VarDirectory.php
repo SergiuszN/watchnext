@@ -6,7 +6,7 @@ use WatchNext\Engine\Config;
 
 class VarDirectory {
 
-    public function init(): void {
+    public function check(): void {
         $dir = (new Config())->getRootPath() . '/var';
 
         if (!file_exists($dir)) {
