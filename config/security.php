@@ -33,7 +33,9 @@ return [
         ],
 
         'ROLE_CATALOG_GR' => [
-            'ROLE_CATALOG_SHOW'
+            'ROLE_CATALOG_SHOW',
+            'ROLE_CATALOG_ADD',
+            'ROLE_CATALOG_REMOVE',
         ]
     ],
     'access_control' => [

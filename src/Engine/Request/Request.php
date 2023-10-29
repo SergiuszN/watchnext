@@ -41,6 +41,10 @@ class Request {
         return $this->post[$name] ?? $defaultValue;
     }
 
+    public function hasPost(string $name): bool {
+        return isset($this->post[$name]);
+    }
+
     public function getRoute(): ?DispatchedRoute {
         return self::$route;
     }

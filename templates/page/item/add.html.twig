@@ -3,10 +3,21 @@
 {% block body %}
     <h1>Add new item</h1>
 
+    {% include 'component/flash.html.twig' %}
+
     <form action="" method="post">
+        <input type="hidden" name="csfr" id="csfr" value="{{ csfr.get() }}">
         <div class="mb-3">
             <label for="url" class="form-label">Put url here:</label>
             <input type="url" class="form-control" required name="url" id="url">
+        </div>
+        <div class="mb-3">
+            <label for="catalog" class="form-label">Select catalog</label>
+            <select name="catalog" id="catalog" class="form-control">
+                {% for catalog in catalogs %}
+                    <option value="{{ catalog.id }}">{{ catalog.name }}</option>
+                {% endfor %}
+            </select>
         </div>
         <div class="mb-3">
             <button type="submit" class="btn btn-primary">Create</button>

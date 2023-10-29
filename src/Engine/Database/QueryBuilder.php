@@ -12,6 +12,11 @@ class QueryBuilder {
     private array $_orderBy;
     private string $_limit;
     private array $_params;
+    private string $_insert;
+    private array $_values;
+    private string $_update;
+    private array $_sets;
+    private string $_delete;
 
 
     public function __construct() {
@@ -28,6 +33,14 @@ class QueryBuilder {
         $this->_orderBy = [];
         $this->_limit = '';
         $this->_params = [];
+
+        $this->_insert = '';
+        $this->_values = [];
+
+        $this->_update = '';
+        $this->_sets = [];
+
+        $this->_delete = '';
     }
 
     public function select(string $select): self {
@@ -84,7 +97,62 @@ class QueryBuilder {
         return $this;
     }
 
+    public function setParameters(array $parameters): self {
+        $this->_params = array_merge($this->_params, $parameters);
+        return $this;
+    }
+
+    public function getParams(): array {
+        return $this->_params;
+    }
+
+    public function insert(string $insert): self {
+        $this->_insert = "INSERT INTO $insert";
+        return $this;
+    }
+
+    public function addValue(string $value, ?string $paramName = null): self {
+        $this->_values[] = [$value, $paramName ? ':' . $paramName : ':' . str_replace('`', '', $value)];
+        return $this;
+    }
+
+    public function update(string $update): self {
+        $this->_update = "UPDATE $update";
+        return $this;
+    }
+
+    public function addSet(string $set, ?string $paramName = null): self {
+        $paramName = $paramName ? ':' . $paramName : ':' . str_replace('`', '', $set);
+        $this->_sets[] = "$set = $paramName";
+        return $this;
+    }
+
+    public function delete(string $delete) {
+        $this->_delete = "DELETE FROM $delete";
+        return $this;
+    }
+
     public function getSql(): string {
+        if ($this->_select) {
+            return $this->buildSelect();
+        }
+
+        if ($this->_insert) {
+            return $this->buildInsert();
+        }
+
+        if ($this->_update) {
+            return $this->buildUpdate();
+        }
+
+        if ($this->_delete) {
+            return $this->buildDelete();
+        }
+
+        return '';
+    }
+
+    private function buildSelect(): string {
         $sql = $this->_select . "\n";
         $sql .= $this->_from . "\n";
 
@@ -115,7 +183,52 @@ class QueryBuilder {
         return $sql;
     }
 
-    public function getParams(): array {
-        return $this->_params;
+    private function buildInsert(): string {
+        $sql = $this->_insert . " (\n";
+        $sql .= implode(",\n", array_map(fn ($value) => $value[0], $this->_values));
+        $sql .= "\n) VALUES (\n";
+        $sql .= implode(",\n", array_map(fn ($value) => $value[1], $this->_values));
+        $sql .= "\n)\n";
+
+        return $sql;
+    }
+
+    private function buildUpdate(): string {
+        $sql = $this->_update . "\n";
+        $sql .= "SET\n" . implode(",\n", $this->_sets) . "\n";
+
+        /** @noinspection DuplicatedCode */
+        if (!empty($this->_andWheres)) {
+            $sql .= 'WHERE ' . implode("\n AND ", $this->_andWheres) . "\n";
+        }
+
+        if (!empty($this->_orderBy)) {
+            $sql .= 'ORDER BY ' . implode(', ', $this->_orderBy) . "\n";
+        }
+
+        if ($this->_limit) {
+            $sql .= $this->_limit . "\n";
+        }
+
+        return $sql;
+    }
+
+    private function buildDelete(): string {
+        $sql = $this->_delete . "\n";
+
+        /** @noinspection DuplicatedCode */
+        if (!empty($this->_andWheres)) {
+            $sql .= 'WHERE ' . implode("\n AND ", $this->_andWheres) . "\n";
+        }
+
+        if (!empty($this->_orderBy)) {
+            $sql .= 'ORDER BY ' . implode(', ', $this->_orderBy) . "\n";
+        }
+
+        if ($this->_limit) {
+            $sql .= $this->_limit . "\n";
+        }
+
+        return $sql;
     }
 }

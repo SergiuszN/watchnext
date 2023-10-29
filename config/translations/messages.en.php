@@ -26,4 +26,11 @@ return [
 	'user.password.assert.minLength' => 'Password must be at least 8 symbol long',
 	'user.password.assert.sameAsLogin' => 'Login and password can\'t be the same',
     'command.createDefaultUserCatalog.defaultCatalog' => 'My Catalog',
+    'csfr.token.invalid' => 'Wrong csfr token try resubmit form or contact with us',
+    'catalog.add.assert.name.minLength' => 'Catalog name must be at least 8 symbols long',
+    'catalog.add.form.name' => 'Name',
+    'catalog.add.form.default' => 'Set as default',
+    'catalog.add.form.create' => 'Create',
+    'catalog.add.success' => 'A new one catalog successfully added',
+    'catalog.remove.success' => 'Catalog was successfully removed',
 ];

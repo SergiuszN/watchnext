@@ -6,6 +6,7 @@ use WatchNext\Engine\Event\EventManager;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Response\RedirectResponse;
 use WatchNext\Engine\Response\TemplateResponse;
+use WatchNext\Engine\Session\Auth;
 use WatchNext\Engine\Session\FlashBag;
 use WatchNext\Engine\Session\Security;
 use WatchNext\Engine\Template\Language;
@@ -22,7 +23,8 @@ readonly class SecurityController {
         private Language $language,
         private Security $security,
         private FlashBag $flashBag,
-        private EventManager $eventManager
+        private EventManager $eventManager,
+        private Auth $auth,
     ) {
     }
 
@@ -45,6 +47,10 @@ readonly class SecurityController {
 
     public function login(): TemplateResponse|RedirectResponse {
         $form = new UserLoginForm($this->request);
+
+        if ($this->auth->getUserId()) {
+            return new RedirectResponse('homepage_app');
+        }
 
         if ($form->isValid()) {
             $user = $this->userRepository->findByLogin($form->login);

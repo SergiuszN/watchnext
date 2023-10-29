@@ -12,6 +12,8 @@ return [
 
     'item_add' => [['GET', 'POST'], '/item/add', \WatchNext\WatchNext\Application\Controller\ItemController::class . '::' . 'add'],
 
-    'catalog_show' => ['GET', '/catalog/{catalog}', \WatchNext\WatchNext\Application\Controller\CatalogController::class . '::' . 'show'],
-    'catalog_show_page' => ['GET', '/catalog/{catalog}/{page}', \WatchNext\WatchNext\Application\Controller\CatalogController::class . '::' . 'show'],
+    'catalog_show' => ['GET', '/catalog/{catalog:\d+}', \WatchNext\WatchNext\Application\Controller\CatalogController::class . '::' . 'show'],
+    'catalog_show_page' => ['GET', '/catalog/{catalog:\d+}/{page:\d+}', \WatchNext\WatchNext\Application\Controller\CatalogController::class . '::' . 'show'],
+    'catalog_add' => [['GET', 'POST'], '/catalog/add', \WatchNext\WatchNext\Application\Controller\CatalogController::class . '::' . 'add'],
+    'catalog_remove' => ['GET', '/catalog/remove/{catalog:\d+}', \WatchNext\WatchNext\Application\Controller\CatalogController::class . '::' . 'remove'],
 ];

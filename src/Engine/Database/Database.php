@@ -28,12 +28,6 @@ class Database {
             preg_match('/dbname=([^;]*)/', $_ENV['DATABASE_DSN'], $matches);
             self::$databaseName = $matches[1] ?? '';
         }
-
-
-        $sth = self::$pdo->prepare("SELECT * FROM user WHERE 1");
-        $sth->execute();
-        $sth->fetch();
-        $sth->fetchAll();
     }
 
     public function getDatabase(): string {
@@ -74,6 +68,12 @@ class Database {
 
     public function execute(string $sql): void {
         self::$pdo->exec($sql);
+    }
+
+    public function query(QueryBuilder $query): Statement {
+        return $this
+            ->prepare($query->getSql())
+            ->execute($query->getParams());
     }
 
     public function getLastInsertId(): int|string|null {

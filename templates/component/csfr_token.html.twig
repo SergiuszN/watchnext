@@ -1,0 +1,4 @@
+{% for flash in flash.getAllByLabel('error.token') %}
+    <p style="color: red">{{ flash.message }}</p>
+{% endfor %}
+<input type="hidden" id="_token" name="_token" value="{{ csfr.get() }}">

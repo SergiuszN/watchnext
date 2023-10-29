@@ -87,6 +87,7 @@ class ItemPDORepository extends PDORepository implements ItemRepository {
 
         $query = (clone $countQuery)
             ->select('i.*')
+            ->addOrderBy('i.id', 'DESC')
             ->limit($limit, $limit * ($page - 1));
 
         $items = $this->database

@@ -6,13 +6,13 @@ use WatchNext\Engine\Database\Migration;
 
 class %className% extends Migration {
     public function up(): void {
-//        $this->connection->executeStatement(
+//        $this->database->execute(
 //            "ALTER TABLE users ADD email varchar(255);"
 //        );
     }
 
     public function down(): void {
-//        $this->connection->executeStatement(
+//        $this->database->execute(
 //            "ALTER TABLE users DROP COLUMN email;"
 //        );
     }

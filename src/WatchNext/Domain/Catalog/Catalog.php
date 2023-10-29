@@ -4,26 +4,20 @@ namespace WatchNext\WatchNext\Domain\Catalog;
 
 use DateTimeImmutable;
 use Exception;
-use WatchNext\WatchNext\Domain\Item\Item;
 
 class Catalog {
     private ?int $id = null;
     private int $owner;
     private bool $shared;
-    private bool $default;
     private string $name;
     private DateTimeImmutable $createdAt;
 
-    /** @var array|Item[] */
-    private array $items = [];
-
-    public static function create(string $name, int $ownerId, bool $isDefault = false, bool $isShared = false): Catalog
+    public static function create(string $name, int $ownerId, bool $isShared = false): Catalog
     {
         return (new Catalog())
             ->setName($name)
             ->setOwner($ownerId)
             ->setCreatedAt(new DateTimeImmutable())
-            ->setDefault($isDefault)
             ->setShared($isShared);
     }
 
@@ -54,15 +48,6 @@ class Catalog {
         return $this;
     }
 
-    public function isDefault(): bool {
-        return $this->default;
-    }
-
-    public function setDefault(bool $default): Catalog {
-        $this->default = $default;
-        return $this;
-    }
-
     public function getName(): string {
         return $this->name;
     }
@@ -89,7 +74,6 @@ class Catalog {
         $model->id = (int) $item['id'];
         $model->owner = (int) $item['owner'];
         $model->shared = (bool) $item['shared'];
-        $model->default = (bool) $item['default'];
         $model->name = $item['name'];
         $model->createdAt = new DateTimeImmutable($item['created_at']);
 
@@ -100,7 +84,6 @@ class Catalog {
         return [
             'owner' => $this->owner,
             'shared' => (int) $this->shared,
-            'default' => (int) $this->default,
             'name' => $this->name,
             'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
         ];

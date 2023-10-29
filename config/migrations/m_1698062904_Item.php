@@ -6,7 +6,7 @@ use WatchNext\Engine\Database\Migration;
 
 class m_1698062904_Item extends Migration {
     public function up(): void {
-        $this->connection->executeStatement(
+        $this->database->execute(
             "CREATE TABLE `item` (
                 `id` INT PRIMARY KEY AUTO_INCREMENT,
                 `title` VARCHAR(255) NOT NULL,
@@ -21,7 +21,7 @@ class m_1698062904_Item extends Migration {
     }
 
     public function down(): void {
-        $this->connection->executeStatement(
+        $this->database->execute(
             "DROP TABLE `item`"
         );
     }
