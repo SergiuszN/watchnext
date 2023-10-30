@@ -18,6 +18,13 @@ readonly class CacheClearCommand implements CliCommandInterface {
     ) {
     }
 
+    public function getHelp(): string {
+        return "That command clears filesystem cache
+If you need warmup cache after clearing you can add option
+    --warmup
+";
+    }
+
     public function execute(): void {
         $input = new CliInput();
         $output = new CliOutput();

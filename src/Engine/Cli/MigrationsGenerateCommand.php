@@ -7,11 +7,18 @@ use WatchNext\Engine\Cli\IO\CliOutput;
 use WatchNext\Engine\Config;
 
 class MigrationsGenerateCommand implements CliCommandInterface {
+    public function getHelp(): string {
+        return 'This command creates empty migration template with selected name
+Required arguments:
+    migrations:generate {NameWhatYouNeedForNewCommand}
+';
+    }
+
     public function execute(): void {
         [$input, $output] = [new CliInput(), new CliOutput()];
         $rootPath = (new Config())->getRootPath();
 
-        $name = $input->getOption('name');
+        $name = $input->getArgument(0, null, true, "You must provide 'name'(0) argument!");
 
         $output->writeln("Creation of '$name' migration...");
 

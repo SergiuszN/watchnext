@@ -24,6 +24,13 @@ class MigrationsMigrateCommand implements CliCommandInterface {
         $this->output = new CliOutput();
     }
 
+    public function getHelp(): string {
+        return 'This command run migrations on selected database
+You can specify some version to do or partial up or down grade
+For that just add --version=VERSION_NUMBER
+';
+    }
+
     /** @noinspection PhpUnhandledExceptionInspection */
     public function execute(): void {
         $this->output->writeln('Migration of database...');

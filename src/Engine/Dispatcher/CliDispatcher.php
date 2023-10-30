@@ -6,6 +6,7 @@ use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use WatchNext\Engine\Cache\VarDirectory;
 use WatchNext\Engine\Cli\CliCommandInterface;
+use WatchNext\Engine\Cli\IO\CliInput;
 use WatchNext\Engine\Config;
 use WatchNext\Engine\Container;
 use WatchNext\Engine\Env;
@@ -25,13 +26,34 @@ class CliDispatcher {
         $commands = array_merge($commands, $this->getKernelCliCommands());
 
         global $argv;
-        $selectedCommandName = $argv[1];
+        $selectedCommandName = $argv[1] ?? null;
+
+        if ($selectedCommandName === null) {
+            echo "Available commands:\n\n";
+
+            foreach ($commands as $commandName => $commandClass) {
+                echo "\t$commandName\n";
+            }
+
+            die();
+        }
+
+        $input = new CliInput();
+        $isHelpOptionSelected = $input->isOptionExist('help');
 
         foreach ($commands as $commandName => $commandClass) {
             if ($commandName === $selectedCommandName) {
                 /** @var CliCommandInterface $command */
                 $command = $container->get($commandClass);
-                $command->execute();
+
+                if (!$isHelpOptionSelected) {
+                    $command->execute();
+                } else {
+                    echo "Help about '$commandName':\n\n";
+                    echo $command->getHelp();
+                    echo "\n";
+                }
+
                 die();
             }
         }

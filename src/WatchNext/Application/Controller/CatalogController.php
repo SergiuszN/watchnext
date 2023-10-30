@@ -2,9 +2,6 @@
 
 namespace WatchNext\WatchNext\Application\Controller;
 
-use Exception;
-use WatchNext\Engine\Database\Database;
-use WatchNext\Engine\Database\QueryBuilder;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Response\RedirectResponse;
 use WatchNext\Engine\Response\TemplateResponse;
@@ -125,10 +122,6 @@ readonly class CatalogController {
     }
 
     public function sharing(): TemplateResponse {
-        return new RedirectResponse('homepage_app');
-    }
-
-    public function toggleSharing(): RedirectResponse {
         return new RedirectResponse('homepage_app');
     }
 

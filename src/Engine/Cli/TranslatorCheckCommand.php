@@ -14,15 +14,30 @@ class TranslatorCheckCommand implements CliCommandInterface {
         $this->translationsPath = $container->get('root.dir') . '/config/translations';
     }
 
+    public function getHelp(): string {
+        return 'This command search for lost translations in non main translation file
+By default main translation file is "en"
+Buy you can put option --base=CODE with any other lang
+';
+    }
+
     public function execute(): void {
         [$input, $output] = [new CliInput(), new CliOutput()];
 
-        $baseLang = $input->getOption('base');
+        $baseLang = $input->getOption('base', false, 'en');
 
         $output->writeln('Translation check command started');
         $translationFiles = array_filter(scandir($this->translationsPath), fn ($file) => !in_array($file, ['.', '..', "messages.{$baseLang}.php"]));
 
-        $baseTranslations = require $this->translationsPath . "/messages.{$baseLang}.php";
+        $baseTranslationsPath = $this->translationsPath . "/messages.{$baseLang}.php";
+
+        if (!file_exists($baseTranslationsPath)) {
+            echo "Base translations ($baseTranslationsPath) not exist!";
+            die();
+        }
+
+        $baseTranslations = require $baseTranslationsPath;
+
         $output->writeln('Found ' . count($translationFiles) . ' translations for check');
 
         foreach ($translationFiles as $file) {

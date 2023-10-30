@@ -5,7 +5,7 @@ namespace WatchNext\Engine\Session;
 use WatchNext\WatchNext\Domain\User\User;
 
 class Auth {
-    private static ?User $user;
+    private static ?User $user = null;
 
     public function init(): void {
         self::$user = isset($_SESSION['main.auth.user']) ? unserialize($_SESSION['main.auth.user']) : null;

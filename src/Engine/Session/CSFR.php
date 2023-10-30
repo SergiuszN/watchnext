@@ -21,6 +21,6 @@ class CSFR {
     }
 
     public function get(): string {
-        return $_SESSION[self::TOKEN_KEY];
+        return $_SESSION[self::TOKEN_KEY] ?? '';
     }
 }

@@ -1,8 +1,8 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.2-fpm
 
-RUN apk update && \
-    apk upgrade && \
-    apk add curl nano zip wget bash
+RUN apt update && \
+    apt upgrade -y && \
+    apt install -y curl nano zip wget bash
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 

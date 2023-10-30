@@ -14,6 +14,12 @@ class TranslatorOrderKeysCommand implements CliCommandInterface {
         $this->translationsPath = $container->get('root.dir') . '/config/translations';
     }
 
+    public function getHelp(): string {
+        return 'This command reorder translations file keys in alphabetical order
+Ensure add that command in some process before commit changes
+';
+    }
+
     public function execute(): void {
         [$input, $output] = [new CliInput(), new CliOutput()];
 
