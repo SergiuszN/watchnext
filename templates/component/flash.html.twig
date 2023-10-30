@@ -1,20 +1,20 @@
 {% for flash in flash.getAllByLabel('success') %}
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ flash.message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t.trans('app.close') }}"></button>
     </div>
 {% endfor %}
 
 {% for flash in flash.getAllByLabel('error') %}
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         {{ flash.message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t.trans('app.close') }}"></button>
     </div>
 {% endfor %}
 
 {% for flash in flash.getAllByLabel('warning') %}
     <div class="alert alert-warning alert-dismissible fade show" role="alert">
         {{ flash.message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ t.trans('app.close') }}"></button>
     </div>
 {% endfor %}

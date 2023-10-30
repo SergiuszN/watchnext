@@ -2,6 +2,8 @@
 
 return [
 	'app.areYouSure' => 'Are you sure?',
+	'app.back' => 'Back',
+	'app.close' => 'Close',
 	'catalog.add.assert.name.minLength' => 'Catalog name must be at least 8 symbols long',
 	'catalog.add.form.create' => 'Create',
 	'catalog.add.form.name' => 'Name',
@@ -33,6 +35,7 @@ return [
 	'catalog.unsubscribe.success' => 'You successfully unsubscribe from catalog',
 	'command.createDefaultUserCatalog.defaultCatalog' => 'My Catalog',
 	'csfr.token.invalid' => 'Wrong csfr token try resubmit form or contact with us',
+	'menu.manage' => 'Manage',
 	'security.login.form.login' => 'Login',
 	'security.login.form.notAMember' => 'Not a member?',
 	'security.login.form.password' => 'Password',
@@ -57,4 +60,8 @@ return [
 	'user.password.assert.areNotTheSame' => 'Two password must be are the same',
 	'user.password.assert.minLength' => 'Password must be at least 8 symbol long',
 	'user.password.assert.sameAsLogin' => 'Login and password can\'t be the same',
+    'item.add.header' => 'Add new item',
+    'item.add.form.url' => 'Url:',
+    'item.add.form.catalog' => 'Catalog:',
+    'item.add.form.submit' => 'Add',
 ];

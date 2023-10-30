@@ -18,6 +18,6 @@
         </a>
     {% endfor %}
         <a href="{{ route.make('catalog_manage') }}" class="list-group-item list-group-item-action {% if route.startsFrom('catalog_manage') %}active{% endif %}">
-                <i class="fa-solid fa-pencil"></i> Manage
+                <i class="fa-solid fa-pencil"></i> {{ t.trans('menu.manage') }}
         </a>
 </div>
