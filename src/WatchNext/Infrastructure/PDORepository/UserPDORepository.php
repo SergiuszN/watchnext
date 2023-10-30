@@ -2,6 +2,7 @@
 
 namespace WatchNext\WatchNext\Infrastructure\PDORepository;
 
+use WatchNext\Engine\Database\QueryBuilder;
 use WatchNext\WatchNext\Domain\User\User;
 use WatchNext\WatchNext\Domain\User\UserRepository;
 
@@ -75,5 +76,20 @@ class UserPDORepository extends PDORepository implements UserRepository {
             ->fetch();
 
         return $data ? User::fromDatabase($data) : null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findSharedWithUsersForCatalog(int $catalogId): array {
+        return array_map(fn ($user) => User::fromDatabase($user), $this->database->query((new QueryBuilder())
+            ->select('u.*')
+            ->from('`user` as u')
+            ->addLeftJoin('`catalog_user` as cu', 'cu.user = u.id')
+            ->addLeftJoin('`catalog` as c', 'c.id = cu.catalog')
+            ->andWhere('c.id = :catalog')
+            ->setParameter('catalog', $catalogId)
+            ->andWhere('cu.user != c.owner')
+        )->fetchAll());
     }
 }

@@ -17,17 +17,19 @@ use WatchNext\WatchNext\Domain\Catalog\CatalogRepository;
 use WatchNext\WatchNext\Domain\Catalog\CatalogUser;
 use WatchNext\WatchNext\Domain\Catalog\CatalogVoter;
 use WatchNext\WatchNext\Domain\Catalog\Command\CreateDefaultUserCatalogCommand;
-use WatchNext\WatchNext\Domain\Catalog\Form\AddCatalogForm;
+use WatchNext\WatchNext\Domain\Catalog\Form\AddEditCatalogForm;
 use WatchNext\WatchNext\Domain\Item\ItemRepository;
 use WatchNext\WatchNext\Domain\User\Query\UserCreatedQuery;
+use WatchNext\WatchNext\Domain\User\UserRepository;
 
 readonly class CatalogController {
     public function __construct(
         private Request $request,
         private CatalogRepository $catalogRepository,
+        private ItemRepository $itemRepository,
+        private UserRepository $userRepository,
         private SecurityFirewall $firewall,
         private CatalogVoter $catalogVoter,
-        private ItemRepository $itemRepository,
         private CSFR $csfr,
         private Auth $auth,
         private FlashBag $flashBag,
@@ -60,9 +62,23 @@ readonly class CatalogController {
     /**
      * @throws AccessDeniedException
      */
+    public function manage(): TemplateResponse {
+        $this->firewall->throwIfNotGranted('ROLE_CATALOG_MANAGE');
+        $userId = $this->auth->getUserId();
+        $catalogs = $this->catalogRepository->findAllForUser($userId);
+
+        return new TemplateResponse('page/catalog/manage.html.twig', [
+            'ownedCatalogs' => array_filter($catalogs, fn (Catalog $catalog) => $catalog->getOwner() === $userId),
+            'sharedCatalogs' => array_filter($catalogs, fn (Catalog $catalog) => $catalog->getOwner() !== $userId),
+        ]);
+    }
+
+    /**
+     * @throws AccessDeniedException
+     */
     public function add(): TemplateResponse|RedirectResponse {
         $this->firewall->throwIfNotGranted('ROLE_CATALOG_ADD');
-        $form = new AddCatalogForm($this->request, $this->csfr);
+        $form = new AddEditCatalogForm($this->request, $this->csfr);
         $userId = $this->auth->getUserId();
 
         if ($form->isValid()) {
@@ -72,22 +88,15 @@ readonly class CatalogController {
             $catalogUser = new CatalogUser($catalog->getId(), $userId);
             $this->catalogRepository->addAccess($catalogUser);
 
-            if ($form->default) {
-                $this->catalogRepository->setAsDefault($catalogUser);
-            }
-
             $this->flashBag->add('success', $this->language->trans('catalog.add.success'));
-            return new RedirectResponse('catalog_show', [
-                'catalog' => $this->catalogRepository->findDefaultForUser($userId)->getId()
-            ]);
+            return new RedirectResponse('catalog_manage');
         }
 
         return new TemplateResponse('page/catalog/add.html.twig');
     }
 
     /**
-     * @throws NotFoundException
-     * @throws AccessDeniedException
+     * @throws NotFoundException|AccessDeniedException
      */
     public function remove(int $catalog): RedirectResponse {
         $this->firewall->throwIfNotGranted('ROLE_CATALOG_REMOVE');
@@ -108,28 +117,55 @@ readonly class CatalogController {
         }
 
         $this->flashBag->add('success', $this->language->trans('catalog.remove.success'));
-        return new RedirectResponse('catalog_show', [
-            'catalog' => $this->catalogRepository->findDefaultForUser($this->auth->getUserId())->getId()
+        return new RedirectResponse('catalog_manage');
+    }
+
+    /**
+     * @throws NotFoundException|AccessDeniedException
+     */
+    public function setDefault(int $catalog): RedirectResponse {
+        $this->firewall->throwIfNotGranted('ROLE_CATALOG_SET_DEFAULT');
+        $catalog = $this->catalogRepository->find($catalog);
+        $this->catalogVoter->throwIfNotGranted($catalog, CatalogVoter::EDIT);
+        $this->catalogRepository->setAsDefault(new CatalogUser($catalog->getId(), $catalog->getOwner()));
+
+        $this->flashBag->add('success', $this->language->trans('catalog.setDefault.success'));
+        return new RedirectResponse('catalog_manage');
+    }
+
+    /**
+     * @throws NotFoundException|AccessDeniedException
+     */
+    public function edit(int $catalog): TemplateResponse|RedirectResponse {
+        $this->firewall->throwIfNotGranted('ROLE_CATALOG_EDIT');
+        $catalog = $this->catalogRepository->find($catalog);
+        $this->catalogVoter->throwIfNotGranted($catalog, CatalogVoter::EDIT);
+
+        $form = new AddEditCatalogForm($this->request, $this->csfr);
+
+        if ($form->isValid()) {
+            $catalog->setName($form->name);
+            $this->catalogRepository->save($catalog);
+
+            $this->flashBag->add('success', $this->language->trans('catalog.edit.success'));
+            return new RedirectResponse('catalog_manage');
+        }
+
+        return new TemplateResponse('page/catalog/edit.html.twig', [
+            'catalog' => $catalog,
+            'sharedWith' => $this->userRepository->findSharedWithUsersForCatalog($catalog->getId()),
         ]);
     }
 
-    public function setDefault(): RedirectResponse {
+    public function addSharedUser(int $catalog): RedirectResponse {
         return new RedirectResponse('homepage_app');
     }
 
-    public function edit(): TemplateResponse|RedirectResponse {
+    public function removeSharedUser(int $catalog, int $user): RedirectResponse {
         return new RedirectResponse('homepage_app');
     }
 
-    public function sharing(): TemplateResponse {
-        return new RedirectResponse('homepage_app');
-    }
-
-    public function addSharedUser(): RedirectResponse {
-        return new RedirectResponse('homepage_app');
-    }
-
-    public function removeSharedUser(): RedirectResponse {
+    public function unsubscribe(int $catalog): RedirectResponse {
         return new RedirectResponse('homepage_app');
     }
 }

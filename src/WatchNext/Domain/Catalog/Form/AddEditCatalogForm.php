@@ -9,12 +9,11 @@ use WatchNext\Engine\Session\FlashBag;
 use WatchNext\Engine\Template\Language;
 use Webmozart\Assert\Assert;
 
-class AddCatalogForm {
+class AddEditCatalogForm {
     private bool $isPost;
     private CSFR $csfr;
     public readonly string $token;
-    public readonly string $name;
-    public readonly bool $default;
+    public string $name;
 
     public function __construct(Request $request, CSFR $csfr) {
         $this->isPost = $request->isPost();
@@ -23,7 +22,6 @@ class AddCatalogForm {
         if ($this->isPost) {
             $this->token = $request->post('_token', '');
             $this->name = $request->post('name', '');
-            $this->default = $request->hasPost('default');
         }
     }
 

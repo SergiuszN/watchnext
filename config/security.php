@@ -34,8 +34,11 @@ return [
 
         'ROLE_CATALOG_GR' => [
             'ROLE_CATALOG_SHOW',
+            'ROLE_CATALOG_MANAGE',
             'ROLE_CATALOG_ADD',
             'ROLE_CATALOG_REMOVE',
+            'ROLE_CATALOG_SET_DEFAULT',
+            'ROLE_CATALOG_EDIT',
         ]
     ],
     'access_control' => [

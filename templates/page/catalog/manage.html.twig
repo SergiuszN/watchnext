@@ -1,0 +1,84 @@
+{% extends 'app.html.twig' %}
+
+{% block body %}
+    {% include 'component/flash.html.twig' %}
+
+    <a href="{{ route.make('catalog_add') }}" class="btn btn-success float-end">
+        <i class="fa-solid fa-plus"></i>
+        Add
+    </a>
+    <h2>{{ t.trans('catalog.manage.ownedHeader') }}</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mb-5">
+            <thead>
+            <tr>
+                <th style="width: 10%">{{ t.trans('catalog.manage.table.id') }}</th>
+                <th style="width: 40%">{{ t.trans('catalog.manage.table.name') }}</th>
+                <th style="width: 10%">{{ t.trans('catalog.manage.table.isDefault') }}</th>
+                <th style="width: 10%">{{ t.trans('catalog.manage.table.createdAt') }}</th>
+                <th style="width: 30%">{{ t.trans('catalog.manage.table.actions') }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for catalog in ownedCatalogs %}
+                <tr>
+                    <td>{{ catalog.getId() }}</td>
+                    <td>{{ catalog.getName() }}</td>
+                    <td>
+                        {% if catalogMenu.isDefault(catalog) %}
+                            <i class="fa-solid fa-star text-warning float-end"></i>
+                        {% else %}
+                            <a href="{{ route.make('catalog_set_default', {'catalog': catalog.id}) }}"><i class="fa-regular fa-star text-warning float-end"></i></a>
+                        {% endif %}
+                    </td>
+                    <td>{{ catalog.getCreatedAt()|date('Y-m-d') }} <br> {{ catalog.getCreatedAt()|date('H:i:s') }}</td>
+                    <td>
+                        <a href="{{ route.make('catalog_edit', {'catalog': catalog.id}) }}"
+                           class="btn btn-sm btn-info me-1 mb-1">
+                            {{ t.trans('catalog.manage.edit') }}
+                        </a>
+
+                        <a href="{{ route.make('catalog_remove', {'catalog': catalog.id}) }}"
+                           class="btn btn-sm btn-danger me-1 mb-1"
+                           onclick="return confirm('{{ t.trans('catalog.manage.confirmRemove') }}')">
+                            {{ t.trans('catalog.manage.remove') }}
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2>{{ t.trans('catalog.manage.sharedHeader') }}</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped mb-5">
+            <thead>
+            <tr>
+                <th style="width: 10%">{{ t.trans('catalog.manage.table.id') }}</th>
+                <th style="width: 40%">{{ t.trans('catalog.manage.table.name') }}</th>
+                <th style="width: 10%">{{ t.trans('catalog.manage.table.isDefault') }}</th>
+                <th style="width: 10%">{{ t.trans('catalog.manage.table.createdAt') }}</th>
+                <th style="width: 30%">{{ t.trans('catalog.manage.table.actions') }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for catalog in sharedCatalogs %}
+                <tr>
+                    <td>{{ catalog.getId() }}</td>
+                    <td>{{ catalog.getName() }}</td>
+                    <td>
+                        {% if catalogMenu.isDefault(catalog) %}
+                            <i class="fa-solid fa-star text-warning float-end"></i>
+                        {% else %}
+                            <i class="fa-regular fa-star text-warning float-end"></i>
+                        {% endif %}
+                    </td>
+                    <td>{{ catalog.getCreatedAt()|date('Y-m-d') }} <br> {{ catalog.getCreatedAt()|date('H:i:s') }}</td>
+                    <td>Actions</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
