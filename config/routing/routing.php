@@ -22,6 +22,9 @@ return [
     'catalog_remove' => ['GET', '/catalog/remove/{catalog:\d+}', CatalogController::class . '::' . 'remove'],
     'catalog_edit' => [['GET', 'POST'], '/catalog/edit/{catalog:\d+}', CatalogController::class . '::' . 'edit'],
     'catalog_set_default' => ['GET', '/catalog/set-default/{catalog:\d+}', CatalogController::class . '::' . 'setDefault'],
+    'catalog_share' => ['POST', '/catalog/share/{catalog:\d+}', CatalogController::class . '::' . 'share'],
+    'catalog_un_share' => ['GET', '/catalog/un-share/{catalog:\d+}/{user:\d+}', CatalogController::class . '::' . 'unShare'],
+    'catalog_unsubscribe' => ['GET', '/catalog/unsubscribe/{catalog:\d+}', CatalogController::class . '::' . 'unsubscribe'],
     'catalog_show' => ['GET', '/catalog/{catalog:\d+}', CatalogController::class . '::' . 'show'],
     'catalog_show_page' => ['GET', '/catalog/{catalog:\d+}/{page:\d+}', CatalogController::class . '::' . 'show'],
 ];

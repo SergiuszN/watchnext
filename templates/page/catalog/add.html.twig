@@ -11,7 +11,8 @@
             {% for flash in flash.getAllByLabel('error.name') %}
                 <p style="color: red">{{ flash.message }}</p>
             {% endfor %}
-            <input type="text" class="form-control" required name="name" id="name">
+            <input type="text" class="form-control" required name="name" id="name"
+                   value="{{ request.post('name', catalog.name) }}">
         </div>
         <div class="mb-3">
             <div class="form-check">

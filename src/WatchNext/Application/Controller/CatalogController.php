@@ -16,10 +16,10 @@ use WatchNext\WatchNext\Domain\Catalog\Catalog;
 use WatchNext\WatchNext\Domain\Catalog\CatalogRepository;
 use WatchNext\WatchNext\Domain\Catalog\CatalogUser;
 use WatchNext\WatchNext\Domain\Catalog\CatalogVoter;
-use WatchNext\WatchNext\Domain\Catalog\Command\CreateDefaultUserCatalogCommand;
 use WatchNext\WatchNext\Domain\Catalog\Form\AddEditCatalogForm;
+use WatchNext\WatchNext\Domain\Catalog\Form\CatalogShareWithForm;
+use WatchNext\WatchNext\Domain\Catalog\SetDefaultCatalogIfRemoved;
 use WatchNext\WatchNext\Domain\Item\ItemRepository;
-use WatchNext\WatchNext\Domain\User\Query\UserCreatedQuery;
 use WatchNext\WatchNext\Domain\User\UserRepository;
 
 readonly class CatalogController {
@@ -34,7 +34,7 @@ readonly class CatalogController {
         private Auth $auth,
         private FlashBag $flashBag,
         private Language $language,
-        private CreateDefaultUserCatalogCommand $createDefaultUserCatalogCommand
+        private SetDefaultCatalogIfRemoved $setDefaultCatalogIfRemoved
     ) {
     }
 
@@ -106,14 +106,7 @@ readonly class CatalogController {
         $removedDefaults = $this->catalogRepository->remove($catalog);
 
         foreach ($removedDefaults as $removedDefault) {
-            /** @var Catalog[] $userCatalogs */
-            $userCatalogs = $this->catalogRepository->findAllForUser($removedDefault->user);
-
-            if (!empty($userCatalogs)) {
-                $this->catalogRepository->setAsDefault(new CatalogUser($userCatalogs[0]->getId(), $removedDefault->user));
-            } else {
-                $this->createDefaultUserCatalogCommand->execute(new UserCreatedQuery($removedDefault->user));
-            }
+            $this->setDefaultCatalogIfRemoved->execute($removedDefault->user);
         }
 
         $this->flashBag->add('success', $this->language->trans('catalog.remove.success'));
@@ -126,8 +119,8 @@ readonly class CatalogController {
     public function setDefault(int $catalog): RedirectResponse {
         $this->firewall->throwIfNotGranted('ROLE_CATALOG_SET_DEFAULT');
         $catalog = $this->catalogRepository->find($catalog);
-        $this->catalogVoter->throwIfNotGranted($catalog, CatalogVoter::EDIT);
-        $this->catalogRepository->setAsDefault(new CatalogUser($catalog->getId(), $catalog->getOwner()));
+        $this->catalogVoter->throwIfNotGranted($catalog, CatalogVoter::VIEW);
+        $this->catalogRepository->setAsDefault(new CatalogUser($catalog->getId(), $this->auth->getUserId()));
 
         $this->flashBag->add('success', $this->language->trans('catalog.setDefault.success'));
         return new RedirectResponse('catalog_manage');
@@ -157,15 +150,57 @@ readonly class CatalogController {
         ]);
     }
 
-    public function addSharedUser(int $catalog): RedirectResponse {
-        return new RedirectResponse('homepage_app');
+    /**
+     * @throws NotFoundException|AccessDeniedException
+     */
+    public function share(int $catalog): RedirectResponse {
+        $this->firewall->throwIfNotGranted('ROLE_CATALOG_SHARE');
+        $catalog = $this->catalogRepository->find($catalog);
+        $this->catalogVoter->throwIfNotGranted($catalog, CatalogVoter::EDIT);
+
+        $form = new CatalogShareWithForm($this->request, $this->csfr);
+
+        if ($form->isValid()) {
+            $user = $this->userRepository->findByLogin($form->username);
+
+            if ($user) {
+                $this->catalogRepository->addAccess(new CatalogUser($catalog->getId(), $user->getId()));
+                $this->flashBag->add('success', $this->language->trans('catalog.addSharedUser.success'));
+            } else {
+                $this->flashBag->add('error', $this->language->trans('catalog.addSharedUser.error', ['%user%' => $form->username]));
+            }
+        }
+
+        return new RedirectResponse('catalog_edit', ['catalog' => $catalog->getId()]);
     }
 
-    public function removeSharedUser(int $catalog, int $user): RedirectResponse {
-        return new RedirectResponse('homepage_app');
+    /**
+     * @throws NotFoundException|AccessDeniedException
+     */
+    public function unShare(int $catalog, int $user): RedirectResponse {
+        $this->firewall->throwIfNotGranted('ROLE_CATALOG_UN_SHARE_TO');
+        $catalog = $this->catalogRepository->find($catalog);
+        $this->catalogVoter->throwIfNotGranted($catalog, CatalogVoter::EDIT);
+
+        $defaultUserId = $this->catalogRepository->removeAccess(new CatalogUser($catalog->getId(), $user));
+        $this->setDefaultCatalogIfRemoved->execute($defaultUserId);
+
+        $this->flashBag->add('success', $this->language->trans('catalog.unShareTo.success'));
+        return new RedirectResponse('catalog_edit', ['catalog' => $catalog->getId()]);
     }
 
+    /**
+     * @throws NotFoundException|AccessDeniedException
+     */
     public function unsubscribe(int $catalog): RedirectResponse {
-        return new RedirectResponse('homepage_app');
+        $this->firewall->throwIfNotGranted('ROLE_CATALOG_UNSUBSCRIBE');
+        $catalog = $this->catalogRepository->find($catalog);
+        $this->catalogVoter->throwIfNotGranted($catalog, CatalogVoter::VIEW);
+
+        $defaultUserId = $this->catalogRepository->removeAccess(new CatalogUser($catalog->getId(), $this->auth->getUserId()));
+        $this->setDefaultCatalogIfRemoved->execute($defaultUserId);
+
+        $this->flashBag->add('success', $this->language->trans('catalog.unsubscribe.success'));
+        return new RedirectResponse('catalog_manage');
     }
 }

@@ -39,6 +39,9 @@ return [
             'ROLE_CATALOG_REMOVE',
             'ROLE_CATALOG_SET_DEFAULT',
             'ROLE_CATALOG_EDIT',
+            'ROLE_CATALOG_SHARE',
+            'ROLE_CATALOG_UN_SHARE',
+            'ROLE_CATALOG_UNSUBSCRIBE',
         ]
     ],
     'access_control' => [

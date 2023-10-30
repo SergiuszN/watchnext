@@ -13,5 +13,6 @@ return [
     \WatchNext\WatchNext\Domain\Catalog\CatalogVoter::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\CatalogVoter::class),
     \WatchNext\WatchNext\Domain\Catalog\CatalogMenuLoader::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\CatalogMenuLoader::class),
 
-    \WatchNext\WatchNext\Domain\Catalog\Command\CreateDefaultUserCatalogCommand::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\Command\CreateDefaultUserCatalogCommand::class)
+    \WatchNext\WatchNext\Domain\Catalog\Command\CreateDefaultUserCatalogCommand::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\Command\CreateDefaultUserCatalogCommand::class),
+    \WatchNext\WatchNext\Domain\Catalog\SetDefaultCatalogIfRemoved::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\SetDefaultCatalogIfRemoved::class),
 ];

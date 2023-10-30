@@ -6,7 +6,7 @@ interface CatalogRepository {
     public function save(Catalog $catalog): void;
     public function hasAccess(CatalogUser $catalogUser): bool;
     public function addAccess(CatalogUser $catalogUser): void;
-    public function removeAccess(CatalogUser $catalogUser): void;
+    public function removeAccess(CatalogUser $catalogUser): ?int;
     public function addItem(CatalogItem $catalogItem): void;
     public function find(int $catalogId): ?Catalog;
     public function findDefaultForUser(?int $userId): ?Catalog;
