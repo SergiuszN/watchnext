@@ -7,10 +7,9 @@ use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Response\RedirectResponse;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Router\AccessDeniedException;
-use WatchNext\Engine\Session\Auth;
 use WatchNext\Engine\Session\CSFR;
 use WatchNext\Engine\Session\FlashBag;
-use WatchNext\Engine\Session\SecurityFirewall;
+use WatchNext\Engine\Session\Security;
 use WatchNext\WatchNext\Domain\Catalog\CatalogItem;
 use WatchNext\WatchNext\Domain\Catalog\CatalogRepository;
 use WatchNext\WatchNext\Domain\Item\ItemCurlBuilder;
@@ -18,11 +17,10 @@ use WatchNext\WatchNext\Domain\Item\ItemRepository;
 
 readonly class ItemController {
     public function __construct(
-        private SecurityFirewall  $firewall,
         private Request           $request,
         private ItemRepository    $itemRepository,
         private CatalogRepository $catalogRepository,
-        private Auth              $auth,
+        private Security          $security,
         private CSFR              $csfr,
         private FlashBag          $flashBag,
     ) {
@@ -32,8 +30,8 @@ readonly class ItemController {
      * @throws AccessDeniedException|Exception
      */
     public function add(): TemplateResponse|RedirectResponse {
-        $this->firewall->throwIfNotGranted('ROLE_ITEM_ADD');
-        $userId = $this->auth->getUserId();
+        $this->security->throwIfNotGranted('ROLE_ITEM_ADD');
+        $userId = $this->security->getUserId();
 
         if ($this->request->isPost()) {
             $this->csfr->throwIfNotValid($this->request->post('csfr'));

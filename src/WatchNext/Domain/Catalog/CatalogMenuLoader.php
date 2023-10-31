@@ -2,7 +2,7 @@
 
 namespace WatchNext\WatchNext\Domain\Catalog;
 
-use WatchNext\Engine\Session\Auth;
+use WatchNext\Engine\Session\Security;
 
 class CatalogMenuLoader {
     private ?Catalog $defaultUserCatalog = null;
@@ -11,13 +11,13 @@ class CatalogMenuLoader {
 
     public function __construct(
         private readonly CatalogRepository $catalogRepository,
-        private readonly Auth $auth,
+        private readonly Security          $security,
     ) {
     }
 
     public function get(): array {
         $this->init();
-        return $this->catalogRepository->findAllForUser($this->auth->getUserId());
+        return $this->catalogRepository->findAllForUser($this->security->getUserId());
     }
 
     public function isDefault(Catalog $catalog): bool {
@@ -30,7 +30,7 @@ class CatalogMenuLoader {
             return;
         }
 
-        $userId = $this->auth->getUserId();
+        $userId = $this->security->getUserId();
         $this->defaultUserCatalog = $this->catalogRepository->findDefaultForUser($userId);
         self::$inited = true;
     }

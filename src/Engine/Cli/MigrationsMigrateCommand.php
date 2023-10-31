@@ -4,22 +4,20 @@ namespace WatchNext\Engine\Cli;
 
 use WatchNext\Engine\Cli\IO\CliInput;
 use WatchNext\Engine\Cli\IO\CliOutput;
-use WatchNext\Engine\Config;
 use WatchNext\Engine\Container;
 use WatchNext\Engine\Database\Database;
 use WatchNext\Engine\Database\Migration;
 
 class MigrationsMigrateCommand implements CliCommandInterface {
-    private Database $database;
     private CliInput $input;
     private CliOutput $output;
     private array $migrations;
     private array $migrated;
-    private Container $container;
 
-    public function __construct() {
-        $this->container = new Container();
-        $this->database = $this->container->get(Database::class);
+    public function __construct(
+        private readonly Container $container,
+        private readonly Database $database
+    ) {
         $this->input = new CliInput();
         $this->output = new CliOutput();
     }
@@ -31,7 +29,6 @@ For that just add --version=VERSION_NUMBER
 ';
     }
 
-    /** @noinspection PhpUnhandledExceptionInspection */
     public function execute(): void {
         $this->output->writeln('Migration of database...');
 
@@ -99,7 +96,6 @@ For that just add --version=VERSION_NUMBER
         }
     }
 
-    /** @noinspection PhpUnhandledExceptionInspection */
     private function createMigrationsTableIfNotExist(): void {
         $database = $this->database->getDatabase();
 
@@ -127,7 +123,6 @@ For that just add --version=VERSION_NUMBER
         }
     }
 
-    /** @noinspection PhpUnhandledExceptionInspection */
     private function getCurrentVersion(): int {
         return (int) $this->database
             ->prepare("SELECT MAX(version) AS current_version FROM `migrations` WHERE 1;")
@@ -143,10 +138,9 @@ For that just add --version=VERSION_NUMBER
     }
 
     private function loadAvailableMigrations(): void {
-        $config = new Config();
-        $basePath = "{$config->getRootPath()}/config/migrations";
+        $basePath = ROOT_PATH . '/config/migrations';
         $files = scandir($basePath);
-        $files = array_filter($files, fn ($path) => str_starts_with($path, 'm_'));
+        $files = array_filter($files, fn($path) => str_starts_with($path, 'm_'));
         $this->migrations = [];
 
         foreach ($files as $file) {
@@ -163,7 +157,7 @@ For that just add --version=VERSION_NUMBER
         }
     }
 
-    private function loadMigratedMigrations() {
+    private function loadMigratedMigrations(): void {
         $result = $this->database->prepare("SELECT * FROM `migrations` WHERE 1;")->execute();
         $migrated = $result->fetchAll();
 

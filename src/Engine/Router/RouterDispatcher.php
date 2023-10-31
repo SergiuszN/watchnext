@@ -5,13 +5,17 @@ namespace WatchNext\Engine\Router;
 use Exception;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
-use WatchNext\Engine\Cache\CacheInterface;
+use WatchNext\Engine\Cache\ApcuCache;
 use WatchNext\Engine\Config;
 use WatchNext\Engine\Request\Request;
 use function FastRoute\cachedDispatcher;
 
 readonly class RouterDispatcher {
-    public function __construct(private CacheInterface $cache, private Request $request) {
+    public function __construct(
+        private ApcuCache $cache,
+        private Request $request,
+        private Config $config,
+    ) {
     }
 
     /**
@@ -55,7 +59,7 @@ readonly class RouterDispatcher {
         $httpMethod = $_SERVER['REQUEST_METHOD'];
         $uri = $this->getUri();
 
-        if ($_ENV['APP_ENV'] === 'prod') {
+        if (ENV === 'prod') {
             return $this->cache->get("router:$httpMethod:$uri", function () use ($httpMethod, $uri) {
                 return $this->getDispatcher()->dispatch($httpMethod, $uri);
             });
@@ -65,16 +69,14 @@ readonly class RouterDispatcher {
     }
 
     private function getDispatcher(): Dispatcher {
-        $config = new Config();
-
-        return cachedDispatcher(function (RouteCollector $r) use ($config) {
-            $routes = $config->get('routing/routing.php');
+        return cachedDispatcher(function (RouteCollector $r) {
+            $routes = $this->config->get('routing/routing.php');
 
             foreach ($routes as $name => $route) {
                 $r->addRoute($route[0], $route[1], $route[2] . '::' . $name);
             }
         }, [
-            'cacheFile' => "{$config->getCachePath()}/router.cache.php",
+            'cacheFile' => ROOT_PATH . '/var/cache/router.cache.php',
             'cacheDisabled' => $_ENV['APP_ENV'] !== 'prod',
         ]);
     }

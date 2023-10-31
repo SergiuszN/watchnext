@@ -2,15 +2,14 @@
 
 namespace WatchNext\Engine\Template;
 
-use WatchNext\Engine\Cache\CacheInterface;
-use WatchNext\Engine\Config;
+use WatchNext\Engine\Cache\ApcuCache;
 
 class Asset {
     private string $publicPath;
-    private CacheInterface $cache;
+    private ApcuCache $cache;
 
-    public function __construct(CacheInterface $cache, Config $config) {
-        $this->publicPath = $config->getRootPath() . '/public';
+    public function __construct(ApcuCache $cache) {
+        $this->publicPath = ROOT_PATH . '/public';
         $this->cache = $cache;
     }
 

@@ -27,14 +27,12 @@ class MemcachedCache implements CacheInterface {
         return $data;
     }
 
-    public function read(string $key): mixed {
-        return self::$memcached->get($key);
+    public function read(string $key, mixed $default = null): mixed {
+        return self::$memcached->get($key) ?? $default;
     }
 
-    public function set(string $key, mixed $data, ?int $ttl = null): mixed {
+    public function set(string $key, mixed $data, ?int $ttl = null): void {
         self::$memcached->set($key, $data, $ttl > 0 ? $ttl : 0);
-
-        return $data;
     }
 
     public function delete(string $key): void {

@@ -2,10 +2,10 @@
 
 namespace WatchNext\Engine\Cli;
 
+use WatchNext\Engine\Cache\ApcuCache;
 use WatchNext\Engine\Cache\MemcachedCache;
 use WatchNext\Engine\Cli\IO\CliInput;
 use WatchNext\Engine\Cli\IO\CliOutput;
-use WatchNext\Engine\Config;
 use WatchNext\Engine\Container;
 use WatchNext\Engine\Router\RouterDispatcher;
 use WatchNext\Engine\Template\TemplateEngine;
@@ -14,7 +14,9 @@ readonly class CacheClearCommand implements CliCommandInterface {
     public function __construct(
         private Container $container,
         private TemplateEngine $templateEngine,
-        private RouterDispatcher $dispatcher
+        private RouterDispatcher $dispatcher,
+        private MemcachedCache $memcachedCache,
+        private ApcuCache $apcuCache,
     ) {
     }
 
@@ -30,12 +32,13 @@ If you need warmup cache after clearing you can add option
         $output = new CliOutput();
 
         $output->write('Clearing the filesystem cache...');
-        $cacheFolder = (new Config())->getCachePath() . '/*';
+        $cacheFolder = ROOT_PATH . '/var/cache/*';
         exec("rm -rf $cacheFolder");
         $output->writeln(' OK');
 
-        $output->write('Clearing the memcache cache...');
-        (new MemcachedCache())->clearAll();
+        $output->write('Clearing the cache...');
+        $this->memcachedCache->clearAll();
+        $this->apcuCache->clearAll();
         $output->writeln(' OK');
 
         if ($input->isOptionExist('warmup')) {

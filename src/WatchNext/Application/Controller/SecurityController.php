@@ -6,7 +6,6 @@ use WatchNext\Engine\Event\EventManager;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Response\RedirectResponse;
 use WatchNext\Engine\Response\TemplateResponse;
-use WatchNext\Engine\Session\Auth;
 use WatchNext\Engine\Session\FlashBag;
 use WatchNext\Engine\Session\Security;
 use WatchNext\Engine\Template\Language;
@@ -24,12 +23,12 @@ readonly class SecurityController {
         private Security $security,
         private FlashBag $flashBag,
         private EventManager $eventManager,
-        private Auth $auth,
+        private UserRegisterForm $userRegisterForm,
     ) {
     }
 
     public function register(): TemplateResponse|RedirectResponse {
-        $form = new UserRegisterForm($this->request);
+        $form = $this->userRegisterForm->load();
 
         if ($form->isValid($this->userRepository)) {
             $password = password_hash($form->password, PASSWORD_DEFAULT);
@@ -48,7 +47,7 @@ readonly class SecurityController {
     public function login(): TemplateResponse|RedirectResponse {
         $form = new UserLoginForm($this->request);
 
-        if ($this->auth->getUserId()) {
+        if ($this->security->getUserId()) {
             return new RedirectResponse('homepage_app');
         }
 
@@ -73,7 +72,7 @@ readonly class SecurityController {
     }
 
     public function logout(): RedirectResponse {
-        $this->security->unathorize();
+        $this->security->unauthorize();
         return new RedirectResponse('security_login');
     }
 

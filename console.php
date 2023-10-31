@@ -3,4 +3,7 @@
 require __DIR__ . '/vendor/autoload.php';
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new \WatchNext\Engine\Dispatcher\CliDispatcher())->dispatch();
+$container = (new \WatchNext\Engine\Dispatcher\KernelLoader())->load();
+
+/** @noinspection PhpUnhandledExceptionInspection */
+$container->get(\WatchNext\Engine\Dispatcher\CliDispatcher::class)->dispatch();

@@ -2,31 +2,29 @@
 
 namespace WatchNext\Engine;
 
-use WatchNext\Engine\Cache\FileSystemCache;
+use WatchNext\Engine\Cache\ApcuCache;
 use WatchNext\Engine\Database\Database;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Router\DispatchedRoute;
-use WatchNext\Engine\Session\Auth;
+use WatchNext\Engine\Session\Security;
 use WatchNext\WatchNext\Domain\User\User;
 
-class DevTools {
+class Profiler {
     private bool $enabled;
-    private FileSystemCache $storage;
-    private ?Database $database;
-
     private static string $id = '';
+    private static array $data = [];
 
-    public function __construct() {
+    public function __construct(
+        private readonly ApcuCache $storage,
+        private readonly Database  $database,
+        private readonly Security  $security,
+        private readonly Request   $request,
+    ) {
         if (!self::$id) {
             self::$id = bin2hex(random_bytes(5));
         }
 
-        $this->enabled = $_ENV['APP_ENV'] === 'dev';
-        $this->storage = new FileSystemCache();
-
-        if ($this->enabled) {
-            $this->database = new Database();
-        }
+        $this->enabled = ENV === 'dev';
     }
 
     public function start(): void {
@@ -34,21 +32,15 @@ class DevTools {
             return;
         }
 
-        $requests = $this->storage->read('dev.tools') ?? [];
-        if (count($requests) > 9) {
-            $requests = array_slice($requests, -9);
-        }
-
-        $requests[self::$id] = [
+        self::$data = [
             'id' => self::$id,
             'method' => $_SERVER['REQUEST_METHOD'],
             'uri' => $_SERVER['REQUEST_URI'],
-            'started' => microtime(true) * 1000000,
+            'started' => STARTED_AT * 1000000,
             'events' => [],
+            'last_tick' => STARTED_AT * 1000000,
             'database' => [],
         ];
-
-        $this->storage->set('dev.tools', $requests);
     }
 
     public function add($event, mixed $data = null): void {
@@ -56,24 +48,19 @@ class DevTools {
             return;
         }
 
-        $requests = $this->storage->read('dev.tools') ?? [];
-        $lastTick = empty($requests[self::$id]['events'])
-            ? $requests[self::$id]['started']
-            : $requests[self::$id]['events'][array_key_last($requests[self::$id]['events'])]['tick'];
         $tick = microtime(true) * 1000000;
 
-        $requests[self::$id]['events'][] = [
+        self::$data['events'][] = [
             'event' => $event,
             'tick' => $tick,
-            'executed_in' => $tick - $lastTick,
+            'executed_in' => $tick - self::$data['last_tick'],
             'data' => $data,
         ];
 
-        $requests[self::$id]['max_memory'] = memory_get_peak_usage(false);
-        $requests[self::$id]['ended'] = microtime(true) * 1000000;
-        $requests[self::$id]['executed_in'] = $requests[self::$id]['ended'] - $requests[self::$id]['started'];
-
-        $this->storage->set('dev.tools', $requests);
+        self::$data['last_tick'] = $tick;
+        self::$data['max_memory'] = memory_get_peak_usage(false);
+        self::$data['ended'] = microtime(true) * 1000000;
+        self::$data['executed_in'] = self::$data['ended'] - self::$data['started'];
     }
 
     public function end(bool $render): void {
@@ -81,16 +68,16 @@ class DevTools {
             return;
         }
 
-        $requests = $this->storage->read('dev.tools') ?? [];
+        self::$data['max_memory'] = memory_get_peak_usage(false);
+        self::$data['user'] = $this->security->getUser();
+        self::$data['route'] = $this->request->getRoute();
+        self::$data['database'] = $this->database->getLogs();
+        self::$data['ended'] = microtime(true) * 1000000;
+        self::$data['executed_in'] = self::$data['ended'] - self::$data['started'];
 
-        $requests[self::$id]['max_memory'] = memory_get_peak_usage(false);
-        $requests[self::$id]['user'] = (new Auth())->getUser();
-        $requests[self::$id]['route'] = (new Request())->getRoute();
-        $requests[self::$id]['database'] = $this->database?->getLogs();
-        $requests[self::$id]['ended'] = microtime(true) * 1000000;
-        $requests[self::$id]['executed_in'] = $requests[self::$id]['ended'] - $requests[self::$id]['started'];
-
-        $this->storage->set('dev.tools', $requests);
+        $requests = $this->storage->read('profiler.storage', []);
+        $requests[self::$id] = self::$data;
+        $this->storage->set('profiler.storage', $requests);
 
         if ($render) {
             $this->render();
@@ -98,7 +85,7 @@ class DevTools {
     }
 
     public function render(): void {
-        $requests = $this->storage->read('dev.tools') ?? [];
+        $requests = $this->storage->read('profiler.storage', []);
 
         echo "<hr style='margin-top: 100px'>";
 
@@ -126,7 +113,7 @@ class DevTools {
 
             if (!empty($request['database'])) {
                 $countOfQueries = count($request['database']);
-                $timeOfQueries = round(array_sum(array_map(fn ($log) => $log['time'], $request['database'])) * 1000000);
+                $timeOfQueries = round(array_sum(array_map(fn($log) => $log['time'], $request['database'])) * 1000000);
 
                 echo "Database queries: {$countOfQueries} in $timeOfQueries (microseconds)<br>";
             }

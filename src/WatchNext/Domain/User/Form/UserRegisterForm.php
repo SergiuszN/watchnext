@@ -15,14 +15,18 @@ class UserRegisterForm {
     public readonly string $password;
     public readonly string $repeatPassword;
 
-    public function __construct(Request $request) {
-        $this->isPost = $request->isPost();
+    public function __construct(private readonly Request $request, private readonly Language $t) {
+        $this->isPost = $this->request->isPost();
+    }
 
+    public function load(): self {
         if ($this->isPost) {
-            $this->login = $request->post('login', '');
-            $this->password = $request->post('password', '');
-            $this->repeatPassword = $request->post('password-repeat', '');
+            $this->login = $this->request->post('login', '');
+            $this->password = $this->request->post('password', '');
+            $this->repeatPassword = $this->request->post('password-repeat', '');
         }
+
+        return $this;
     }
 
     public function isValid(UserRepository $userRepository): bool {
@@ -31,12 +35,11 @@ class UserRegisterForm {
         }
 
         try {
-            $l = new Language();
-            Assert::minLength($this->login, 3, "login:{$l->trans('user.login.assert.minLength')}");
-            Assert::minLength($this->password, 8, "password:{$l->trans('user.password.assert.minLength')}");
-            Assert::notEq($this->password, $this->login, "password:{$l->trans('user.password.assert.sameAsLogin')}");
-            Assert::eq($this->password, $this->repeatPassword, "password:{$l->trans('user.password.assert.areNotTheSame')}");
-            Assert::false($userRepository->doesExist($this->login), "login:{$l->trans('user.login.assert.alreadyExist')}");
+            Assert::minLength($this->login, 3, "login:{$this->t->trans('user.login.assert.minLength')}");
+            Assert::minLength($this->password, 8, "password:{$this->t->trans('user.password.assert.minLength')}");
+            Assert::notEq($this->password, $this->login, "password:{$this->t->trans('user.password.assert.sameAsLogin')}");
+            Assert::eq($this->password, $this->repeatPassword, "password:{$this->t->trans('user.password.assert.areNotTheSame')}");
+            Assert::false($userRepository->doesExist($this->login), "login:{$this->t->trans('user.login.assert.alreadyExist')}");
         } catch (InvalidArgumentException $invalidArgumentException) {
             (new FlashBag())->addValidationErrors($invalidArgumentException);
             return false;

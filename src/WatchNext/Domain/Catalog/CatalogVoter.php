@@ -3,14 +3,14 @@
 namespace WatchNext\WatchNext\Domain\Catalog;
 
 use WatchNext\Engine\Router\NotFoundException;
-use WatchNext\Engine\Session\Auth;
+use WatchNext\Engine\Session\Security;
 
 readonly class CatalogVoter {
     public const VIEW = 'view';
     public const EDIT = 'edit';
 
     public function __construct(
-        private Auth              $auth,
+        private Security          $security,
         private CatalogRepository $catalogRepository,
     ) {
     }
@@ -33,7 +33,7 @@ readonly class CatalogVoter {
             throw new NotFoundException();
         }
 
-        $userId = $this->auth->getUserId();
+        $userId = $this->security->getUserId();
 
         return match ($action) {
             self::VIEW => $this->canView($catalog, $userId),

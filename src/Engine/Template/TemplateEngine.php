@@ -15,9 +15,9 @@ use WatchNext\Engine\Container;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Router\RouteGenerator;
-use WatchNext\Engine\Session\Auth;
 use WatchNext\Engine\Session\CSFR;
 use WatchNext\Engine\Session\FlashBag;
+use WatchNext\Engine\Session\Security;
 
 class TemplateEngine {
     private static ?Environment $twig = null;
@@ -25,14 +25,13 @@ class TemplateEngine {
     /**
      * @throws Exception
      */
-    public function __construct(Container $container) {
+    public function __construct(Container $container, Config $config) {
         if (self::$twig) {
             return;
         }
 
-        $config = new Config();
-        $loader = new FilesystemLoader($config->getRootPath() . '/templates');
-        $cache = $_ENV['APP_ENV'] === 'dev' ? false : $config->getCachePath() . '/template-cache';
+        $loader = new FilesystemLoader(ROOT_PATH . '/templates');
+        $cache = $_ENV['APP_ENV'] === 'dev' ? false : ROOT_PATH . '/var/cache/template-cache';
         $debug = $_ENV['APP_ENV'] === 'dev';
 
         self::$twig = new Environment($loader, [
@@ -74,13 +73,13 @@ class TemplateEngine {
     }
 
     private function addDefaultGlobals(Container $container): void {
-        $this->addGlobal('flash', new FlashBag());
-        $this->addGlobal('t', new Language());
-        $this->addGlobal('csfr', new CSFR());
+        $this->addGlobal('flash', $container->get(FlashBag::class));
+        $this->addGlobal('t', $container->get(Language::class));
+        $this->addGlobal('csfr', $container->get(CSFR::class));
         $this->addGlobal('asset', $container->get(Asset::class));
-        $this->addGlobal('route', new RouteGenerator());
-        $this->addGlobal('request', new Request());
-        $this->addGlobal('auth', new Auth());
+        $this->addGlobal('route', $container->get(RouteGenerator::class));
+        $this->addGlobal('request', $container->get(Request::class));
+        $this->addGlobal('security', $container->get(Security::class));
     }
 
     /**

@@ -4,25 +4,24 @@ namespace WatchNext\Engine\Dispatcher;
 
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
-use WatchNext\Engine\Cache\VarDirectory;
 use WatchNext\Engine\Cli\CliCommandInterface;
 use WatchNext\Engine\Cli\IO\CliInput;
 use WatchNext\Engine\Config;
 use WatchNext\Engine\Container;
-use WatchNext\Engine\Env;
 
-class CliDispatcher {
+readonly class CliDispatcher {
+    public function __construct(
+        private Config    $config,
+        private Container $container,
+    ) {
+
+    }
+
     /**
      * @throws Exception
      */
     #[NoReturn] public function dispatch(): void {
-        (new Env())->load();
-        (new VarDirectory())->check();
-
-        $container = new Container();
-        $container->init();
-
-        $commands = (new Config())->get('cli.php');
+        $commands = $this->config->get('cli.php');
         $commands = array_merge($commands, $this->getKernelCliCommands());
 
         global $argv;
@@ -44,7 +43,7 @@ class CliDispatcher {
         foreach ($commands as $commandName => $commandClass) {
             if ($commandName === $selectedCommandName) {
                 /** @var CliCommandInterface $command */
-                $command = $container->get($commandClass);
+                $command = $this->container->get($commandClass);
 
                 if (!$isHelpOptionSelected) {
                     $command->execute();

@@ -1,5 +1,6 @@
 <?php
 
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
 return [
     \WatchNext\Engine\Cache\CacheInterface::class => fn () => new \WatchNext\Engine\Cache\MemcachedCache(),
     \WatchNext\WatchNext\Application\Controller\HomepageController::class => \DI\autowire(\WatchNext\WatchNext\Application\Controller\HomepageController::class),
@@ -15,4 +16,6 @@ return [
 
     \WatchNext\WatchNext\Domain\Catalog\Command\CreateDefaultUserCatalogCommand::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\Command\CreateDefaultUserCatalogCommand::class),
     \WatchNext\WatchNext\Domain\Catalog\SetDefaultCatalogIfRemoved::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\SetDefaultCatalogIfRemoved::class),
+    \WatchNext\WatchNext\Domain\User\Form\UserRegisterForm::class => \DI\autowire(\WatchNext\WatchNext\Domain\User\Form\UserRegisterForm::class),
+    \WatchNext\WatchNext\Domain\Catalog\Form\AddEditCatalogForm::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\Form\AddEditCatalogForm::class),
 ];

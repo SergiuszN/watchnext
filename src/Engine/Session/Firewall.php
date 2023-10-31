@@ -2,22 +2,26 @@
 
 namespace WatchNext\Engine\Session;
 
-use WatchNext\Engine\Cache\CacheInterface;
+use WatchNext\Engine\Cache\ApcuCache;
 use WatchNext\Engine\Config;
 use WatchNext\Engine\Router\AccessDeniedException;
 use WatchNext\WatchNext\Domain\User\User;
 
-class SecurityFirewall {
+class Firewall {
     private static ?array $roleTree = null;
     private static ?array $access = null;
     private static ?array $loggedUserRoles = null;
 
-    public function __construct(Auth $auth, Config $config, CacheInterface $cache) {
+    public function __construct(
+        private readonly Config    $config,
+        private readonly ApcuCache $cache
+    ) {
+    }
+
+    public function buildTree(?User $user): void {
         if (self::$roleTree !== null) {
             return;
         }
-
-        $user = $auth->getUser();
 
         if (!$user) {
             self::$roleTree = [];
@@ -26,11 +30,13 @@ class SecurityFirewall {
 
         self::$loggedUserRoles = $user->getRoles();
 
-        self::$roleTree = $_ENV['APP_ENV'] === 'prod'
-            ? $cache->get('security.firewall.tree', fn() => $this->buildRoleTree($config->get('security.php')['roles']))
-            : $this->buildRoleTree($config->get('security.php')['roles']);
+        $config = $this->config->get('security.php');
 
-        self::$access = $config->get('security.php')['access_control'];
+        self::$roleTree = ENV === 'prod'
+            ? $this->cache->get('security.firewall.tree', fn() => $this->buildRoleTree($config['roles']))
+            : $this->buildRoleTree($config['roles']);
+
+        self::$access = $config['access_control'];
     }
 
     public function isGranted(string $role, ?User $user = null): bool {

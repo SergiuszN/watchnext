@@ -5,22 +5,22 @@ namespace WatchNext\Engine\Template;
 use WatchNext\Engine\Config;
 
 class Language {
-    private static ?array $config = null;
+    private static ?array $translationConfig = null;
     private static array $translations = [];
-    private string $lang;
+    private static string $lang;
 
-    public function __construct() {
-        if (self::$config !== null) {
+    public function __construct(private readonly Config $config) {
+        if (self::$translationConfig !== null) {
             return;
         }
 
-        self::$config = (new Config())->get('translation.php');
-        $this->setLang($_SESSION['kernel.lang'] ?? self::$config['defaultLanguage']);
+        self::$translationConfig = $config->get('translation.php');
+        $this->setLang($_SESSION['kernel.lang'] ?? self::$translationConfig['defaultLanguage']);
     }
 
     public function setLang(string $lang): void {
-        $this->lang = $lang;
-        self::$translations = (new Config())->get("translations/messages.{$this->lang}.php");
+        self::$lang = $lang;
+        self::$translations = $this->config->get("translations/messages.{$lang}.php");
     }
 
     public function trans(string $key, array $params = []): string {
@@ -34,6 +34,6 @@ class Language {
     }
 
     public function getLang(): string {
-        return $this->lang;
+        return self::$lang;
     }
 }

@@ -2,35 +2,39 @@
 
 namespace WatchNext\Engine\Event;
 
-use WatchNext\Engine\Cache\CacheInterface;
+use WatchNext\Engine\Cache\ApcuCache;
 use WatchNext\Engine\Config;
 use WatchNext\Engine\Container;
 
 class EventManager {
     private static array $queries = [];
 
-    public function __construct(private readonly Container $container) {
+    public function __construct(
+        private Container $container,
+        private ApcuCache $cache,
+        private Config    $config,
+    ) {
 
     }
 
-    public function init(Config $config): void {
-        $cache = null;
-        if ($_ENV['APP_ENV'] === 'prod') {
-            $cache = $this->container->get(CacheInterface::class);
-            if ($cache->has('kernel.event.manager')) {
-                self::$queries = $cache->read('kernel.event.manager');
+    public function init(): void {
+        $isProduction = ENV === 'prod';
+
+        if ($isProduction) {
+            if ($this->cache->has('kernel.event.manager')) {
+                self::$queries = $this->cache->read('kernel.event.manager');
                 return;
             }
         }
 
-        $events = $config->get('events.php');
+        $events = $this->config->get('events.php');
 
         foreach ($events as $query => $command) {
             $this->register($query, $command);
         }
 
-        if ($cache) {
-            $cache->set('kernel.event.manager', self::$queries);
+        if ($isProduction) {
+            $this->cache->set('kernel.event.manager', self::$queries);
         }
     }
 

@@ -7,10 +7,9 @@ use WatchNext\Engine\Response\RedirectResponse;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Router\AccessDeniedException;
 use WatchNext\Engine\Router\NotFoundException;
-use WatchNext\Engine\Session\Auth;
 use WatchNext\Engine\Session\CSFR;
 use WatchNext\Engine\Session\FlashBag;
-use WatchNext\Engine\Session\SecurityFirewall;
+use WatchNext\Engine\Session\Security;
 use WatchNext\Engine\Template\Language;
 use WatchNext\WatchNext\Domain\Catalog\Catalog;
 use WatchNext\WatchNext\Domain\Catalog\CatalogRepository;
@@ -24,17 +23,18 @@ use WatchNext\WatchNext\Domain\User\UserRepository;
 
 readonly class CatalogController {
     public function __construct(
-        private Request $request,
-        private CatalogRepository $catalogRepository,
-        private ItemRepository $itemRepository,
-        private UserRepository $userRepository,
-        private SecurityFirewall $firewall,
-        private CatalogVoter $catalogVoter,
-        private CSFR $csfr,
-        private Auth $auth,
-        private FlashBag $flashBag,
-        private Language $language,
-        private SetDefaultCatalogIfRemoved $setDefaultCatalogIfRemoved
+        private Request                    $request,
+        private CatalogRepository          $catalogRepository,
+        private ItemRepository             $itemRepository,
+        private UserRepository             $userRepository,
+        private CatalogVoter               $catalogVoter,
+        private CSFR                       $csfr,
+        private Security                   $security,
+        private FlashBag                   $flashBag,
+        private Language                   $language,
+        private SetDefaultCatalogIfRemoved $setDefaultCatalogIfRemoved,
+        private AddEditCatalogForm         $addEditCatalogForm,
+        private CatalogShareWithForm       $catalogShareWithForm,
     ) {
     }
 
@@ -42,7 +42,7 @@ readonly class CatalogController {
      * @throws NotFoundException|AccessDeniedException
      */
     public function show(int $catalog, int $page = 1): TemplateResponse {
-        $this->firewall->throwIfNotGranted('ROLE_CATALOG_SHOW');
+        $this->security->throwIfNotGranted('ROLE_CATALOG_SHOW');
         $catalog = $this->catalogRepository->find($catalog);
         $this->catalogVoter->throwIfNotGranted($catalog, CatalogVoter::VIEW);
 
@@ -63,13 +63,13 @@ readonly class CatalogController {
      * @throws AccessDeniedException
      */
     public function manage(): TemplateResponse {
-        $this->firewall->throwIfNotGranted('ROLE_CATALOG_MANAGE');
-        $userId = $this->auth->getUserId();
+        $this->security->throwIfNotGranted('ROLE_CATALOG_MANAGE');
+        $userId = $this->security->getUserId();
         $catalogs = $this->catalogRepository->findAllForUser($userId);
 
         return new TemplateResponse('page/catalog/manage.html.twig', [
-            'ownedCatalogs' => array_filter($catalogs, fn (Catalog $catalog) => $catalog->getOwner() === $userId),
-            'sharedCatalogs' => array_filter($catalogs, fn (Catalog $catalog) => $catalog->getOwner() !== $userId),
+            'ownedCatalogs' => array_filter($catalogs, fn(Catalog $catalog) => $catalog->getOwner() === $userId),
+            'sharedCatalogs' => array_filter($catalogs, fn(Catalog $catalog) => $catalog->getOwner() !== $userId),
         ]);
     }
 
@@ -77,9 +77,9 @@ readonly class CatalogController {
      * @throws AccessDeniedException
      */
     public function add(): TemplateResponse|RedirectResponse {
-        $this->firewall->throwIfNotGranted('ROLE_CATALOG_ADD');
-        $form = new AddEditCatalogForm($this->request, $this->csfr);
-        $userId = $this->auth->getUserId();
+        $this->security->throwIfNotGranted('ROLE_CATALOG_ADD');
+        $form = $this->addEditCatalogForm->load();
+        $userId = $this->security->getUserId();
 
         if ($form->isValid()) {
             $catalog = Catalog::create($form->name, $userId);
@@ -99,7 +99,7 @@ readonly class CatalogController {
      * @throws NotFoundException|AccessDeniedException
      */
     public function remove(int $catalog): RedirectResponse {
-        $this->firewall->throwIfNotGranted('ROLE_CATALOG_REMOVE');
+        $this->security->throwIfNotGranted('ROLE_CATALOG_REMOVE');
         $catalog = $this->catalogRepository->find($catalog);
         $this->catalogVoter->throwIfNotGranted($catalog, CatalogVoter::EDIT);
 
@@ -117,10 +117,10 @@ readonly class CatalogController {
      * @throws NotFoundException|AccessDeniedException
      */
     public function setDefault(int $catalog): RedirectResponse {
-        $this->firewall->throwIfNotGranted('ROLE_CATALOG_SET_DEFAULT');
+        $this->security->throwIfNotGranted('ROLE_CATALOG_SET_DEFAULT');
         $catalog = $this->catalogRepository->find($catalog);
         $this->catalogVoter->throwIfNotGranted($catalog, CatalogVoter::VIEW);
-        $this->catalogRepository->setAsDefault(new CatalogUser($catalog->getId(), $this->auth->getUserId()));
+        $this->catalogRepository->setAsDefault(new CatalogUser($catalog->getId(), $this->security->getUserId()));
 
         $this->flashBag->add('success', $this->language->trans('catalog.setDefault.success'));
         return new RedirectResponse('catalog_manage');
@@ -130,11 +130,11 @@ readonly class CatalogController {
      * @throws NotFoundException|AccessDeniedException
      */
     public function edit(int $catalog): TemplateResponse|RedirectResponse {
-        $this->firewall->throwIfNotGranted('ROLE_CATALOG_EDIT');
+        $this->security->throwIfNotGranted('ROLE_CATALOG_EDIT');
         $catalog = $this->catalogRepository->find($catalog);
         $this->catalogVoter->throwIfNotGranted($catalog, CatalogVoter::EDIT);
 
-        $form = new AddEditCatalogForm($this->request, $this->csfr);
+        $form = $this->addEditCatalogForm->load();
 
         if ($form->isValid()) {
             $catalog->setName($form->name);
@@ -154,11 +154,11 @@ readonly class CatalogController {
      * @throws NotFoundException|AccessDeniedException
      */
     public function share(int $catalog): RedirectResponse {
-        $this->firewall->throwIfNotGranted('ROLE_CATALOG_SHARE');
+        $this->security->throwIfNotGranted('ROLE_CATALOG_SHARE');
         $catalog = $this->catalogRepository->find($catalog);
         $this->catalogVoter->throwIfNotGranted($catalog, CatalogVoter::EDIT);
 
-        $form = new CatalogShareWithForm($this->request, $this->csfr);
+        $form = $this->catalogShareWithForm->load();
 
         if ($form->isValid()) {
             $user = $this->userRepository->findByLogin($form->username);
@@ -178,7 +178,7 @@ readonly class CatalogController {
      * @throws NotFoundException|AccessDeniedException
      */
     public function unShare(int $catalog, int $user): RedirectResponse {
-        $this->firewall->throwIfNotGranted('ROLE_CATALOG_UN_SHARE_TO');
+        $this->security->throwIfNotGranted('ROLE_CATALOG_UN_SHARE_TO');
         $catalog = $this->catalogRepository->find($catalog);
         $this->catalogVoter->throwIfNotGranted($catalog, CatalogVoter::EDIT);
 
@@ -193,11 +193,11 @@ readonly class CatalogController {
      * @throws NotFoundException|AccessDeniedException
      */
     public function unsubscribe(int $catalog): RedirectResponse {
-        $this->firewall->throwIfNotGranted('ROLE_CATALOG_UNSUBSCRIBE');
+        $this->security->throwIfNotGranted('ROLE_CATALOG_UNSUBSCRIBE');
         $catalog = $this->catalogRepository->find($catalog);
         $this->catalogVoter->throwIfNotGranted($catalog, CatalogVoter::VIEW);
 
-        $defaultUserId = $this->catalogRepository->removeAccess(new CatalogUser($catalog->getId(), $this->auth->getUserId()));
+        $defaultUserId = $this->catalogRepository->removeAccess(new CatalogUser($catalog->getId(), $this->security->getUserId()));
         $this->setDefaultCatalogIfRemoved->execute($defaultUserId);
 
         $this->flashBag->add('success', $this->language->trans('catalog.unsubscribe.success'));

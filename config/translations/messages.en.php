@@ -4,7 +4,7 @@ return [
 	'app.areYouSure' => 'Are you sure?',
 	'app.back' => 'Back',
 	'app.close' => 'Close',
-	'catalog.add.assert.name.minLength' => 'Catalog name must be at least 8 symbols long',
+	'catalog.add.assert.name.minLength' => 'Catalog name must be at least 3 symbols long',
 	'catalog.add.form.create' => 'Create',
 	'catalog.add.form.name' => 'Name',
 	'catalog.add.success' => 'A new one catalog successfully added',

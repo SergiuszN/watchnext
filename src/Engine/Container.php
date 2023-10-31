@@ -5,18 +5,21 @@ namespace WatchNext\Engine;
 use DI\Container as DIContainer;
 use DI\ContainerBuilder;
 use Exception;
+use WatchNext\Engine\Cache\ApcuCache;
+use WatchNext\Engine\Cache\MemcachedCache;
 use WatchNext\Engine\Cli\CacheClearCommand;
 use WatchNext\Engine\Cli\MigrationsGenerateCommand;
 use WatchNext\Engine\Cli\MigrationsMigrateCommand;
 use WatchNext\Engine\Cli\TranslatorOrderKeysCommand;
 use WatchNext\Engine\Database\Database;
+use WatchNext\Engine\Dispatcher\HttpDispatcher;
 use WatchNext\Engine\Event\EventManager;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Session\Auth;
 use WatchNext\Engine\Session\FlashBag;
 use WatchNext\Engine\Session\Security;
-use WatchNext\Engine\Session\SecurityFirewall;
+use WatchNext\Engine\Session\Firewall;
 use WatchNext\Engine\Template\Asset;
 use WatchNext\Engine\Template\Language;
 use WatchNext\Engine\Template\TemplateEngine;
@@ -28,19 +31,20 @@ class Container {
     /**
      * @throws Exception
      */
-    public function init(): void {
+    public function init(): self {
         if (self::$diContainer) {
             throw new Exception('Container already created!');
         }
 
         $this->build();
+        return $this;
     }
 
     /**
      * @throws Exception
      */
     private function build(): void {
-        $env = $_ENV['APP_ENV'];
+        $env = ENV;
         $config = new Config();
 
         $kernelConfig = $this->getKernelDI();
@@ -51,8 +55,8 @@ class Container {
         $builder->addDefinitions(array_merge($kernelConfig, $baseConfig, $envConfig));
 
         if ($env === 'prod') {
-            $builder->enableCompilation("{$config->getCachePath()}/di-cache");
-            $builder->writeProxiesToFile(true, "{$config->getCachePath()}/di-cache/proxies");
+            $builder->enableCompilation(ROOT_PATH . "/var/cache/di-cache");
+            $builder->writeProxiesToFile(true, ROOT_PATH . "/var/cache/di-cache/proxies");
         }
 
         self::$diContainer = $builder->build();
@@ -81,28 +85,28 @@ class Container {
 
     private function getKernelDI(): array {
         return [
-            'root.dir' => (new Config())->getRootPath(),
+            'rootDir' => ROOT_PATH,
 
-            Container::class => fn() => new Container(),
-            Database::class => fn() => new Database(),
+            Container::class => autowire(Container::class),
+            HttpDispatcher::class => autowire(HttpDispatcher::class),
+            Database::class => autowire(Database::class),
             TemplateEngine::class => autowire(TemplateEngine::class),
             Asset::class => autowire(Asset::class),
-            Request::class => fn() => new Request(),
-
+            Request::class => autowire(Request::class),
             RouteGenerator::class => autowire(RouteGenerator::class),
-
-            Logger::class => fn() => fn() => new Logger(),
-            Language::class => fn() => new Language(),
-            FlashBag::class => fn() => new FlashBag(),
-            Auth::class => fn() => new Auth(),
+            Logger::class => autowire(Logger::class),
+            Language::class => autowire(Language::class),
+            FlashBag::class => autowire(FlashBag::class),
+            Auth::class => autowire(Auth::class),
             Security::class => autowire(Security::class),
-            SecurityFirewall::class => autowire(SecurityFirewall::class),
+            Firewall::class => autowire(Firewall::class),
             EventManager::class => autowire(EventManager::class),
-
             CacheClearCommand::class => autowire(CacheClearCommand::class),
             MigrationsGenerateCommand::class => autowire(MigrationsGenerateCommand::class),
             MigrationsMigrateCommand::class => autowire(MigrationsMigrateCommand::class),
             TranslatorOrderKeysCommand::class => autowire(TranslatorOrderKeysCommand::class),
+            MemcachedCache::class => autowire(MemcachedCache::class),
+            ApcuCache::class => autowire(ApcuCache::class),
         ];
     }
 }

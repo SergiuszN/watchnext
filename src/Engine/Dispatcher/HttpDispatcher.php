@@ -7,11 +7,8 @@ use Throwable;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
-use WatchNext\Engine\Cache\VarDirectory;
-use WatchNext\Engine\Config;
 use WatchNext\Engine\Container;
-use WatchNext\Engine\DevTools;
-use WatchNext\Engine\Env;
+use WatchNext\Engine\Profiler;
 use WatchNext\Engine\Event\EventManager;
 use WatchNext\Engine\Logger;
 use WatchNext\Engine\Response\JsonResponse;
@@ -23,68 +20,63 @@ use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Router\RouterDispatcher;
 use WatchNext\Engine\Router\RouterDispatcherStatusEnum;
 use WatchNext\Engine\Session\Security;
-use WatchNext\Engine\Session\SecurityFirewall;
 use WatchNext\Engine\Template\TemplateEngine;
 use WatchNext\WatchNext\Application\Controller\SecurityController;
 
 class HttpDispatcher {
-    private Container $container;
+    public function __construct(
+        private Profiler           $profiler,
+        private Security           $security,
+        private RouterDispatcher   $routerDispatcher,
+        private EventManager       $eventManager,
+        private SecurityController $securityController,
+        private TemplateEngine     $templateEngine,
+        private RouteGenerator     $routeGenerator,
+        private Container          $container,
+        private Logger             $logger
+    ) {
+    }
 
     /**
      * @throws Exception|Throwable
      */
     public function dispatch(): void {
-        (new Env())->load();
-        (new VarDirectory())->check();
+        $this->profiler->start();
+        $this->profiler->add('kernel.booted');
 
-        $devTools = new DevTools();
-        $devTools->start();
+        $this->security->init();
+        $this->profiler->add('security.booted');
 
-        $this->container = new Container();
-        $this->container->init();
-        $devTools->add('container.booted');
+        $route = $this->routerDispatcher->dispatch();
+        $this->profiler->add('route.dispatched');
 
-        $this->container->get(Security::class)->init();
-        $devTools->add('security.booted');
-
-        $route = $this->container->get(RouterDispatcher::class)->dispatch();
-        $devTools->add('route.dispatched');
-
-        $this->container->get(EventManager::class)->init(new Config());
+        $this->eventManager->init();
 
         if ($route->status === RouterDispatcherStatusEnum::FOUND) {
             try {
-                $firewall = $this->container->get(SecurityFirewall::class);
-                $firewall->throwIfPathNotAccessible($_SERVER['REQUEST_URI']);
+                $this->security->throwIfPathNotAccessible($_SERVER['REQUEST_URI']);
 
-                $controller = (new Container())->get($route->class);
+                $controller = $this->container->get($route->class);
                 $response = $controller->{$route->action}(...$route->vars);
+                $this->profiler->add('controller.dispatched');
 
-                $devTools->add('controller.dispatched');
-
-                $this->render($response, $devTools);
-            }
-            catch (AccessDeniedException $accessDeniedException) {
-                $securityController = $this->container->get(SecurityController::class);
-                $this->render($securityController->accessDenied(), $devTools);
+                $this->render($response);
+            } catch (AccessDeniedException $accessDeniedException) {
+                $this->render($this->securityController->accessDenied());
 
                 die();
-            }
-            catch (NotFoundException $notFoundException) {
-                $securityController = $this->container->get(SecurityController::class);
-                $this->render($securityController->notFound(), $devTools);
+            } catch (NotFoundException $notFoundException) {
+                $this->render($this->securityController->notFound());
 
                 die();
-            }
-            catch (Throwable $throwable) {
-                (new Logger())->error($throwable);
+            } catch (Throwable $throwable) {
+                $this->logger->error($throwable);
                 throw $throwable;
             }
 
             die();
         } else {
-            $securityController = $this->container->get(SecurityController::class);
-            $this->render($securityController->notFound(), $devTools);
+            $this->render($this->securityController->notFound());
         }
     }
 
@@ -94,24 +86,21 @@ class HttpDispatcher {
      * @throws LoaderError
      * @throws Exception
      */
-    private function render($response, DevTools $devTools): void {
+    private function render($response): void {
         $responseClass = get_class($response);
+        $printProfile = false;
 
         switch ($responseClass) {
             case TemplateResponse::class:
                 /** @var $response TemplateResponse */
-                echo $this->container->get(TemplateEngine::class)->render($response);
+                echo $this->templateEngine->render($response);
 
-                $devTools->add('twig.rendered');
-                $devTools->end(true);
-
+                $printProfile = true;
                 break;
             case RedirectResponse::class:
                 /** @var $response RedirectResponse */
-                $location = (new RouteGenerator())->make($response->route, $response->params);
+                $location = $this->routeGenerator->make($response->route, $response->params);
                 header("Location: $location");
-
-                $devTools->end(false);
 
                 break;
             case JsonResponse::class:
@@ -120,13 +109,12 @@ class HttpDispatcher {
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode($response->data);
 
-                $devTools->end(false);
-
                 break;
             default:
-                echo 'Controller return unknown type of response';
-
                 break;
         }
+
+        $this->profiler->add('kernel.rendered');
+        $this->profiler->end($printProfile);
     }
 }

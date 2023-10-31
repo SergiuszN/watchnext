@@ -16,7 +16,7 @@ Required arguments:
 
     public function execute(): void {
         [$input, $output] = [new CliInput(), new CliOutput()];
-        $rootPath = (new Config())->getRootPath();
+        $rootPath = ROOT_PATH;
 
         $name = $input->getArgument(0, null, true, "You must provide 'name'(0) argument!");
 

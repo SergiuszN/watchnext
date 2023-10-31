@@ -123,7 +123,7 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository {
                 ->from('`catalog_user`')
                 ->andWhere('catalog = :catalog')
                 ->andWhere('user = :user')
-                ->andWhere('id_default = 1')
+                ->andWhere('is_default = 1')
                 ->limit(1)
                 ->setParameters($catalogUser->toDatabase())
             )->fetchSingle() > 0;
