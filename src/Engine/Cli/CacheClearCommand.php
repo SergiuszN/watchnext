@@ -2,6 +2,7 @@
 
 namespace WatchNext\Engine\Cli;
 
+use Exception;
 use WatchNext\Engine\Cache\ApcuCache;
 use WatchNext\Engine\Cache\MemcachedCache;
 use WatchNext\Engine\Cli\IO\CliInput;
@@ -29,6 +30,9 @@ If you need warmup cache after clearing you can add option
 ';
     }
 
+    /**
+     * @throws Exception
+     */
     public function execute(): void
     {
         $input = new CliInput();
@@ -64,7 +68,7 @@ If you need warmup cache after clearing you can add option
         $output->writeln('Done!');
     }
 
-    private function getDirContents($dir, &$results = [])
+    private function getDirContents($dir, &$results = []): void
     {
         $files = scandir($dir);
 
@@ -78,7 +82,5 @@ If you need warmup cache after clearing you can add option
                 $this->getDirContents($path, $results);
             }
         }
-
-        return $results;
     }
 }
