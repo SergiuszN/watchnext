@@ -19,13 +19,15 @@ use WatchNext\Engine\Session\CSFR;
 use WatchNext\Engine\Session\FlashBag;
 use WatchNext\Engine\Session\Security;
 
-class TemplateEngine {
+class TemplateEngine
+{
     private static ?Environment $twig = null;
 
     /**
      * @throws Exception
      */
-    public function __construct(Container $container, Config $config) {
+    public function __construct(Container $container, Config $config)
+    {
         if (self::$twig) {
             return;
         }
@@ -48,11 +50,13 @@ class TemplateEngine {
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function render(TemplateResponse $templateResponse): string {
+    public function render(TemplateResponse $templateResponse): string
+    {
         return self::$twig->render($templateResponse->template, $templateResponse->params);
     }
 
-    public function warmup(string $template): void {
+    public function warmup(string $template): void
+    {
         try {
             self::$twig->render($template);
         } catch (Exception $exception) {
@@ -60,19 +64,23 @@ class TemplateEngine {
         }
     }
 
-    public function addGlobal(string $name, $value): void {
+    public function addGlobal(string $name, $value): void
+    {
         self::$twig->addGlobal($name, $value);
     }
 
-    public function addFilter(TwigFilter $filter): void {
+    public function addFilter(TwigFilter $filter): void
+    {
         self::$twig->addFilter($filter);
     }
 
-    public function addFunction(TwigFunction $function): void {
+    public function addFunction(TwigFunction $function): void
+    {
         self::$twig->addFunction($function);
     }
 
-    private function addDefaultGlobals(Container $container): void {
+    private function addDefaultGlobals(Container $container): void
+    {
         $this->addGlobal('flash', $container->get(FlashBag::class));
         $this->addGlobal('t', $container->get(Language::class));
         $this->addGlobal('csfr', $container->get(CSFR::class));
@@ -85,7 +93,8 @@ class TemplateEngine {
     /**
      * @throws Exception
      */
-    private function addUserGlobals(Config $config, Container $container): void {
+    private function addUserGlobals(Config $config, Container $container): void
+    {
         $globals = $config->get('twigGlobals.php');
         foreach ($globals as $name => $globalClass) {
             $this->addGlobal($name, $container->get($globalClass));

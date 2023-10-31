@@ -8,9 +8,11 @@ use FastRoute\RouteCollector;
 use WatchNext\Engine\Cache\ApcuCache;
 use WatchNext\Engine\Config;
 use WatchNext\Engine\Request\Request;
+
 use function FastRoute\cachedDispatcher;
 
-readonly class RouterDispatcher {
+readonly class RouterDispatcher
+{
     public function __construct(
         private ApcuCache $cache,
         private Request $request,
@@ -21,7 +23,8 @@ readonly class RouterDispatcher {
     /**
      * @throws Exception
      */
-    public function dispatch(): DispatchedRoute {
+    public function dispatch(): DispatchedRoute
+    {
         $routeInfo = $this->getRouteInfo();
 
         switch ($routeInfo[0]) {
@@ -55,7 +58,8 @@ readonly class RouterDispatcher {
         throw new Exception('This code must not be ever runed!');
     }
 
-    private function getRouteInfo(): array {
+    private function getRouteInfo(): array
+    {
         $httpMethod = $_SERVER['REQUEST_METHOD'];
         $uri = $this->getUri();
 
@@ -68,7 +72,8 @@ readonly class RouterDispatcher {
         }
     }
 
-    private function getDispatcher(): Dispatcher {
+    private function getDispatcher(): Dispatcher
+    {
         return cachedDispatcher(function (RouteCollector $r) {
             $routes = $this->config->get('routing/routing.php');
 
@@ -81,11 +86,13 @@ readonly class RouterDispatcher {
         ]);
     }
 
-    public function warmup(): void {
+    public function warmup(): void
+    {
         $this->getDispatcher();
     }
 
-    private function getUri(): string {
+    private function getUri(): string
+    {
         $uri = $_SERVER['REQUEST_URI'];
 
         if (false !== $pos = strpos($uri, '?')) {

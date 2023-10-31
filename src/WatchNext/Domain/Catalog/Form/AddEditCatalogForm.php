@@ -7,10 +7,12 @@ use WatchNext\Engine\Request\Form;
 use WatchNext\Engine\Session\FlashBag;
 use Webmozart\Assert\Assert;
 
-class AddEditCatalogForm extends Form {
+class AddEditCatalogForm extends Form
+{
     public string $name;
 
-    public function load(): AddEditCatalogForm {
+    public function load(): AddEditCatalogForm
+    {
         if ($this->isPost) {
             $this->name = $this->request->post('name', '');
         }
@@ -18,12 +20,14 @@ class AddEditCatalogForm extends Form {
         return $this;
     }
 
-    public function isValid(bool $csfr = true): bool {
+    public function isValid(bool $csfr = true): bool
+    {
         if (parent::isValid($csfr)) {
             try {
                 Assert::minLength($this->name, 3, "name:{$this->t->trans('catalog.add.assert.name.minLength')}");
             } catch (InvalidArgumentException $invalidArgumentException) {
                 (new FlashBag())->addValidationErrors($invalidArgumentException);
+
                 return false;
             }
 

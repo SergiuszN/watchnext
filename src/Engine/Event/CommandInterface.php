@@ -2,6 +2,7 @@
 
 namespace WatchNext\Engine\Event;
 
-interface CommandInterface {
+interface CommandInterface
+{
     public function execute(QueryInterface $query): void;
 }

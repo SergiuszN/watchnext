@@ -6,22 +6,25 @@ use WatchNext\Engine\Cli\IO\CliInput;
 use WatchNext\Engine\Cli\IO\CliOutput;
 use WatchNext\Engine\Container;
 
-class TranslatorCheckCommand implements CliCommandInterface {
-
+class TranslatorCheckCommand implements CliCommandInterface
+{
     private string $translationsPath;
 
-    public function __construct(Container $container) {
+    public function __construct(Container $container)
+    {
         $this->translationsPath = $container->get('root.dir') . '/config/translations';
     }
 
-    public function getHelp(): string {
+    public function getHelp(): string
+    {
         return 'This command search for lost translations in non main translation file
 By default main translation file is "en"
 Buy you can put option --base=CODE with any other lang
 ';
     }
 
-    public function execute(): void {
+    public function execute(): void
+    {
         [$input, $output] = [new CliInput(), new CliOutput()];
 
         $baseLang = $input->getOption('base', false, 'en');
@@ -33,7 +36,7 @@ Buy you can put option --base=CODE with any other lang
 
         if (!file_exists($baseTranslationsPath)) {
             echo "Base translations ($baseTranslationsPath) not exist!";
-            die();
+            exit;
         }
 
         $baseTranslations = require $baseTranslationsPath;

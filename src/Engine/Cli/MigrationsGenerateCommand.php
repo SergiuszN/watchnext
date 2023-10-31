@@ -4,17 +4,19 @@ namespace WatchNext\Engine\Cli;
 
 use WatchNext\Engine\Cli\IO\CliInput;
 use WatchNext\Engine\Cli\IO\CliOutput;
-use WatchNext\Engine\Config;
 
-class MigrationsGenerateCommand implements CliCommandInterface {
-    public function getHelp(): string {
+class MigrationsGenerateCommand implements CliCommandInterface
+{
+    public function getHelp(): string
+    {
         return 'This command creates empty migration template with selected name
 Required arguments:
     migrations:generate {NameWhatYouNeedForNewCommand}
 ';
     }
 
-    public function execute(): void {
+    public function execute(): void
+    {
         [$input, $output] = [new CliInput(), new CliOutput()];
         $rootPath = ROOT_PATH;
 
@@ -22,7 +24,7 @@ Required arguments:
 
         $output->writeln("Creation of '$name' migration...");
 
-        $file = file_get_contents( "{$rootPath}/src/Engine/Database/ExampleMigration.php.text");
+        $file = file_get_contents("{$rootPath}/src/Engine/Database/ExampleMigration.php.text");
         $className = 'm_' . time() . '_' . $name;
 
         $file = str_replace('%className%', $className, $file);

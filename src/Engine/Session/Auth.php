@@ -6,7 +6,8 @@ use Exception;
 use WatchNext\WatchNext\Domain\User\User;
 use WatchNext\WatchNext\Domain\User\UserRepository;
 
-readonly class Auth {
+readonly class Auth
+{
     public function __construct(
         private UserRepository $userRepository
     ) {
@@ -15,7 +16,8 @@ readonly class Auth {
     /**
      * @throws Exception
      */
-    public function authorize(User $user, bool $rememberMe = false): void {
+    public function authorize(User $user, bool $rememberMe = false): void
+    {
         $_SESSION['main.auth.user'] = serialize($user);
 
         if ($rememberMe) {
@@ -31,7 +33,8 @@ readonly class Auth {
         }
     }
 
-    public function unauthorize(): void {
+    public function unauthorize(): void
+    {
         unset($_SESSION['main.auth.user']);
         setcookie('rmmbr.key', '', -1);
         setcookie('rmmbr.token', '', -1);
@@ -40,7 +43,8 @@ readonly class Auth {
     /**
      * @throws Exception
      */
-    public function tryAuthorizeFromCookie(): void {
+    public function tryAuthorizeFromCookie(): void
+    {
         if (isset($_SESSION['main.auth.user']) || !isset($_COOKIE['rmmbr.key'])) {
             return;
         }

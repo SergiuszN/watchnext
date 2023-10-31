@@ -9,17 +9,20 @@ use WatchNext\Engine\Template\Language;
 use WatchNext\WatchNext\Domain\User\UserRepository;
 use Webmozart\Assert\Assert;
 
-class UserRegisterForm {
+class UserRegisterForm
+{
     private bool $isPost;
     public readonly string $login;
     public readonly string $password;
     public readonly string $repeatPassword;
 
-    public function __construct(private readonly Request $request, private readonly Language $t) {
+    public function __construct(private readonly Request $request, private readonly Language $t)
+    {
         $this->isPost = $this->request->isPost();
     }
 
-    public function load(): self {
+    public function load(): self
+    {
         if ($this->isPost) {
             $this->login = $this->request->post('login', '');
             $this->password = $this->request->post('password', '');
@@ -29,7 +32,8 @@ class UserRegisterForm {
         return $this;
     }
 
-    public function isValid(UserRepository $userRepository): bool {
+    public function isValid(UserRepository $userRepository): bool
+    {
         if (!$this->isPost) {
             return false;
         }
@@ -42,6 +46,7 @@ class UserRegisterForm {
             Assert::false($userRepository->doesExist($this->login), "login:{$this->t->trans('user.login.assert.alreadyExist')}");
         } catch (InvalidArgumentException $invalidArgumentException) {
             (new FlashBag())->addValidationErrors($invalidArgumentException);
+
             return false;
         }
 

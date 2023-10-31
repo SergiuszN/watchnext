@@ -4,13 +4,15 @@ namespace WatchNext\WatchNext\Domain\User\Form;
 
 use WatchNext\Engine\Request\Request;
 
-class UserLoginForm {
+class UserLoginForm
+{
     private bool $isPost;
     public readonly string $login;
     public readonly string $password;
     public readonly bool $rememberMe;
 
-    public function __construct(Request $request) {
+    public function __construct(Request $request)
+    {
         $this->isPost = $request->isPost();
 
         if ($this->isPost) {
@@ -20,7 +22,8 @@ class UserLoginForm {
         }
     }
 
-    public function isValid(): bool {
+    public function isValid(): bool
+    {
         return $this->isPost;
     }
 }

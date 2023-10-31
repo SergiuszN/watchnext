@@ -6,22 +6,25 @@ use Exception;
 use WatchNext\Engine\Container;
 use WatchNext\Engine\Env;
 
-class KernelLoader {
-
+class KernelLoader
+{
     /**
      * @throws Exception
      */
-    public function load(): Container {
+    public function load(): Container
+    {
         define('ROOT_PATH', realpath(__DIR__ . '/../../../'));
 
         (new Env())->load();
         define('ENV', $_ENV['APP_ENV']);
 
         $this->createVarDirectory();
+
         return (new Container())->init();
     }
 
-    public function createVarDirectory(): void {
+    public function createVarDirectory(): void
+    {
         $dir = ROOT_PATH . '/var';
 
         if (!file_exists($dir)) {

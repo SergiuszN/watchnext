@@ -70,10 +70,12 @@ trans:
 			php console.php translations:reorder; \
 		"
 
-#push: ## Check project before push
-#	$(MAKE)	fix-cs
-#	$(MAKE) dep-trac
-#
+push: ## Check project before push
+	@$(PHP_CONT) sh -c "\
+    			php console.php translations:reorder; \
+    			vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix; \
+    		"
+
 #dsu: ## Build project after pull
 #	@$(DOCKER_COMP) exec php sh -c "\
 #			php bin/console d:s:u --dump-sql --force --complete; \

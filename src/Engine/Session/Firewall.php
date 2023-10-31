@@ -7,24 +7,27 @@ use WatchNext\Engine\Config;
 use WatchNext\Engine\Router\AccessDeniedException;
 use WatchNext\WatchNext\Domain\User\User;
 
-class Firewall {
+class Firewall
+{
     private static ?array $roleTree = null;
     private static ?array $access = null;
     private static ?array $loggedUserRoles = null;
 
     public function __construct(
-        private readonly Config    $config,
+        private readonly Config $config,
         private readonly ApcuCache $cache
     ) {
     }
 
-    public function buildTree(?User $user): void {
+    public function buildTree(?User $user): void
+    {
         if (self::$roleTree !== null) {
             return;
         }
 
         if (!$user) {
             self::$roleTree = [];
+
             return;
         }
 
@@ -33,13 +36,14 @@ class Firewall {
         $config = $this->config->get('security.php');
 
         self::$roleTree = ENV === 'prod'
-            ? $this->cache->get('security.firewall.tree', fn() => $this->buildRoleTree($config['roles']))
+            ? $this->cache->get('security.firewall.tree', fn () => $this->buildRoleTree($config['roles']))
             : $this->buildRoleTree($config['roles']);
 
         self::$access = $config['access_control'];
     }
 
-    public function isGranted(string $role, ?User $user = null): bool {
+    public function isGranted(string $role, User $user = null): bool
+    {
         $userRoles = $user ? $user->getRoles() : self::$loggedUserRoles;
 
         if (!is_array($userRoles)) {
@@ -57,13 +61,15 @@ class Firewall {
         return false;
     }
 
-    public function throwIfNotGranted(string $role, ?User $user = null): void {
+    public function throwIfNotGranted(string $role, User $user = null): void
+    {
         if (!$this->isGranted($role, $user)) {
             throw new AccessDeniedException();
         }
     }
 
-    public function throwIfPathNotAccessible(string $uri): void {
+    public function throwIfPathNotAccessible(string $uri): void
+    {
         if (self::$access === null) {
             return;
         }
@@ -81,7 +87,8 @@ class Firewall {
         }
     }
 
-    private function buildRoleTree(array $roles): array {
+    private function buildRoleTree(array $roles): array
+    {
         $flatRoles = [];
 
         foreach ($roles as $role => $subRoles) {
@@ -105,7 +112,8 @@ class Firewall {
         return $tree;
     }
 
-    private function mapFlatRoles(array &$roles, array $flatRoles, array $parents): void {
+    private function mapFlatRoles(array &$roles, array $flatRoles, array $parents): void
+    {
         foreach ($parents as $parent) {
             $roles[] = $parent;
 

@@ -10,7 +10,8 @@ use WatchNext\Engine\Container;
 use WatchNext\Engine\Router\RouterDispatcher;
 use WatchNext\Engine\Template\TemplateEngine;
 
-readonly class CacheClearCommand implements CliCommandInterface {
+readonly class CacheClearCommand implements CliCommandInterface
+{
     public function __construct(
         private Container $container,
         private TemplateEngine $templateEngine,
@@ -20,14 +21,16 @@ readonly class CacheClearCommand implements CliCommandInterface {
     ) {
     }
 
-    public function getHelp(): string {
-        return "That command clears filesystem cache
+    public function getHelp(): string
+    {
+        return 'That command clears filesystem cache
 If you need warmup cache after clearing you can add option
     --warmup
-";
+';
     }
 
-    public function execute(): void {
+    public function execute(): void
+    {
         $input = new CliInput();
         $output = new CliOutput();
 
@@ -61,7 +64,8 @@ If you need warmup cache after clearing you can add option
         $output->writeln('Done!');
     }
 
-    private function getDirContents($dir, &$results = array()) {
+    private function getDirContents($dir, &$results = [])
+    {
         $files = scandir($dir);
 
         foreach ($files as $key => $value) {
@@ -70,7 +74,7 @@ If you need warmup cache after clearing you can add option
                 if (str_contains($path, '.html.twig')) {
                     $results[] = $path;
                 }
-            } else if ($value != "." && $value != "..") {
+            } elseif ($value != '.' && $value != '..') {
                 $this->getDirContents($path, $results);
             }
         }

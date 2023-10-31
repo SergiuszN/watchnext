@@ -11,15 +11,18 @@ use WatchNext\WatchNext\Domain\Catalog\CatalogItem;
 use WatchNext\WatchNext\Domain\Catalog\CatalogRepository;
 use WatchNext\WatchNext\Domain\Catalog\CatalogUser;
 
-class CatalogPDORepository extends PDORepository implements CatalogRepository {
+class CatalogPDORepository extends PDORepository implements CatalogRepository
+{
     private CacheInterface $cache;
 
-    public function __construct(Database $database, CacheInterface $cache) {
+    public function __construct(Database $database, CacheInterface $cache)
+    {
         parent::__construct($database);
         $this->cache = $cache;
     }
 
-    public function save(Catalog $catalog): void {
+    public function save(Catalog $catalog): void
+    {
         if ($catalog->getId() === null) {
             $this->database->query((new QueryBuilder())
                 ->insert('`catalog`')
@@ -47,7 +50,8 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository {
     /**
      * @throws Exception
      */
-    public function find(int $catalogId): ?Catalog {
+    public function find(int $catalogId): ?Catalog
+    {
         $data = $this->database->query((new QueryBuilder())
             ->select('*')
             ->from('`catalog`')
@@ -62,7 +66,8 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository {
     /**
      * @throws Exception
      */
-    public function findDefaultForUser(?int $userId): ?Catalog {
+    public function findDefaultForUser(?int $userId): ?Catalog
+    {
         return $this->cache->get("catalog.repo.findDefaultForUser.$userId", function () use ($userId) {
             $data = $this->database->query((new QueryBuilder())
                 ->select('c.*')
@@ -81,7 +86,8 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository {
     /**
      * @throws Exception
      */
-    public function findAllForUser(?int $userId): array {
+    public function findAllForUser(?int $userId): array
+    {
         $data = $this->database->query((new QueryBuilder())
             ->select('c.*')
             ->from('`catalog` as c')
@@ -90,10 +96,11 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository {
             ->setParameter('user', $userId)
         )->fetchAll();
 
-        return array_map(fn($r) => Catalog::fromDatabase($r), $data);
+        return array_map(fn ($r) => Catalog::fromDatabase($r), $data);
     }
 
-    public function hasAccess(CatalogUser $catalogUser): bool {
+    public function hasAccess(CatalogUser $catalogUser): bool
+    {
         return $this->cache->get("catalog.repo.hasAccess.{$catalogUser->catalog}.{$catalogUser->user}", function () use ($catalogUser) {
             return $this->database->query((new QueryBuilder())
                     ->select('COUNT(*)')
@@ -102,11 +109,12 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository {
                     ->andWhere('catalog = :catalog')
                     ->setParameters($catalogUser->toDatabase())
                     ->limit(1)
-                )->fetchSingle() > 0;
+            )->fetchSingle() > 0;
         });
     }
 
-    public function addAccess(CatalogUser $catalogUser): void {
+    public function addAccess(CatalogUser $catalogUser): void
+    {
         $this->database->query((new QueryBuilder())
             ->insert('`catalog_user`')
             ->addValue('catalog')
@@ -117,7 +125,8 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository {
         $this->cache->set("catalog.repo.hasAccess.{$catalogUser->catalog}.{$catalogUser->user}", true);
     }
 
-    public function removeAccess(CatalogUser $catalogUser): ?int {
+    public function removeAccess(CatalogUser $catalogUser): ?int
+    {
         $doesDefault = $this->database->query((new QueryBuilder())
                 ->select('COUNT(*)')
                 ->from('`catalog_user`')
@@ -126,7 +135,7 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository {
                 ->andWhere('is_default = 1')
                 ->limit(1)
                 ->setParameters($catalogUser->toDatabase())
-            )->fetchSingle() > 0;
+        )->fetchSingle() > 0;
 
         $this->database->query((new QueryBuilder())
             ->delete('`catalog_user`')
@@ -141,7 +150,8 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository {
         return $doesDefault ? (int) $catalogUser->user : null;
     }
 
-    public function addItem(CatalogItem $catalogItem): void {
+    public function addItem(CatalogItem $catalogItem): void
+    {
         $this->database->query((new QueryBuilder())
             ->insert('`catalog_item`')
             ->addValue('catalog')
@@ -150,7 +160,8 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository {
         );
     }
 
-    public function setAsDefault(CatalogUser $catalogUser): void {
+    public function setAsDefault(CatalogUser $catalogUser): void
+    {
         $this->database->query((new QueryBuilder())
             ->update('`catalog_user`')
             ->addSet('is_default')
@@ -172,7 +183,8 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository {
         $this->cache->delete("catalog.repo.findDefaultForUser.{$catalogUser->user}");
     }
 
-    public function remove(Catalog $catalog): array {
+    public function remove(Catalog $catalog): array
+    {
         $this->database->transactionBegin();
 
         try {
@@ -190,7 +202,7 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository {
 
             /** @var CatalogUser[] $removedDefaultCatalogsUsers */
             $removedDefaultCatalogsUsers = array_map(
-                fn($row) => CatalogUser::fromDatabase($row),
+                fn ($row) => CatalogUser::fromDatabase($row),
                 $this->database->query((new QueryBuilder())
                     ->select('*')
                     ->from('catalog_user')
@@ -217,10 +229,11 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository {
             );
 
             $this->database->transactionCommit();
+
             return $removedDefaultCatalogsUsers;
         } catch (Exception $exception) {
             $this->database->transactionRollback();
-            throw new $exception;
+            throw new $exception();
         }
     }
 }

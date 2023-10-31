@@ -4,12 +4,14 @@ namespace WatchNext\Engine\Template;
 
 use WatchNext\Engine\Config;
 
-class Language {
+class Language
+{
     private static ?array $translationConfig = null;
     private static array $translations = [];
     private static string $lang;
 
-    public function __construct(private readonly Config $config) {
+    public function __construct(private readonly Config $config)
+    {
         if (self::$translationConfig !== null) {
             return;
         }
@@ -18,12 +20,14 @@ class Language {
         $this->setLang($_SESSION['kernel.lang'] ?? self::$translationConfig['defaultLanguage']);
     }
 
-    public function setLang(string $lang): void {
+    public function setLang(string $lang): void
+    {
         self::$lang = $lang;
         self::$translations = $this->config->get("translations/messages.{$lang}.php");
     }
 
-    public function trans(string $key, array $params = []): string {
+    public function trans(string $key, array $params = []): string
+    {
         $translation = self::$translations[$key] ?? $key;
 
         foreach ($params as $paramKey => $paramValue) {
@@ -33,7 +37,8 @@ class Language {
         return $translation;
     }
 
-    public function getLang(): string {
+    public function getLang(): string
+    {
         return self::$lang;
     }
 }

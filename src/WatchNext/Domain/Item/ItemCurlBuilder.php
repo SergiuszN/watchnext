@@ -3,16 +3,20 @@
 namespace WatchNext\WatchNext\Domain\Item;
 
 use DateTimeImmutable;
+use Exception;
 
-class ItemCurlBuilder {
+class ItemCurlBuilder
+{
     private string $page;
 
     private Item $item;
 
-    public function __construct(private string $url) {
+    public function __construct(private string $url)
+    {
     }
 
-    public function load(): self {
+    public function load(): self
+    {
         $ch = curl_init($this->url);
         curl_setopt_array($ch, [
             CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0',
@@ -32,7 +36,8 @@ class ItemCurlBuilder {
         return $this;
     }
 
-    public function parse(): self {
+    public function parse(): self
+    {
         [$matches, $descriptionMatch] = [[], []];
         preg_match_all('~<\s*meta\s+property="(og:[^"]+)"\s+content="([^"]*)~i', $this->page, $matches);
         preg_match('<meta\s*name="description"\s*content="([^"]*)">', $this->page, $descriptionMatch);
@@ -47,7 +52,7 @@ class ItemCurlBuilder {
         $image = $matches[2][array_search('og:image', $matches[1])] ?? '';
 
         if ($title === '' || $url === '' || $description === '' || $image === '') {
-            throw new \Exception('Cant parse url :(. Please contact with as for adding selected site');
+            throw new Exception('Cant parse url :(. Please contact with as for adding selected site');
         }
 
         if (!str_starts_with($image, 'http')) {
@@ -63,7 +68,8 @@ class ItemCurlBuilder {
         return $this;
     }
 
-    public function getItem(): Item {
+    public function getItem(): Item
+    {
         return $this->item;
     }
 }

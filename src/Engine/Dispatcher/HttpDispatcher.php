@@ -8,9 +8,9 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use WatchNext\Engine\Container;
-use WatchNext\Engine\Profiler;
 use WatchNext\Engine\Event\EventManager;
 use WatchNext\Engine\Logger;
+use WatchNext\Engine\Profiler;
 use WatchNext\Engine\Response\JsonResponse;
 use WatchNext\Engine\Response\RedirectResponse;
 use WatchNext\Engine\Response\TemplateResponse;
@@ -23,24 +23,26 @@ use WatchNext\Engine\Session\Security;
 use WatchNext\Engine\Template\TemplateEngine;
 use WatchNext\WatchNext\Application\Controller\SecurityController;
 
-class HttpDispatcher {
+class HttpDispatcher
+{
     public function __construct(
-        private Profiler           $profiler,
-        private Security           $security,
-        private RouterDispatcher   $routerDispatcher,
-        private EventManager       $eventManager,
+        private Profiler $profiler,
+        private Security $security,
+        private RouterDispatcher $routerDispatcher,
+        private EventManager $eventManager,
         private SecurityController $securityController,
-        private TemplateEngine     $templateEngine,
-        private RouteGenerator     $routeGenerator,
-        private Container          $container,
-        private Logger             $logger
+        private TemplateEngine $templateEngine,
+        private RouteGenerator $routeGenerator,
+        private Container $container,
+        private Logger $logger
     ) {
     }
 
     /**
      * @throws Exception|Throwable
      */
-    public function dispatch(): void {
+    public function dispatch(): void
+    {
         $this->profiler->start();
         $this->profiler->add('kernel.booted');
 
@@ -64,17 +66,17 @@ class HttpDispatcher {
             } catch (AccessDeniedException $accessDeniedException) {
                 $this->render($this->securityController->accessDenied());
 
-                die();
+                exit;
             } catch (NotFoundException $notFoundException) {
                 $this->render($this->securityController->notFound());
 
-                die();
+                exit;
             } catch (Throwable $throwable) {
                 $this->logger->error($throwable);
                 throw $throwable;
             }
 
-            die();
+            exit;
         } else {
             $this->render($this->securityController->notFound());
         }
@@ -86,7 +88,8 @@ class HttpDispatcher {
      * @throws LoaderError
      * @throws Exception
      */
-    private function render($response): void {
+    private function render($response): void
+    {
         $responseClass = get_class($response);
         $printProfile = false;
 

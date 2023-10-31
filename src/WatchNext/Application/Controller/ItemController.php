@@ -15,21 +15,23 @@ use WatchNext\WatchNext\Domain\Catalog\CatalogRepository;
 use WatchNext\WatchNext\Domain\Item\ItemCurlBuilder;
 use WatchNext\WatchNext\Domain\Item\ItemRepository;
 
-readonly class ItemController {
+readonly class ItemController
+{
     public function __construct(
-        private Request           $request,
-        private ItemRepository    $itemRepository,
+        private Request $request,
+        private ItemRepository $itemRepository,
         private CatalogRepository $catalogRepository,
-        private Security          $security,
-        private CSFR              $csfr,
-        private FlashBag          $flashBag,
+        private Security $security,
+        private CSFR $csfr,
+        private FlashBag $flashBag,
     ) {
     }
 
     /**
      * @throws AccessDeniedException|Exception
      */
-    public function add(): TemplateResponse|RedirectResponse {
+    public function add(): TemplateResponse|RedirectResponse
+    {
         $this->security->throwIfNotGranted('ROLE_ITEM_ADD');
         $userId = $this->security->getUserId();
 
@@ -46,11 +48,12 @@ readonly class ItemController {
             $this->catalogRepository->addItem(new CatalogItem($item->getId(), $this->request->post('catalog')));
 
             $this->flashBag->add('success', 'New item added to your library');
+
             return new RedirectResponse('homepage_app');
         }
 
         return new TemplateResponse('page/item/add.html.twig', [
-            'catalogs' => $this->catalogRepository->findAllForUser($userId)
+            'catalogs' => $this->catalogRepository->findAllForUser($userId),
         ]);
     }
 }

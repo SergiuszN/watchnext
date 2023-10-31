@@ -9,11 +9,12 @@ use WatchNext\Engine\Template\PaginationCollection;
 use WatchNext\WatchNext\Domain\Item\Item;
 use WatchNext\WatchNext\Domain\Item\ItemRepository;
 
-class ItemPDORepository extends PDORepository implements ItemRepository {
-
-    public function save(Item $item): void {
+class ItemPDORepository extends PDORepository implements ItemRepository
+{
+    public function save(Item $item): void
+    {
         if ($item->getId() === null) {
-            $this->database->prepare("
+            $this->database->prepare('
                 INSERT INTO `item` (
                     `title`, 
                     `url`,
@@ -30,10 +31,10 @@ class ItemPDORepository extends PDORepository implements ItemRepository {
                     :owner, 
                     :added_at
                 )
-            ")->execute($item->toDatabase());
+            ')->execute($item->toDatabase());
             $item->setId($this->database->getLastInsertId());
         } else {
-            $this->database->prepare("
+            $this->database->prepare('
                 UPDATE `item` SET
                     `title` = :title,
                     `url` = :url,
@@ -42,15 +43,16 @@ class ItemPDORepository extends PDORepository implements ItemRepository {
                     `owner` = :owner,
                     `added_at` = :added_at
                 WHERE `id` = :id
-            ")->execute(array_merge($item->toDatabase(), ['id' => $item->getId()]));
+            ')->execute(array_merge($item->toDatabase(), ['id' => $item->getId()]));
         }
     }
 
     /**
      * @throws Exception
      */
-    public function find(int $id): ?Item {
-        $data = $this->database->prepare("SELECT * FROM `item` WHERE id=:id")
+    public function find(int $id): ?Item
+    {
+        $data = $this->database->prepare('SELECT * FROM `item` WHERE id=:id')
             ->execute(['id' => $id])
             ->fetch();
 
@@ -60,8 +62,9 @@ class ItemPDORepository extends PDORepository implements ItemRepository {
     /**
      * @throws Exception
      */
-    public function findAllForUser(?int $owner): array {
-        $data = $this->database->prepare("SELECT * FROM `item` WHERE owner=:owner ORDER BY id DESC")
+    public function findAllForUser(?int $owner): array
+    {
+        $data = $this->database->prepare('SELECT * FROM `item` WHERE owner=:owner ORDER BY id DESC')
             ->execute(['owner' => $owner])
             ->fetchAll();
 
@@ -71,7 +74,8 @@ class ItemPDORepository extends PDORepository implements ItemRepository {
     /**
      * @throws Exception
      */
-    public function findPage(int $page, int $limit, int $catalog, Request $request): PaginationCollection {
+    public function findPage(int $page, int $limit, int $catalog, Request $request): PaginationCollection
+    {
         $countQuery = (new QueryBuilder())
             ->select('COUNT(i.id)')
             ->from('item as i')
@@ -98,7 +102,7 @@ class ItemPDORepository extends PDORepository implements ItemRepository {
         return new PaginationCollection(
             $page,
             $limit,
-            ceil(($count) / $limit),
+            ceil($count / $limit),
             $items
         );
     }

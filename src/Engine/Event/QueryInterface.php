@@ -2,6 +2,6 @@
 
 namespace WatchNext\Engine\Event;
 
-interface QueryInterface {
-
+interface QueryInterface
+{
 }

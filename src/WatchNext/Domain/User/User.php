@@ -4,7 +4,8 @@ namespace WatchNext\WatchNext\Domain\User;
 
 use DateTimeImmutable;
 
-class User {
+class User
+{
     private ?int $id = null;
     private string $login;
     private string $password;
@@ -24,36 +25,44 @@ class User {
         $this->createdAt = new DateTimeImmutable();
     }
 
-    public function setId(int $id): void {
+    public function setId(int $id): void
+    {
         $this->id = $id;
     }
 
-    public function getId(): ?int {
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
-    public function getPassword(): string {
+    public function getPassword(): string
+    {
         return $this->password;
     }
 
-    public function getRememberMeToken(): ?string {
+    public function getRememberMeToken(): ?string
+    {
         return $this->rememberMeToken;
     }
 
-    public function getRoles(): array {
+    public function getRoles(): array
+    {
         return $this->roles;
     }
 
-    public function getLogin(): string {
+    public function getLogin(): string
+    {
         return $this->login;
     }
 
-    public function rememberMe(string $key, string $token): void {
+    public function rememberMe(string $key, string $token): void
+    {
         $this->rememberMeKey = $key;
         $this->rememberMeToken = $token;
     }
 
-    public static function fromDatabase(array $user): User {
+    public static function fromDatabase(array $user): User
+    {
         $model = new User($user['login'], $user['password'], $user['roles'] ? json_decode($user['roles']) : []);
         $model->id = (int) $user['id'];
         $model->createdAt = new DateTimeImmutable($user['created_at']);
@@ -63,7 +72,8 @@ class User {
         return $model;
     }
 
-    public function toDatabase(): array {
+    public function toDatabase(): array
+    {
         return [
             'login' => $this->login,
             'password' => $this->password,

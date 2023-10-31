@@ -2,12 +2,15 @@
 
 namespace WatchNext\Engine\Cli\IO;
 
-class CliOutput {
-    public function write(string $message): void {
+class CliOutput
+{
+    public function write(string $message): void
+    {
         echo $message;
     }
 
-    public function writeln(string $message): void {
+    public function writeln(string $message): void
+    {
         echo $message;
         echo "\n";
     }

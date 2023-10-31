@@ -4,7 +4,8 @@ namespace WatchNext\Engine\Database;
 
 use PDO;
 
-class Database {
+class Database
+{
     private static ?PDO $pdo = null;
 
     private static string $databaseName = '';
@@ -12,7 +13,8 @@ class Database {
     private static array $debug = [];
     private static bool $isDebug;
 
-    public function __construct() {
+    public function __construct()
+    {
         if (self::$pdo === null) {
             self::$isDebug = $_ENV['APP_ENV'] === 'dev';
             self::$pdo = new PDO(
@@ -30,53 +32,65 @@ class Database {
         }
     }
 
-    public function getDatabase(): string {
+    public function getDatabase(): string
+    {
         return self::$databaseName;
     }
 
-    public function setIsDebug(bool $isDebug): void {
+    public function setIsDebug(bool $isDebug): void
+    {
         self::$isDebug = $isDebug;
     }
 
-    public function isDebug(): bool {
+    public function isDebug(): bool
+    {
         return self::$isDebug;
     }
 
-    public function log(string $query, array $params, float $time): void {
+    public function log(string $query, array $params, float $time): void
+    {
         self::$debug[] = ['query' => $query, 'params' => $params, 'time' => $time];
     }
 
-    public function getLogs(): array {
+    public function getLogs(): array
+    {
         return self::$debug;
     }
 
-    public function transactionBegin(): void {
+    public function transactionBegin(): void
+    {
         self::$pdo->beginTransaction();
     }
 
-    public function transactionCommit(): void {
+    public function transactionCommit(): void
+    {
         self::$pdo->commit();
     }
 
-    public function transactionRollback(): void {
+    public function transactionRollback(): void
+    {
         self::$pdo->rollBack();
     }
 
-    public function prepare(string $sql): Statement {
+    public function prepare(string $sql): Statement
+    {
         return new Statement($this, self::$pdo->prepare($sql));
     }
 
-    public function execute(string $sql): void {
+    public function execute(string $sql): void
+    {
         self::$pdo->exec($sql);
     }
 
-    public function query(QueryBuilder $query): Statement {
+    public function query(QueryBuilder $query): Statement
+    {
         return $this
             ->prepare($query->getSql())
             ->execute($query->getParams());
     }
 
-    public function getLastInsertId(): int|string|null {
+    public function getLastInsertId(): int|string|null
+    {
         $id = self::$pdo->lastInsertId();
 
         if (is_numeric($id)) {

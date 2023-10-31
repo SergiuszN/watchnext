@@ -8,20 +8,24 @@ use WatchNext\Engine\Session\FlashBag;
 use WatchNext\Engine\Template\Language;
 use Webmozart\Assert\Assert;
 
-class Form {
+class Form
+{
     protected bool $isPost;
     protected readonly string $token;
 
-    public function __construct(protected Request $request, protected CSFR $csfr, protected Language $t) {
+    public function __construct(protected Request $request, protected CSFR $csfr, protected Language $t)
+    {
         $this->isPost = $this->request->isPost();
         $this->token = $this->request->post('_token', '');
     }
 
-    public function load(): self {
+    public function load(): self
+    {
         return $this;
     }
 
-    public function isValid(bool $csfr = true): bool {
+    public function isValid(bool $csfr = true): bool
+    {
         if (!$this->isPost) {
             return false;
         }
@@ -32,6 +36,7 @@ class Form {
             }
         } catch (InvalidArgumentException $invalidArgumentException) {
             (new FlashBag())->addValidationErrors($invalidArgumentException);
+
             return false;
         }
 

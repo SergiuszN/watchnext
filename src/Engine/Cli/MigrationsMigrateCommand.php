@@ -8,7 +8,8 @@ use WatchNext\Engine\Container;
 use WatchNext\Engine\Database\Database;
 use WatchNext\Engine\Database\Migration;
 
-class MigrationsMigrateCommand implements CliCommandInterface {
+class MigrationsMigrateCommand implements CliCommandInterface
+{
     private CliInput $input;
     private CliOutput $output;
     private array $migrations;
@@ -22,14 +23,16 @@ class MigrationsMigrateCommand implements CliCommandInterface {
         $this->output = new CliOutput();
     }
 
-    public function getHelp(): string {
+    public function getHelp(): string
+    {
         return 'This command run migrations on selected database
 You can specify some version to do or partial up or down grade
 For that just add --version=VERSION_NUMBER
 ';
     }
 
-    public function execute(): void {
+    public function execute(): void
+    {
         $this->output->writeln('Migration of database...');
 
         $this->createMigrationsTableIfNotExist();
@@ -50,16 +53,17 @@ For that just add --version=VERSION_NUMBER
         $this->output->writeln('Done');
     }
 
-    private function up(int $selectedVersion): void {
+    private function up(int $selectedVersion): void
+    {
         $migrationsToMigrate = array_values(array_filter($this->migrations, function ($migration) use ($selectedVersion) {
             return $migration['version'] <= $selectedVersion && $migration['isMigrated'] === false;
         }));
 
-        usort($migrationsToMigrate, fn($left, $right) => $left['version'] <=> $right['version']);
+        usort($migrationsToMigrate, fn ($left, $right) => $left['version'] <=> $right['version']);
 
-        $statement = $this->database->prepare("
+        $statement = $this->database->prepare('
             INSERT INTO `migrations`(`version`, `name`, `executed_at`) VALUES (:version, :name, NOW());
-        ");
+        ');
 
         foreach ($migrationsToMigrate as $migration) {
             echo "Migrate: {$migration['name']}...\n";
@@ -73,16 +77,17 @@ For that just add --version=VERSION_NUMBER
         }
     }
 
-    private function down(int $selectedVersion): void {
+    private function down(int $selectedVersion): void
+    {
         $migrationsToMigrate = array_values(array_filter($this->migrations, function ($migration) use ($selectedVersion) {
             return $migration['version'] >= $selectedVersion && $migration['isMigrated'] === true;
         }));
 
-        usort($migrationsToMigrate, fn($left, $right) => $right['version'] <=> $left['version']);
+        usort($migrationsToMigrate, fn ($left, $right) => $right['version'] <=> $left['version']);
 
-        $statement = $this->database->prepare("
+        $statement = $this->database->prepare('
             DELETE FROM `migrations` WHERE `version`=:version;
-        ");
+        ');
 
         foreach ($migrationsToMigrate as $migration) {
             echo "Migrate: {$migration['name']}...\n";
@@ -96,7 +101,8 @@ For that just add --version=VERSION_NUMBER
         }
     }
 
-    private function createMigrationsTableIfNotExist(): void {
+    private function createMigrationsTableIfNotExist(): void
+    {
         $database = $this->database->getDatabase();
 
         $result = $this->database
@@ -123,24 +129,27 @@ For that just add --version=VERSION_NUMBER
         }
     }
 
-    private function getCurrentVersion(): int {
+    private function getCurrentVersion(): int
+    {
         return (int) $this->database
-            ->prepare("SELECT MAX(version) AS current_version FROM `migrations` WHERE 1;")
+            ->prepare('SELECT MAX(version) AS current_version FROM `migrations` WHERE 1;')
             ->execute()
             ->fetchSingle();
     }
 
-    private function getLastVersionInFiles(): int {
+    private function getLastVersionInFiles(): int
+    {
         return max(array_map(
-            fn($migration) => $migration['version'],
+            fn ($migration) => $migration['version'],
             $this->migrations
         ));
     }
 
-    private function loadAvailableMigrations(): void {
+    private function loadAvailableMigrations(): void
+    {
         $basePath = ROOT_PATH . '/config/migrations';
         $files = scandir($basePath);
-        $files = array_filter($files, fn($path) => str_starts_with($path, 'm_'));
+        $files = array_filter($files, fn ($path) => str_starts_with($path, 'm_'));
         $this->migrations = [];
 
         foreach ($files as $file) {
@@ -157,8 +166,9 @@ For that just add --version=VERSION_NUMBER
         }
     }
 
-    private function loadMigratedMigrations(): void {
-        $result = $this->database->prepare("SELECT * FROM `migrations` WHERE 1;")->execute();
+    private function loadMigratedMigrations(): void
+    {
+        $result = $this->database->prepare('SELECT * FROM `migrations` WHERE 1;')->execute();
         $migrated = $result->fetchAll();
 
         $this->migrated = [];

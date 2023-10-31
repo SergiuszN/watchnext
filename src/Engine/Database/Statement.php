@@ -4,11 +4,14 @@ namespace WatchNext\Engine\Database;
 
 use PDOStatement;
 
-readonly class Statement {
-    public function __construct(private Database $database, private PDOStatement $PDOStatement) {
+readonly class Statement
+{
+    public function __construct(private Database $database, private PDOStatement $PDOStatement)
+    {
     }
 
-    public function execute(array $params = []): self {
+    public function execute(array $params = []): self
+    {
         $tick = $this->database->isDebug() ? microtime(true) : 0;
         $this->PDOStatement->execute($params);
 
@@ -19,15 +22,18 @@ readonly class Statement {
         return $this;
     }
 
-    public function fetch(): ?array {
+    public function fetch(): ?array
+    {
         return $this->PDOStatement->fetch() ?: null;
     }
 
-    public function fetchAll(): array {
+    public function fetchAll(): array
+    {
         return $this->PDOStatement->fetchAll() ?: [];
     }
 
-    public function fetchSingle(): mixed {
+    public function fetchSingle(): mixed
+    {
         $row = $this->PDOStatement->fetch();
 
         if (empty($row)) {

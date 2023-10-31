@@ -4,23 +4,25 @@ namespace WatchNext\Engine\Cli;
 
 use WatchNext\Engine\Cli\IO\CliInput;
 use WatchNext\Engine\Cli\IO\CliOutput;
-use WatchNext\Engine\Container;
 
-class TranslatorOrderKeysCommand implements CliCommandInterface {
-
+class TranslatorOrderKeysCommand implements CliCommandInterface
+{
     private string $translationsPath;
 
-    public function __construct(Container $container) {
-        $this->translationsPath = $container->get('root.dir') . '/config/translations';
+    public function __construct()
+    {
+        $this->translationsPath = ROOT_PATH . '/config/translations';
     }
 
-    public function getHelp(): string {
+    public function getHelp(): string
+    {
         return 'This command reorder translations file keys in alphabetical order
 Ensure add that command in some process before commit changes
 ';
     }
 
-    public function execute(): void {
+    public function execute(): void
+    {
         [$input, $output] = [new CliInput(), new CliOutput()];
 
         $output->writeln('Translation order key command started');

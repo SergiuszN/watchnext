@@ -15,7 +15,8 @@ use WatchNext\WatchNext\Domain\User\Query\UserCreatedQuery;
 use WatchNext\WatchNext\Domain\User\User;
 use WatchNext\WatchNext\Domain\User\UserRepository;
 
-readonly class SecurityController {
+readonly class SecurityController
+{
     public function __construct(
         private Request $request,
         private UserRepository $userRepository,
@@ -27,7 +28,8 @@ readonly class SecurityController {
     ) {
     }
 
-    public function register(): TemplateResponse|RedirectResponse {
+    public function register(): TemplateResponse|RedirectResponse
+    {
         $form = $this->userRegisterForm->load();
 
         if ($form->isValid($this->userRepository)) {
@@ -38,13 +40,15 @@ readonly class SecurityController {
             $this->eventManager->dispatch(new UserCreatedQuery($user->getId()));
 
             $this->flashBag->add('success', $this->language->trans('security.register.success'));
+
             return new RedirectResponse('security_login');
         }
 
         return new TemplateResponse('page/security/register.html.twig');
     }
 
-    public function login(): TemplateResponse|RedirectResponse {
+    public function login(): TemplateResponse|RedirectResponse
+    {
         $form = new UserLoginForm($this->request);
 
         if ($this->security->getUserId()) {
@@ -56,31 +60,38 @@ readonly class SecurityController {
 
             if (!$user) {
                 $this->flashBag->add('error', $this->language->trans('security.login.wrongUserOrPassword'));
+
                 return new RedirectResponse('security_login');
             }
 
             if (!password_verify($form->password, $user->getPassword())) {
                 $this->flashBag->add('error', $this->language->trans('security.login.wrongUserOrPassword'));
+
                 return new RedirectResponse('security_login');
             }
 
             $this->security->authorize($user, $form->rememberMe);
+
             return new RedirectResponse('homepage_app');
         }
 
         return new TemplateResponse('page/security/login.html.twig');
     }
 
-    public function logout(): RedirectResponse {
+    public function logout(): RedirectResponse
+    {
         $this->security->unauthorize();
+
         return new RedirectResponse('security_login');
     }
 
-    public function accessDenied(): RedirectResponse {
+    public function accessDenied(): RedirectResponse
+    {
         return new RedirectResponse('security_login');
     }
 
-    public function notFound(): TemplateResponse {
+    public function notFound(): TemplateResponse
+    {
         return new TemplateResponse('page/security/not_found.html.twig');
     }
 }

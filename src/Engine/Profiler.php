@@ -9,16 +9,17 @@ use WatchNext\Engine\Router\DispatchedRoute;
 use WatchNext\Engine\Session\Security;
 use WatchNext\WatchNext\Domain\User\User;
 
-class Profiler {
+class Profiler
+{
     private bool $enabled;
     private static string $id = '';
     private static array $data = [];
 
     public function __construct(
         private readonly ApcuCache $storage,
-        private readonly Database  $database,
-        private readonly Security  $security,
-        private readonly Request   $request,
+        private readonly Database $database,
+        private readonly Security $security,
+        private readonly Request $request,
     ) {
         if (!self::$id) {
             self::$id = bin2hex(random_bytes(5));
@@ -27,7 +28,8 @@ class Profiler {
         $this->enabled = ENV === 'dev';
     }
 
-    public function start(): void {
+    public function start(): void
+    {
         if (!$this->enabled) {
             return;
         }
@@ -43,7 +45,8 @@ class Profiler {
         ];
     }
 
-    public function add($event, mixed $data = null): void {
+    public function add($event, mixed $data = null): void
+    {
         if (!$this->enabled) {
             return;
         }
@@ -63,7 +66,8 @@ class Profiler {
         self::$data['executed_in'] = self::$data['ended'] - self::$data['started'];
     }
 
-    public function end(bool $render): void {
+    public function end(bool $render): void
+    {
         if (!$this->enabled) {
             return;
         }
@@ -84,7 +88,8 @@ class Profiler {
         }
     }
 
-    public function render(): void {
+    public function render(): void
+    {
         $requests = $this->storage->read('profiler.storage', []);
 
         echo "<hr style='margin-top: 100px'>";
@@ -108,12 +113,12 @@ class Profiler {
                 $user = $request['user'];
                 echo "Logged user: {$user->getId()}<br>";
             } else {
-                echo "No user logged<br>";
+                echo 'No user logged<br>';
             }
 
             if (!empty($request['database'])) {
                 $countOfQueries = count($request['database']);
-                $timeOfQueries = round(array_sum(array_map(fn($log) => $log['time'], $request['database'])) * 1000000);
+                $timeOfQueries = round(array_sum(array_map(fn ($log) => $log['time'], $request['database'])) * 1000000);
 
                 echo "Database queries: {$countOfQueries} in $timeOfQueries (microseconds)<br>";
             }
@@ -125,7 +130,7 @@ class Profiler {
                 echo "Event: {$event['event']}, Executed in {$event['executed_in']} (microseconds)<br>";
 
                 if ($event['data']) {
-                    echo "Event data: <br>";
+                    echo 'Event data: <br>';
                     echo '<pre>';
                     var_dump($event['data']);
                     echo '</pre>';
@@ -133,13 +138,13 @@ class Profiler {
             }
 
             foreach ($request['database'] as $query) {
-                echo "<br>";
+                echo '<br>';
                 $microtime = round($query['time'] * 1000000);
                 echo "Query ($microtime microseconds): <br>";
                 echo '<pre>';
                 var_dump($query['query']);
                 echo '</pre>';
-                echo "Params: <br>";
+                echo 'Params: <br>';
                 echo '<pre>';
                 var_dump($query['params']);
                 echo '</pre>';

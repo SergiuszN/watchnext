@@ -2,10 +2,11 @@
 
 namespace WatchNext\Engine\Response;
 
-readonly class RedirectResponse {
+readonly class RedirectResponse
+{
     public function __construct(
         public string $route,
-        public array  $params = []
+        public array $params = []
     ) {
     }
 }

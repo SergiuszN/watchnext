@@ -6,23 +6,25 @@ use WatchNext\Engine\Cache\ApcuCache;
 use WatchNext\Engine\Config;
 use WatchNext\Engine\Container;
 
-class EventManager {
+class EventManager
+{
     private static array $queries = [];
 
     public function __construct(
         private Container $container,
         private ApcuCache $cache,
-        private Config    $config,
+        private Config $config,
     ) {
-
     }
 
-    public function init(): void {
+    public function init(): void
+    {
         $isProduction = ENV === 'prod';
 
         if ($isProduction) {
             if ($this->cache->has('kernel.event.manager')) {
                 self::$queries = $this->cache->read('kernel.event.manager');
+
                 return;
             }
         }
@@ -38,7 +40,8 @@ class EventManager {
         }
     }
 
-    public function register(string $query, string $command): void {
+    public function register(string $query, string $command): void
+    {
         if (!isset(self::$queries[$query])) {
             self::$queries[$query] = [];
         }
@@ -48,7 +51,8 @@ class EventManager {
         }
     }
 
-    public function unregister(string $query, string $command): void {
+    public function unregister(string $query, string $command): void
+    {
         if (!isset(self::$queries[$query])) {
             return;
         }
@@ -59,7 +63,8 @@ class EventManager {
         }
     }
 
-    public function dispatch(QueryInterface $query): void {
+    public function dispatch(QueryInterface $query): void
+    {
         $class = get_class($query);
 
         if (!isset(self::$queries[$class])) {

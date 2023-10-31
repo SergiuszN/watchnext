@@ -9,18 +9,20 @@ use WatchNext\Engine\Cli\IO\CliInput;
 use WatchNext\Engine\Config;
 use WatchNext\Engine\Container;
 
-readonly class CliDispatcher {
+readonly class CliDispatcher
+{
     public function __construct(
-        private Config    $config,
+        private Config $config,
         private Container $container,
     ) {
-
     }
 
     /**
      * @throws Exception
      */
-    #[NoReturn] public function dispatch(): void {
+    #[NoReturn]
+    public function dispatch(): void
+    {
         $commands = $this->config->get('cli.php');
         $commands = array_merge($commands, $this->getKernelCliCommands());
 
@@ -34,7 +36,7 @@ readonly class CliDispatcher {
                 echo "\t$commandName\n";
             }
 
-            die();
+            exit;
         }
 
         $input = new CliInput();
@@ -53,15 +55,16 @@ readonly class CliDispatcher {
                     echo "\n";
                 }
 
-                die();
+                exit;
             }
         }
 
         echo "There no command with name '$selectedCommandName'\n";
-        die();
+        exit;
     }
 
-    private function getKernelCliCommands(): array {
+    private function getKernelCliCommands(): array
+    {
         return [
             'cache:clear' => \WatchNext\Engine\Cli\CacheClearCommand::class,
             'migrations:generate' => \WatchNext\Engine\Cli\MigrationsGenerateCommand::class,

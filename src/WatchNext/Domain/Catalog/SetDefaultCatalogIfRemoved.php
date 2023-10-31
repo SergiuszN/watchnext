@@ -5,14 +5,16 @@ namespace WatchNext\WatchNext\Domain\Catalog;
 use WatchNext\WatchNext\Domain\Catalog\Command\CreateDefaultUserCatalogCommand;
 use WatchNext\WatchNext\Domain\User\Query\UserCreatedQuery;
 
-class SetDefaultCatalogIfRemoved {
+class SetDefaultCatalogIfRemoved
+{
     public function __construct(
         private CatalogRepository $catalogRepository,
         private CreateDefaultUserCatalogCommand $createDefaultUserCatalogCommand
     ) {
     }
 
-    public function execute(?int $userId): void {
+    public function execute(?int $userId): void
+    {
         if (!$userId) {
             return;
         }

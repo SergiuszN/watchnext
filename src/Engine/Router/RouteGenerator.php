@@ -5,13 +5,15 @@ namespace WatchNext\Engine\Router;
 use Exception;
 use WatchNext\Engine\Config;
 
-class RouteGenerator {
+class RouteGenerator
+{
     private static ?array $routes = null;
 
     /**
      * @throws Exception
      */
-    public function make(string $name, array $params = [], bool $absolute = false): string {
+    public function make(string $name, array $params = [], bool $absolute = false): string
+    {
         if (self::$routes === null) {
             self::$routes = (new Config())->get('routing/routing.php');
         }
@@ -52,7 +54,8 @@ class RouteGenerator {
     /**
      * @throws Exception
      */
-    public function makePage(int $page): string {
+    public function makePage(int $page): string
+    {
         $route = str_contains($_SERVER['REQUEST_ROUTE'], '_page') ? $_SERVER['REQUEST_ROUTE'] : $_SERVER['REQUEST_ROUTE'] . '_page';
         $params = array_merge($_SERVER['REQUEST_ROUTE_PARAMS'], $_GET);
         $params['page'] = $page;
@@ -60,7 +63,8 @@ class RouteGenerator {
         return $this->make($route, $params);
     }
 
-    public function startsFrom(string $patch): bool {
+    public function startsFrom(string $patch): bool
+    {
         return str_starts_with($patch, $_SERVER['REQUEST_ROUTE']);
     }
 }

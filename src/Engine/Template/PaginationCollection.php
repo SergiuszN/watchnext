@@ -2,7 +2,8 @@
 
 namespace WatchNext\Engine\Template;
 
-readonly class PaginationCollection {
+readonly class PaginationCollection
+{
     public function __construct(
         public int $page,
         public int $limit,

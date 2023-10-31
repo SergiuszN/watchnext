@@ -4,6 +4,6 @@ namespace WatchNext\Engine\Router;
 
 use Exception;
 
-class NotFoundException extends Exception {
-
+class NotFoundException extends Exception
+{
 }

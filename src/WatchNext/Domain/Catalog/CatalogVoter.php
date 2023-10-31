@@ -5,12 +5,13 @@ namespace WatchNext\WatchNext\Domain\Catalog;
 use WatchNext\Engine\Router\NotFoundException;
 use WatchNext\Engine\Session\Security;
 
-readonly class CatalogVoter {
+readonly class CatalogVoter
+{
     public const VIEW = 'view';
     public const EDIT = 'edit';
 
     public function __construct(
-        private Security          $security,
+        private Security $security,
         private CatalogRepository $catalogRepository,
     ) {
     }
@@ -18,9 +19,9 @@ readonly class CatalogVoter {
     /**
      * @throws NotFoundException
      */
-    public function throwIfNotGranted(?Catalog $catalog, string $action): void {
+    public function throwIfNotGranted(?Catalog $catalog, string $action): void
+    {
         if (!$this->isGranted($catalog, $action)) {
-
             throw new NotFoundException();
         }
     }
@@ -28,7 +29,8 @@ readonly class CatalogVoter {
     /**
      * @throws NotFoundException
      */
-    public function isGranted(?Catalog $catalog, string $action): bool {
+    public function isGranted(?Catalog $catalog, string $action): bool
+    {
         if (!$catalog) {
             throw new NotFoundException();
         }
@@ -42,11 +44,13 @@ readonly class CatalogVoter {
         };
     }
 
-    private function canEdit(Catalog $catalog, int $userId): bool {
+    private function canEdit(Catalog $catalog, int $userId): bool
+    {
         return $catalog->getOwner() === $userId;
     }
 
-    private function canView(Catalog $catalog, int $userId): bool {
+    private function canView(Catalog $catalog, int $userId): bool
+    {
         if ($catalog->getOwner() === $userId) {
             return true;
         }

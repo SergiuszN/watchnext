@@ -2,7 +2,8 @@
 
 namespace WatchNext\Engine\Database;
 
-class QueryBuilder {
+class QueryBuilder
+{
     private string $_select;
     private string $_from;
     private array $_joins;
@@ -18,12 +19,13 @@ class QueryBuilder {
     private array $_sets;
     private string $_delete;
 
-
-    public function __construct() {
+    public function __construct()
+    {
         $this->reset();
     }
 
-    public function reset(): void {
+    public function reset(): void
+    {
         $this->_select = '';
         $this->_from = '';
         $this->_joins = [];
@@ -43,46 +45,62 @@ class QueryBuilder {
         $this->_delete = '';
     }
 
-    public function select(string $select): self {
+    public function select(string $select): self
+    {
         $this->_select = "SELECT $select";
+
         return $this;
     }
 
-    public function from(string $from): self {
+    public function from(string $from): self
+    {
         $this->_from = "FROM $from";
+
         return $this;
     }
 
-    public function addJoin(string $type, string $join, string $on): self {
+    public function addJoin(string $type, string $join, string $on): self
+    {
         $this->_joins[] = "$type JOIN $join ON $on";
+
         return $this;
     }
 
-    public function addLeftJoin(string $join, string $on): self {
+    public function addLeftJoin(string $join, string $on): self
+    {
         return $this->addJoin('LEFT', $join, $on);
     }
 
-    public function andWhere(string $where): self {
+    public function andWhere(string $where): self
+    {
         $this->_andWheres[] = $where;
+
         return $this;
     }
 
-    public function addGroupBy(string $groupBy): self {
+    public function addGroupBy(string $groupBy): self
+    {
         $this->_groupBy[] = $groupBy;
+
         return $this;
     }
 
-    public function having(string $having): self {
+    public function having(string $having): self
+    {
         $this->_having = "HAVING $having";
+
         return $this;
     }
 
-    public function addOrderBy(string $orderBy, string $type): self {
+    public function addOrderBy(string $orderBy, string $type): self
+    {
         $this->_orderBy[] = "$orderBy $type";
+
         return $this;
     }
 
-    public function limit(int $limit, int $offset = 0): self {
+    public function limit(int $limit, int $offset = 0): self
+    {
         if ($offset > 0) {
             $this->_limit = "LIMIT $limit OFFSET $offset";
         } else {
@@ -92,47 +110,64 @@ class QueryBuilder {
         return $this;
     }
 
-    public function setParameter(string $name, mixed $value): self {
+    public function setParameter(string $name, mixed $value): self
+    {
         $this->_params[$name] = $value;
+
         return $this;
     }
 
-    public function setParameters(array $parameters): self {
+    public function setParameters(array $parameters): self
+    {
         $this->_params = array_merge($this->_params, $parameters);
+
         return $this;
     }
 
-    public function getParams(): array {
+    public function getParams(): array
+    {
         return $this->_params;
     }
 
-    public function insert(string $insert): self {
+    public function insert(string $insert): self
+    {
         $this->_insert = "INSERT INTO $insert";
+
         return $this;
     }
 
-    public function addValue(string $value, ?string $paramName = null): self {
+    public function addValue(string $value, string $paramName = null): self
+    {
         $this->_values[] = [$value, $paramName ? ':' . $paramName : ':' . str_replace('`', '', $value)];
+
         return $this;
     }
 
-    public function update(string $update): self {
+    public function update(string $update): self
+    {
         $this->_update = "UPDATE $update";
+
         return $this;
     }
 
-    public function addSet(string $set, ?string $paramName = null): self {
+    public function addSet(string $set, string $paramName = null): self
+    {
         $paramName = $paramName ? ':' . $paramName : ':' . str_replace('`', '', $set);
         $this->_sets[] = "$set = $paramName";
+
         return $this;
     }
 
-    public function delete(string $delete) {
+    public function delete(string $delete): self
+    {
+        /** @noinspection SqlWithoutWhere */
         $this->_delete = "DELETE FROM $delete";
+
         return $this;
     }
 
-    public function getSql(): string {
+    public function getSql(): string
+    {
         if ($this->_select) {
             return $this->buildSelect();
         }
@@ -152,7 +187,8 @@ class QueryBuilder {
         return '';
     }
 
-    private function buildSelect(): string {
+    private function buildSelect(): string
+    {
         $sql = $this->_select . "\n";
         $sql .= $this->_from . "\n";
 
@@ -183,7 +219,8 @@ class QueryBuilder {
         return $sql;
     }
 
-    private function buildInsert(): string {
+    private function buildInsert(): string
+    {
         $sql = $this->_insert . " (\n";
         $sql .= implode(",\n", array_map(fn ($value) => $value[0], $this->_values));
         $sql .= "\n) VALUES (\n";
@@ -193,7 +230,8 @@ class QueryBuilder {
         return $sql;
     }
 
-    private function buildUpdate(): string {
+    private function buildUpdate(): string
+    {
         $sql = $this->_update . "\n";
         $sql .= "SET\n" . implode(",\n", $this->_sets) . "\n";
 
@@ -213,7 +251,8 @@ class QueryBuilder {
         return $sql;
     }
 
-    private function buildDelete(): string {
+    private function buildDelete(): string
+    {
         $sql = $this->_delete . "\n";
 
         /** @noinspection DuplicatedCode */

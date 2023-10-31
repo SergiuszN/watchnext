@@ -2,7 +2,9 @@
 
 namespace WatchNext\Engine\Cli;
 
-interface CliCommandInterface {
+interface CliCommandInterface
+{
     public function getHelp(): string;
+
     public function execute(): void;
 }
