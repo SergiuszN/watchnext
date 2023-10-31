@@ -7,7 +7,6 @@ use WatchNext\Engine\Response\RedirectResponse;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Router\AccessDeniedException;
 use WatchNext\Engine\Router\NotFoundException;
-use WatchNext\Engine\Session\CSFR;
 use WatchNext\Engine\Session\FlashBag;
 use WatchNext\Engine\Session\Security;
 use WatchNext\Engine\Template\Language;

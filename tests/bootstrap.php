@@ -3,4 +3,4 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new \WatchNext\Engine\Dispatcher\InternalDispatcher())->dispatch();
+(new \WatchNext\Engine\Dispatcher\KernelLoader())->load();

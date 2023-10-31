@@ -79,7 +79,13 @@ class Database
 
     public function execute(string $sql): void
     {
+        $tick = $this->isDebug() ? microtime(true) : 0;
+
         self::$pdo->exec($sql);
+
+        if ($this->isDebug()) {
+            $this->log($sql, [], microtime(true) - $tick);
+        }
     }
 
     public function query(QueryBuilder $query): Statement
@@ -89,18 +95,10 @@ class Database
             ->execute($query->getParams());
     }
 
-    public function getLastInsertId(): int|string|null
+    public function getLastInsertId(): int|null
     {
         $id = self::$pdo->lastInsertId();
 
-        if (is_numeric($id)) {
-            return (int) $id;
-        }
-
-        if (is_string($id)) {
-            return $id;
-        }
-
-        return null;
+        return $id ? (int) $id : null;
     }
 }

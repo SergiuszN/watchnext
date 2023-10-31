@@ -37,7 +37,7 @@ class ApcuCache implements CacheInterface
 
     public function has(string $key): bool
     {
-        return apcu_exists($key);
+        return (bool) apcu_exists($key);
     }
 
     public function clearAll(): void
