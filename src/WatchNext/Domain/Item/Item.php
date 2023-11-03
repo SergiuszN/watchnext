@@ -14,6 +14,8 @@ class Item
     private string $image;
     private int $owner;
     private DateTimeImmutable $addedAt;
+    private bool $isWatched;
+    private string $note;
 
     public function getId(): ?int
     {
@@ -106,18 +108,52 @@ class Item
         return $this;
     }
 
+    public function isWatched(): bool
+    {
+        return $this->isWatched;
+    }
+
+    public function setIsWatched(bool $isWatched): Item
+    {
+        $this->isWatched = $isWatched;
+
+        return $this;
+    }
+
+    public function toggleWatched(): self
+    {
+        $this->isWatched = !$this->isWatched;
+
+        return $this;
+    }
+
+    public function getNote(): string
+    {
+        return $this->note;
+    }
+
+    public function setNote(string $note): Item
+    {
+        $this->note = $note;
+
+        return $this;
+    }
+
     /**
      * @throws Exception
      */
     public static function fromDatabase(array $item): Item
     {
         $model = new Item();
+        $model->id = (int) $item['id'];
         $model->title = $item['title'];
         $model->url = $item['url'];
         $model->description = $item['description'];
         $model->image = $item['image'];
         $model->owner = $item['owner'];
         $model->addedAt = new DateTimeImmutable($item['added_at']);
+        $model->isWatched = (bool) $item['is_watched'];
+        $model->note = $item['note'];
 
         return $model;
     }
@@ -131,6 +167,8 @@ class Item
             'image' => $this->image,
             'owner' => $this->owner,
             'added_at' => $this->addedAt->format('Y-m-d H:i:s'),
+            'is_watched' => $this->isWatched ? 1 : 0,
+            'note' => $this->note,
         ];
     }
 }

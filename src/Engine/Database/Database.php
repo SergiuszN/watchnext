@@ -6,35 +6,39 @@ use PDO;
 
 class Database
 {
-    private static ?PDO $pdo = null;
+    private ?PDO $connection;
 
-    private static string $databaseName = '';
+    private string $databaseName;
 
     private static array $debug = [];
     private static bool $isDebug;
 
-    public function __construct()
+    public function __construct(string $dsn = null, string $user = null, string $password = null)
     {
-        if (self::$pdo === null) {
-            self::$isDebug = $_ENV['APP_ENV'] === 'dev';
-            self::$pdo = new PDO(
-                $_ENV['DATABASE_DSN'],
-                $_ENV['DATABASE_USER'] ?: null,
-                $_ENV['DATABASE_PASSWORD'] ?: null, [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    PDO::ATTR_EMULATE_PREPARES => false,
-                ]
-            );
-
-            preg_match('/dbname=([^;]*)/', $_ENV['DATABASE_DSN'], $matches);
-            self::$databaseName = $matches[1] ?? '';
+        if ($dsn === null) {
+            $dsn = $_ENV['DATABASE_DSN'];
+            $user = $_ENV['DATABASE_USER'];
+            $password = $_ENV['DATABASE_PASSWORD'];
         }
+
+        self::$isDebug = $_ENV['APP_ENV'] === 'dev';
+        $this->connection = new PDO(
+            $dsn,
+            $user ?: null,
+            $password ?: null, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+            ]
+        );
+
+        preg_match('/dbname=([^;]*)/', $dsn, $matches);
+        $this->databaseName = $matches[1] ?? '';
     }
 
     public function getDatabase(): string
     {
-        return self::$databaseName;
+        return $this->databaseName;
     }
 
     public function setIsDebug(bool $isDebug): void
@@ -59,29 +63,29 @@ class Database
 
     public function transactionBegin(): void
     {
-        self::$pdo->beginTransaction();
+        $this->connection->beginTransaction();
     }
 
     public function transactionCommit(): void
     {
-        self::$pdo->commit();
+        $this->connection->commit();
     }
 
     public function transactionRollback(): void
     {
-        self::$pdo->rollBack();
+        $this->connection->rollBack();
     }
 
     public function prepare(string $sql): Statement
     {
-        return new Statement($this, self::$pdo->prepare($sql));
+        return new Statement($this, $this->connection->prepare($sql));
     }
 
     public function execute(string $sql): void
     {
         $tick = $this->isDebug() ? microtime(true) : 0;
 
-        self::$pdo->exec($sql);
+        $this->connection->exec($sql);
 
         if ($this->isDebug()) {
             $this->log($sql, [], microtime(true) - $tick);
@@ -97,7 +101,7 @@ class Database
 
     public function getLastInsertId(): int|null
     {
-        $id = self::$pdo->lastInsertId();
+        $id = $this->connection->lastInsertId();
 
         return $id ? (int) $id : null;
     }

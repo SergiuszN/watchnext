@@ -8,6 +8,7 @@ readonly class PaginationCollection
         public int $page,
         public int $limit,
         public int $count,
+        public int $total,
         public array $items
     ) {
     }

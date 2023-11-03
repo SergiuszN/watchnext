@@ -10,11 +10,13 @@ class Request
     private static array $params = [];
     private array $get;
     private array $post;
+    private array $request;
 
     public function __construct()
     {
         $this->get = $_GET;
         $this->post = $_POST;
+        $this->request = $_REQUEST;
     }
 
     public function setRoute(DispatchedRoute $route): void
@@ -45,6 +47,11 @@ class Request
     public function post(string $name, mixed $defaultValue = null): mixed
     {
         return $this->post[$name] ?? $defaultValue;
+    }
+
+    public function request(string $name, mixed $defaultValue = null): mixed
+    {
+        return $this->request[$name] ?? $defaultValue;
     }
 
     public function hasPost(string $name): bool

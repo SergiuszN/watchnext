@@ -4,7 +4,7 @@ namespace WatchNext\Engine\Template;
 
 use WatchNext\Engine\Config;
 
-class Language
+class Translator
 {
     private static ?array $translationConfig = null;
     private static array $translations = [];

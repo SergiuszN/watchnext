@@ -1,0 +1,29 @@
+<nav class="navbar navbar-expand-lg border-bottom mb-4">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {% if route.startsFrom('item_add') %}active{% endif %}" href="{{ route.make('item_add') }}">{{ t.trans('app.nav.addNewItem') }}</a>
+                </li>
+            </ul>
+            <form class="ms-auto d-flex" role="search" action="{{ route.make('item_search') }}">
+                <input class="form-control" type="search" placeholder="Search..." aria-label="Search" name="search" value="{{ request.get('search', '') }}">
+            </form>
+            <ul class="navbar-nav mb-2 mb-lg-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="profile-menu-dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="profile-menu-dropdown" style="left: -120px">
+                        <li>
+                            <a class="dropdown-item" href="{{ route.make('security_logout') }}">{{ t.trans('app.nav.logout') }}</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

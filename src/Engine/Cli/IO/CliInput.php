@@ -49,4 +49,10 @@ class CliInput
 
         return isset($option[1]);
     }
+
+    public function setArgv(array $argv): void
+    {
+        $this->argv = $argv;
+        $this->input = implode(' ', $argv);
+    }
 }

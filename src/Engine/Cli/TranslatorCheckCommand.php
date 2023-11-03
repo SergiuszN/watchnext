@@ -23,10 +23,8 @@ Buy you can put option --base=CODE with any other lang
 ';
     }
 
-    public function execute(): void
+    public function execute(CliInput $input, CliOutput $output): void
     {
-        [$input, $output] = [new CliInput(), new CliOutput()];
-
         $baseLang = $input->getOption('base', false, 'en');
 
         $output->writeln('Translation check command started');

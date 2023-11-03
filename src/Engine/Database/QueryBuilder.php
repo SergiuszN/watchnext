@@ -87,7 +87,7 @@ class QueryBuilder
 
     public function having(string $having): self
     {
-        $this->_having = "HAVING $having";
+        $this->_having = $having;
 
         return $this;
     }
@@ -197,7 +197,7 @@ class QueryBuilder
         }
 
         if (!empty($this->_andWheres)) {
-            $sql .= 'WHERE ' . implode("\n AND ", $this->_andWheres) . "\n";
+            $sql .= 'WHERE ' . implode("\nAND ", $this->_andWheres) . "\n";
         }
 
         if (!empty($this->_groupBy)) {
@@ -233,11 +233,11 @@ class QueryBuilder
     private function buildUpdate(): string
     {
         $sql = $this->_update . "\n";
-        $sql .= "SET\n" . implode(",\n", $this->_sets) . "\n";
+        $sql .= 'SET ' . implode(",\n", $this->_sets) . "\n";
 
         /** @noinspection DuplicatedCode */
         if (!empty($this->_andWheres)) {
-            $sql .= 'WHERE ' . implode("\n AND ", $this->_andWheres) . "\n";
+            $sql .= 'WHERE ' . implode("\nAND ", $this->_andWheres) . "\n";
         }
 
         if (!empty($this->_orderBy)) {
@@ -257,7 +257,7 @@ class QueryBuilder
 
         /** @noinspection DuplicatedCode */
         if (!empty($this->_andWheres)) {
-            $sql .= 'WHERE ' . implode("\n AND ", $this->_andWheres) . "\n";
+            $sql .= 'WHERE ' . implode("\nAND ", $this->_andWheres) . "\n";
         }
 
         if (!empty($this->_orderBy)) {

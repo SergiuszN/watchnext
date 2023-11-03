@@ -7,22 +7,44 @@ use WatchNext\Engine\Config;
 
 class RouteGenerator
 {
-    private static ?array $routes = null;
+    private readonly ?array $routes;
+
+    private array $cache = [];
+
+    public function __construct(
+        private Config $config
+    ) {
+        $this->routes = $this->config->get('routing/routing.php');
+    }
+
+    public function make(string $name, array $params = [], bool $absolute = false): string
+    {
+        $key = $name . '.' . implode('.', array_keys($params)) . '.' . (int) $absolute;
+
+        if (isset($this->cache[$key])) {
+            $route = $this->cache[$key];
+        } else {
+            $route = $this->_make($name, $params, $absolute);
+            $this->cache[$key] = $route;
+        }
+
+        foreach ($params as $key => $value) {
+            $route = str_replace("%$key%", $value, $route);
+        }
+
+        return $route;
+    }
 
     /**
      * @throws Exception
      */
-    public function make(string $name, array $params = [], bool $absolute = false): string
+    private function _make(string $name, array $params = [], bool $absolute = false): string
     {
-        if (self::$routes === null) {
-            self::$routes = (new Config())->get('routing/routing.php');
-        }
-
-        if (!isset(self::$routes[$name])) {
+        if (!isset($this->routes[$name])) {
             throw new Exception("Route $name is not exist!");
         }
 
-        $route = self::$routes[$name][1];
+        $route = $this->routes[$name][1];
 
         // Set params required in route --------------------------------------------------------------------------------
 
@@ -33,7 +55,7 @@ class RouteGenerator
                 throw new Exception("Route $name require parameter $routeParam!");
             }
 
-            $route = str_replace($routeParams[0][$key], urlencode($params[$routeParam]), $route);
+            $route = str_replace($routeParams[0][$key], "%{$routeParam}%", $route);
             unset($params[$routeParam]);
         }
 
@@ -43,7 +65,7 @@ class RouteGenerator
             $route .= '?';
             $queryParams = [];
             foreach ($params as $key => $param) {
-                $queryParams[] = $key . '=' . urlencode($param);
+                $queryParams[] = $key . '=' . "%$key%";
             }
             $route .= implode('&', $queryParams);
         }

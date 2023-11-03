@@ -3,7 +3,7 @@
 namespace WatchNext\WatchNext\Domain\Catalog\Command;
 
 use WatchNext\Engine\Event\CommandInterface;
-use WatchNext\Engine\Template\Language;
+use WatchNext\Engine\Template\Translator;
 use WatchNext\WatchNext\Domain\Catalog\Catalog;
 use WatchNext\WatchNext\Domain\Catalog\CatalogRepository;
 use WatchNext\WatchNext\Domain\Catalog\CatalogUser;
@@ -12,7 +12,7 @@ readonly class CreateDefaultUserCatalogCommand implements CommandInterface
 {
     public function __construct(
         private CatalogRepository $catalogRepository,
-        private Language $language
+        private Translator $language
     ) {
     }
 

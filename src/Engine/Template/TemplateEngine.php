@@ -42,6 +42,7 @@ class TemplateEngine
         ]);
 
         $this->addDefaultGlobals($container);
+        $this->addDefaultFunctions($container);
         $this->addUserGlobals($config, $container);
     }
 
@@ -82,12 +83,21 @@ class TemplateEngine
     private function addDefaultGlobals(Container $container): void
     {
         $this->addGlobal('flash', $container->get(FlashBag::class));
-        $this->addGlobal('t', $container->get(Language::class));
+        $this->addGlobal('t', $container->get(Translator::class));
         $this->addGlobal('csfr', $container->get(CSFR::class));
         $this->addGlobal('asset', $container->get(Asset::class));
         $this->addGlobal('route', $container->get(RouteGenerator::class));
         $this->addGlobal('request', $container->get(Request::class));
         $this->addGlobal('security', $container->get(Security::class));
+    }
+
+    private function addDefaultFunctions(Container $container): void
+    {
+        $this->addFunction(new TwigFunction('dump', function ($data) {
+            echo '<pre>';
+            var_dump($data);
+            echo '</pre>';
+        }));
     }
 
     /**

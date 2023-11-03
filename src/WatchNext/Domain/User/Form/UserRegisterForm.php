@@ -5,7 +5,7 @@ namespace WatchNext\WatchNext\Domain\User\Form;
 use InvalidArgumentException;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Session\FlashBag;
-use WatchNext\Engine\Template\Language;
+use WatchNext\Engine\Template\Translator;
 use WatchNext\WatchNext\Domain\User\UserRepository;
 use Webmozart\Assert\Assert;
 
@@ -16,7 +16,7 @@ class UserRegisterForm
     public readonly string $password;
     public readonly string $repeatPassword;
 
-    public function __construct(private readonly Request $request, private readonly Language $t)
+    public function __construct(private readonly Request $request, private readonly Translator $t)
     {
         $this->isPost = $this->request->isPost();
     }

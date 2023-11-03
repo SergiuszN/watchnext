@@ -6,6 +6,7 @@ use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use WatchNext\Engine\Cli\CliCommandInterface;
 use WatchNext\Engine\Cli\IO\CliInput;
+use WatchNext\Engine\Cli\IO\CliOutput;
 use WatchNext\Engine\Config;
 use WatchNext\Engine\Container;
 
@@ -39,7 +40,7 @@ readonly class CliDispatcher
             exit;
         }
 
-        $input = new CliInput();
+        [$input, $output] = [new CliInput(), new CliOutput()];
         $isHelpOptionSelected = $input->isOptionExist('help');
 
         foreach ($commands as $commandName => $commandClass) {
@@ -48,7 +49,7 @@ readonly class CliDispatcher
                 $command = $this->container->get($commandClass);
 
                 if (!$isHelpOptionSelected) {
-                    $command->execute();
+                    $command->execute($input, $output);
                 } else {
                     echo "Help about '$commandName':\n\n";
                     echo $command->getHelp();

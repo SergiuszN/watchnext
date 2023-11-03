@@ -13,5 +13,9 @@ interface ItemRepository
 
     public function findAllForUser(?int $owner);
 
-    public function findPage(int $page, int $limit, int $catalog, Request $request): PaginationCollection;
+    public function findCatalogPage(int $page, int $limit, int $catalog, Request $request): PaginationCollection;
+
+    public function findSearchPage(int $page, int $limit, int $userId, Request $request): PaginationCollection;
+
+    public function hasAccess(int $itemId, int $userId): bool;
 }

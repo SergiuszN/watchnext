@@ -33,11 +33,8 @@ If you need warmup cache after clearing you can add option
     /**
      * @throws Exception
      */
-    public function execute(): void
+    public function execute(CliInput $input, CliOutput $output): void
     {
-        $input = new CliInput();
-        $output = new CliOutput();
-
         $output->write('Clearing the filesystem cache...');
         $cacheFolder = ROOT_PATH . '/var/cache/*';
         exec("rm -rf $cacheFolder");

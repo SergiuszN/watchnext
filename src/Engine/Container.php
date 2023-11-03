@@ -21,8 +21,8 @@ use WatchNext\Engine\Session\Firewall;
 use WatchNext\Engine\Session\FlashBag;
 use WatchNext\Engine\Session\Security;
 use WatchNext\Engine\Template\Asset;
-use WatchNext\Engine\Template\Language;
 use WatchNext\Engine\Template\TemplateEngine;
+use WatchNext\Engine\Template\Translator;
 
 use function DI\autowire;
 
@@ -105,7 +105,7 @@ class Container
             Request::class => autowire(Request::class),
             RouteGenerator::class => autowire(RouteGenerator::class),
             Logger::class => autowire(Logger::class),
-            Language::class => autowire(Language::class),
+            Translator::class => autowire(Translator::class),
             FlashBag::class => autowire(FlashBag::class),
             Auth::class => autowire(Auth::class),
             Security::class => autowire(Security::class),

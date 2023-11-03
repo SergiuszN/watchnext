@@ -12,6 +12,7 @@ use WatchNext\Engine\Event\EventManager;
 use WatchNext\Engine\Logger;
 use WatchNext\Engine\Profiler;
 use WatchNext\Engine\Response\JsonResponse;
+use WatchNext\Engine\Response\RedirectRefererResponse;
 use WatchNext\Engine\Response\RedirectResponse;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Router\AccessDeniedException;
@@ -104,6 +105,11 @@ class HttpDispatcher
                 /** @var $response RedirectResponse */
                 $location = $this->routeGenerator->make($response->route, $response->params);
                 header("Location: $location");
+
+                break;
+            case RedirectRefererResponse::class:
+                /** @var $response RedirectRefererResponse */
+                header("Location: $response->uri");
 
                 break;
             case JsonResponse::class:

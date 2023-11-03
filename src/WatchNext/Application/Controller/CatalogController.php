@@ -9,7 +9,7 @@ use WatchNext\Engine\Router\AccessDeniedException;
 use WatchNext\Engine\Router\NotFoundException;
 use WatchNext\Engine\Session\FlashBag;
 use WatchNext\Engine\Session\Security;
-use WatchNext\Engine\Template\Language;
+use WatchNext\Engine\Template\Translator;
 use WatchNext\WatchNext\Domain\Catalog\Catalog;
 use WatchNext\WatchNext\Domain\Catalog\CatalogRepository;
 use WatchNext\WatchNext\Domain\Catalog\CatalogUser;
@@ -30,7 +30,7 @@ readonly class CatalogController
         private CatalogVoter $catalogVoter,
         private Security $security,
         private FlashBag $flashBag,
-        private Language $language,
+        private Translator $language,
         private SetDefaultCatalogIfRemoved $setDefaultCatalogIfRemoved,
         private AddEditCatalogForm $addEditCatalogForm,
         private CatalogShareWithForm $catalogShareWithForm,
@@ -46,7 +46,7 @@ readonly class CatalogController
         $catalog = $this->catalogRepository->find($catalog);
         $this->catalogVoter->throwIfNotGranted($catalog, CatalogVoter::VIEW);
 
-        $pagination = $this->itemRepository->findPage(
+        $pagination = $this->itemRepository->findCatalogPage(
             $page,
             12,
             $catalog->getId(),

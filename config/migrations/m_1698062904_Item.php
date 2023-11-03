@@ -4,10 +4,12 @@ namespace Migrations;
 
 use WatchNext\Engine\Database\Migration;
 
-class m_1698062904_Item extends Migration {
-    public function up(): void {
+class m_1698062904_Item extends Migration
+{
+    public function up(): void
+    {
         $this->database->execute(
-            "CREATE TABLE `item` (
+            'CREATE TABLE `item` (
                 `id` INT PRIMARY KEY AUTO_INCREMENT,
                 `title` VARCHAR(255) NOT NULL,
                 `url` VARCHAR(255) NOT NULL,
@@ -16,13 +18,14 @@ class m_1698062904_Item extends Migration {
                 `owner` INT NOT NULL,
                 `added_at` DATETIME NOT NULL DEFAULT NOW(),
                 CONSTRAINT `fk_item_user` FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
-            )"
+            )'
         );
     }
 
-    public function down(): void {
+    public function down(): void
+    {
         $this->database->execute(
-            "DROP TABLE `item`"
+            'DROP TABLE `item`'
         );
     }
 }

@@ -10,8 +10,6 @@ use WatchNext\Engine\Database\Migration;
 
 class MigrationsMigrateCommand implements CliCommandInterface
 {
-    private CliInput $input;
-    private CliOutput $output;
     private array $migrations;
     private array $migrated;
 
@@ -19,8 +17,6 @@ class MigrationsMigrateCommand implements CliCommandInterface
         private readonly Container $container,
         private readonly Database $database
     ) {
-        $this->input = new CliInput();
-        $this->output = new CliOutput();
     }
 
     public function getHelp(): string
@@ -31,17 +27,17 @@ For that just add --version=VERSION_NUMBER
 ';
     }
 
-    public function execute(): void
+    public function execute(CliInput $input, CliOutput $output): void
     {
-        $this->output->writeln('Migration of database...');
+        $output->writeln('Migration of database...');
 
         $this->createMigrationsTableIfNotExist();
         $this->loadMigratedMigrations();
         $this->loadAvailableMigrations();
 
         $currentVersion = $this->getCurrentVersion();
-        $selectedVersion = $this->input->isOptionExist('version')
-            ? (int) $this->input->getOption('version')
+        $selectedVersion = $input->isOptionExist('version')
+            ? (int) $input->getOption('version')
             : $this->getLastVersionInFiles();
 
         if ($currentVersion <= $selectedVersion) {
@@ -50,7 +46,7 @@ For that just add --version=VERSION_NUMBER
             $this->down($selectedVersion);
         }
 
-        $this->output->writeln('Done');
+        $output->writeln('Done');
     }
 
     private function up(int $selectedVersion): void

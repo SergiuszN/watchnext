@@ -9,36 +9,20 @@ use WatchNext\Engine\Database\QueryBuilder;
 
 class DatabaseTest extends TestCase
 {
-    private array $config;
     private Database $database;
 
     public function setUp(): void
     {
-        $this->config = [
-            'dsn' => $_ENV['DATABASE_DSN'],
-            'user' => $_ENV['DATABASE_USER'],
-            'password' => $_ENV['DATABASE_PASSWORD'],
-        ];
-
-        $_ENV['DATABASE_DSN'] = 'sqlite::memory:';
-        $_ENV['DATABASE_USER'] = '';
-        $_ENV['DATABASE_PASSWORD'] = '';
-
-        $this->database = new Database();
-    }
-
-    public function tearDown(): void
-    {
-        parent::tearDown();
-
-        $_ENV['DATABASE_DSN'] = $this->config['dsn'];
-        $_ENV['DATABASE_USER'] = $this->config['user'];
-        $_ENV['DATABASE_PASSWORD'] = $this->config['password'];
+        $this->database = new Database('sqlite::memory:');
     }
 
     public function testGetDatabaseName(): void
     {
         self::assertEquals('', $this->database->getDatabase());
+
+        $envDatabase = new Database();
+
+        self::assertNotEquals('', $envDatabase->getDatabase());
     }
 
     public function testDebug(): void
@@ -60,7 +44,9 @@ class DatabaseTest extends TestCase
 
     public function testTransaction(): void
     {
+        $this->database->setIsDebug(true);
         $this->database->execute('CREATE TABLE test_transaction(name VARCHAR(255));');
+        $this->database->setIsDebug(false);
 
         $this->database->transactionBegin();
         $this->database->execute("INSERT INTO test_transaction VALUES ('firstname')");

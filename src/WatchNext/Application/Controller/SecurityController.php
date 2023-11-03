@@ -8,7 +8,7 @@ use WatchNext\Engine\Response\RedirectResponse;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Session\FlashBag;
 use WatchNext\Engine\Session\Security;
-use WatchNext\Engine\Template\Language;
+use WatchNext\Engine\Template\Translator;
 use WatchNext\WatchNext\Domain\User\Form\UserLoginForm;
 use WatchNext\WatchNext\Domain\User\Form\UserRegisterForm;
 use WatchNext\WatchNext\Domain\User\Query\UserCreatedQuery;
@@ -20,7 +20,7 @@ readonly class SecurityController
     public function __construct(
         private Request $request,
         private UserRepository $userRepository,
-        private Language $language,
+        private Translator $language,
         private Security $security,
         private FlashBag $flashBag,
         private EventManager $eventManager,

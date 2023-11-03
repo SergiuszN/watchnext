@@ -5,7 +5,7 @@ namespace WatchNext\Engine\Request;
 use InvalidArgumentException;
 use WatchNext\Engine\Session\CSFR;
 use WatchNext\Engine\Session\FlashBag;
-use WatchNext\Engine\Template\Language;
+use WatchNext\Engine\Template\Translator;
 use Webmozart\Assert\Assert;
 
 class Form
@@ -13,10 +13,10 @@ class Form
     protected bool $isPost;
     protected readonly string $token;
 
-    public function __construct(protected Request $request, protected CSFR $csfr, protected Language $t)
+    public function __construct(protected Request $request, protected CSFR $csfr, protected Translator $t)
     {
         $this->isPost = $this->request->isPost();
-        $this->token = $this->request->post('_token', '');
+        $this->token = $this->request->request('_token', '');
     }
 
     public function load(): self

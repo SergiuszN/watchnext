@@ -21,10 +21,8 @@ Ensure add that command in some process before commit changes
 ';
     }
 
-    public function execute(): void
+    public function execute(CliInput $input, CliOutput $output): void
     {
-        [$input, $output] = [new CliInput(), new CliOutput()];
-
         $output->writeln('Translation order key command started');
         $translationFiles = array_filter(scandir($this->translationsPath), fn ($file) => !in_array($file, ['.', '..']));
 
@@ -42,7 +40,7 @@ Ensure add that command in some process before commit changes
                 $translation = str_replace("'", "\'", $translation);
                 $translation = str_replace(["\r", "\n"], '', $translation);
 
-                $newFile .= "\t'{$key}' => '$translation',\n";
+                $newFile .= "    '{$key}' => '$translation',\n";
             }
 
             $newFile .= "];\n";

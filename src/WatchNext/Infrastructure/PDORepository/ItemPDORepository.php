@@ -3,6 +3,7 @@
 namespace WatchNext\WatchNext\Infrastructure\PDORepository;
 
 use Exception;
+use WatchNext\Engine\Database\PaginationQuery;
 use WatchNext\Engine\Database\QueryBuilder;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Template\PaginationCollection;
@@ -14,36 +15,35 @@ class ItemPDORepository extends PDORepository implements ItemRepository
     public function save(Item $item): void
     {
         if ($item->getId() === null) {
-            $this->database->prepare('
-                INSERT INTO `item` (
-                    `title`, 
-                    `url`,
-                    `description`,
-                    `image`,
-                    `owner`, 
-                    `added_at`
-                )
-                VALUES (
-                    :title, 
-                    :url,
-                    :description,
-                    :image,
-                    :owner, 
-                    :added_at
-                )
-            ')->execute($item->toDatabase());
+            $this->database->query((new QueryBuilder())
+                ->insert('item')
+                ->addSet('title')
+                ->addSet('url')
+                ->addSet('description')
+                ->addSet('image')
+                ->addSet('owner')
+                ->addSet('added_at')
+                ->addSet('is_watched')
+                ->addSet('note')
+                ->setParameters($item->toDatabase())
+            );
+
             $item->setId($this->database->getLastInsertId());
         } else {
-            $this->database->prepare('
-                UPDATE `item` SET
-                    `title` = :title,
-                    `url` = :url,
-                    `description` = :description,
-                    `image` = :image,
-                    `owner` = :owner,
-                    `added_at` = :added_at
-                WHERE `id` = :id
-            ')->execute(array_merge($item->toDatabase(), ['id' => $item->getId()]));
+            $this->database->query((new QueryBuilder())
+                ->update('item')
+                ->addSet('title')
+                ->addSet('url')
+                ->addSet('description')
+                ->addSet('image')
+                ->addSet('owner')
+                ->addSet('added_at')
+                ->addSet('is_watched')
+                ->addSet('note')
+                ->setParameters($item->toDatabase())
+                ->andWhere('id = :id')
+                ->setParameter('id', $item->getId())
+            );
         }
     }
 
@@ -74,36 +74,67 @@ class ItemPDORepository extends PDORepository implements ItemRepository
     /**
      * @throws Exception
      */
-    public function findPage(int $page, int $limit, int $catalog, Request $request): PaginationCollection
+    public function findCatalogPage(int $page, int $limit, int $catalog, Request $request): PaginationCollection
     {
-        $countQuery = (new QueryBuilder())
-            ->select('COUNT(i.id)')
+        $query = (new QueryBuilder())
             ->from('item as i')
             ->addLeftJoin('catalog_item as ci', 'ci.item = i.id')
             ->addLeftJoin('catalog as c', 'c.id = ci.catalog')
             ->andWhere('c.id = :catalog')
-            ->setParameter('catalog', $catalog);
+            ->setParameter('catalog', $catalog)
+            ->addOrderBy('i.id', 'DESC');
 
-        $count = (int) $this->database
-            ->prepare($countQuery->getSql())
-            ->execute($countQuery->getParams())
-            ->fetchSingle();
-
-        $query = (clone $countQuery)
-            ->select('i.*')
-            ->addOrderBy('i.id', 'DESC')
-            ->limit($limit, $limit * ($page - 1));
-
-        $items = $this->database
-            ->prepare($query->getSql())
-            ->execute($query->getParams())
-            ->fetchAll();
-
-        return new PaginationCollection(
-            $page,
+        return (new PaginationQuery(
+            $this->database,
+            $query,
+            Item::class,
+            'i.*',
+            'COUNT(i.id)',
             $limit,
-            ceil($count / $limit),
-            $items
-        );
+            $page
+        ))->getPagination();
+    }
+
+    public function hasAccess(int $itemId, int $userId): bool
+    {
+        return $this->database->query((new QueryBuilder())
+            ->select('COUNT(i.id)')
+            ->from('item as i')
+            ->addLeftJoin('catalog_item as ci', 'i.id = ci.item')
+            ->addLeftJoin('catalog_user as cu', 'ci.catalog = cu.catalog')
+            ->andWhere('i.id = :itemId')
+            ->andWhere('cu.user = :userId')
+            ->setParameter('itemId', $itemId)
+            ->setParameter('userId', $userId)
+        )->fetchSingle() > 0;
+    }
+
+    public function findSearchPage(int $page, int $limit, int $userId, Request $request): PaginationCollection
+    {
+        $query = (new QueryBuilder())
+            ->from('item as i')
+            ->addLeftJoin('catalog_item as ci', 'ci.item = i.id')
+            ->addLeftJoin('catalog_user as cu', 'ci.catalog = cu.catalog')
+            ->andWhere('cu.user = :userId')
+            ->setParameter('userId', $userId)
+            ->addOrderBy('i.id', 'DESC');
+
+        if ($request->get('search')) {
+            $query
+                ->andWhere('(i.title LIKE :search1 OR i.url LIKE :search2 OR i.description LIKE :search3)')
+                ->setParameter('search1', "%{$request->get('search')}%")
+                ->setParameter('search2', "%{$request->get('search')}%")
+                ->setParameter('search3', "%{$request->get('search')}%");
+        }
+
+        return (new PaginationQuery(
+            $this->database,
+            $query,
+            Item::class,
+            'i.*',
+            'COUNT(i.id)',
+            $limit,
+            $page
+        ))->getPagination();
     }
 }

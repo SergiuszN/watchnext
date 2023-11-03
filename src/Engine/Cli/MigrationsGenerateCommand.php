@@ -15,11 +15,9 @@ Required arguments:
 ';
     }
 
-    public function execute(): void
+    public function execute(CliInput $input, CliOutput $output): void
     {
-        [$input, $output] = [new CliInput(), new CliOutput()];
         $rootPath = ROOT_PATH;
-
         $name = $input->getArgument(0, null, true, "You must provide 'name'(0) argument!");
 
         $output->writeln("Creation of '$name' migration...");

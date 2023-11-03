@@ -30,6 +30,9 @@ return [
 
         'ROLE_ITEM_GR' => [
             'ROLE_ITEM_ADD',
+            'ROLE_ITEM_TOGGLE_WATCHED',
+            'ROLE_ITEM_NOTE',
+            'ROLE_ITEM_SEARCH',
         ],
 
         'ROLE_CATALOG_GR' => [
@@ -42,10 +45,10 @@ return [
             'ROLE_CATALOG_SHARE',
             'ROLE_CATALOG_UN_SHARE',
             'ROLE_CATALOG_UNSUBSCRIBE',
-        ]
+        ],
     ],
     'access_control' => [
         '/admin' => ['ROLE_ADMIN'],
-        '/app' => ['ROLE_USER']
+        '/app' => ['ROLE_USER'],
     ],
 ];
