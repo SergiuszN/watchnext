@@ -44,6 +44,8 @@ return [
     'item.note.error' => 'Something goes wrong on saving note, try one more time or contact with us',
     'item.note.success' => 'You successfully saved a note',
     'item.page.note' => 'Note',
+    'item.page.saveNote' => 'Save',
+    'item.page.watch' => 'Watch',
     'item.search.found' => 'For you search "%search%" found %count% result',
     'item.toggleWatched.success' => 'You successfully toggle watched status',
     'menu.manage' => 'Manage',
