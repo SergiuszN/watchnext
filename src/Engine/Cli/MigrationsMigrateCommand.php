@@ -2,6 +2,7 @@
 
 namespace WatchNext\Engine\Cli;
 
+use Exception;
 use WatchNext\Engine\Cli\IO\CliInput;
 use WatchNext\Engine\Cli\IO\CliOutput;
 use WatchNext\Engine\Container;
@@ -31,7 +32,6 @@ For that just add --version=VERSION_NUMBER
     {
         $output->writeln('Migration of database...');
 
-        $this->createMigrationsTableIfNotExist();
         $this->loadMigratedMigrations();
         $this->loadAvailableMigrations();
 
@@ -57,10 +57,6 @@ For that just add --version=VERSION_NUMBER
 
         usort($migrationsToMigrate, fn ($left, $right) => $left['version'] <=> $right['version']);
 
-        $statement = $this->database->prepare('
-            INSERT INTO `migrations`(`version`, `name`, `executed_at`) VALUES (:version, :name, NOW());
-        ');
-
         foreach ($migrationsToMigrate as $migration) {
             echo "Migrate: {$migration['name']}...\n";
             $migrationClass = "Migrations\\{$migration['name']}";
@@ -69,7 +65,11 @@ For that just add --version=VERSION_NUMBER
             $migrationObject = new $migrationClass($this->container, $this->database);
             $migrationObject->up();
 
-            $statement->execute(['version' => $migration['version'], 'name' => $migration['name']]);
+            $this->database
+                ->prepare('
+                    INSERT INTO `migration`(`version`, `name`, `executed_at`) VALUES (:version, :name, NOW());
+                ')
+                ->execute(['version' => $migration['version'], 'name' => $migration['name']]);
         }
     }
 
@@ -82,7 +82,7 @@ For that just add --version=VERSION_NUMBER
         usort($migrationsToMigrate, fn ($left, $right) => $right['version'] <=> $left['version']);
 
         $statement = $this->database->prepare('
-            DELETE FROM `migrations` WHERE `version`=:version;
+            DELETE FROM `migration` WHERE `version`=:version;
         ');
 
         foreach ($migrationsToMigrate as $migration) {
@@ -106,7 +106,7 @@ For that just add --version=VERSION_NUMBER
                 SELECT count(*) AS cnt
                 FROM information_schema.tables
                 WHERE table_schema = :database
-                AND table_name = 'migrations'
+                AND table_name = 'migration'
             ")
             ->execute(['database' => $database]);
 
@@ -114,23 +114,27 @@ For that just add --version=VERSION_NUMBER
 
         if ($count === 0) {
             $this->database->execute("
-                CREATE TABLE `migrations` (
+                CREATE TABLE `migration` (
                     version INT,
                     name VARCHAR(255),
                     executed_at DATETIME DEFAULT NOW()
                 );
 
-                INSERT INTO `migrations` VALUES (0, 'init', NOW());
+                INSERT INTO `migration` VALUES (0, 'init', NOW());
             ");
         }
     }
 
     private function getCurrentVersion(): int
     {
-        return (int) $this->database
-            ->prepare('SELECT MAX(version) AS current_version FROM `migrations` WHERE 1;')
-            ->execute()
-            ->fetchSingle();
+        try {
+            return (int) $this->database
+                ->prepare('SELECT MAX(version) AS current_version FROM `migration` WHERE 1;')
+                ->execute()
+                ->fetchSingle();
+        } catch (Exception $exception) {
+            return 0;
+        }
     }
 
     private function getLastVersionInFiles(): int
@@ -164,8 +168,12 @@ For that just add --version=VERSION_NUMBER
 
     private function loadMigratedMigrations(): void
     {
-        $result = $this->database->prepare('SELECT * FROM `migrations` WHERE 1;')->execute();
-        $migrated = $result->fetchAll();
+        try {
+            $result = $this->database->prepare('SELECT * FROM `migration` WHERE 1;')->execute();
+            $migrated = $result->fetchAll();
+        } catch (Exception $exception) {
+            $migrated = [];
+        }
 
         $this->migrated = [];
         foreach ($migrated as $migration) {

@@ -8,7 +8,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use WatchNext\Engine\Container;
-use WatchNext\Engine\Event\EventManager;
+use WatchNext\Engine\Event\SyncEventDispatcher;
 use WatchNext\Engine\Logger;
 use WatchNext\Engine\Profiler;
 use WatchNext\Engine\Response\JsonResponse;
@@ -30,7 +30,6 @@ class HttpDispatcher
         private Profiler $profiler,
         private Security $security,
         private RouterDispatcher $routerDispatcher,
-        private EventManager $eventManager,
         private SecurityController $securityController,
         private TemplateEngine $templateEngine,
         private RouteGenerator $routeGenerator,
@@ -44,8 +43,7 @@ class HttpDispatcher
      */
     public function dispatch(): void
     {
-        $this->profiler->start();
-        $this->profiler->add('kernel.booted');
+        $this->profiler->start('kernel.booted');
 
         $this->security->init();
         $this->profiler->add('security.booted');
@@ -53,7 +51,7 @@ class HttpDispatcher
         $route = $this->routerDispatcher->dispatch();
         $this->profiler->add('route.dispatched');
 
-        $this->eventManager->init();
+        $this->container->get(SyncEventDispatcher::class);
 
         if ($route->status === RouterDispatcherStatusEnum::FOUND) {
             try {

@@ -8,12 +8,14 @@ use Exception;
 use WatchNext\Engine\Cache\ApcuCache;
 use WatchNext\Engine\Cache\MemcachedCache;
 use WatchNext\Engine\Cli\CacheClearCommand;
+use WatchNext\Engine\Cli\DatabaseEventWorker;
 use WatchNext\Engine\Cli\MigrationsGenerateCommand;
 use WatchNext\Engine\Cli\MigrationsMigrateCommand;
 use WatchNext\Engine\Cli\TranslatorOrderKeysCommand;
 use WatchNext\Engine\Database\Database;
 use WatchNext\Engine\Dispatcher\HttpDispatcher;
-use WatchNext\Engine\Event\EventManager;
+use WatchNext\Engine\Event\DatabaseEventDispatcher;
+use WatchNext\Engine\Event\SyncEventDispatcher;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Session\Auth;
@@ -110,11 +112,13 @@ class Container
             Auth::class => autowire(Auth::class),
             Security::class => autowire(Security::class),
             Firewall::class => autowire(Firewall::class),
-            EventManager::class => autowire(EventManager::class),
+            SyncEventDispatcher::class => autowire(SyncEventDispatcher::class),
+            DatabaseEventDispatcher::class => autowire(DatabaseEventDispatcher::class),
             CacheClearCommand::class => autowire(CacheClearCommand::class),
             MigrationsGenerateCommand::class => autowire(MigrationsGenerateCommand::class),
             MigrationsMigrateCommand::class => autowire(MigrationsMigrateCommand::class),
             TranslatorOrderKeysCommand::class => autowire(TranslatorOrderKeysCommand::class),
+            DatabaseEventWorker::class => autowire(DatabaseEventWorker::class),
             MemcachedCache::class => autowire(MemcachedCache::class),
             ApcuCache::class => autowire(ApcuCache::class),
         ];

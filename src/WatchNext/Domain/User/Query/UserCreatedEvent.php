@@ -2,9 +2,9 @@
 
 namespace WatchNext\WatchNext\Domain\User\Query;
 
-use WatchNext\Engine\Event\QueryInterface;
+use WatchNext\Engine\Event\EventInterface;
 
-readonly class UserCreatedQuery implements QueryInterface
+readonly class UserCreatedEvent implements EventInterface
 {
     public function __construct(
         public int $userId,

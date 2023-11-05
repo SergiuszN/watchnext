@@ -28,7 +28,7 @@ class Profiler
         $this->enabled = ENV === 'dev';
     }
 
-    public function start(): void
+    public function start($event, mixed $data = null): void
     {
         if (!$this->enabled) {
             return;
@@ -43,6 +43,8 @@ class Profiler
             'last_tick' => STARTED_AT * 1000000,
             'database' => [],
         ];
+
+        $this->add($event, $data);
     }
 
     public function add($event, mixed $data = null): void

@@ -2,14 +2,14 @@
 
 namespace WatchNext\WatchNext\Domain\Catalog;
 
-use WatchNext\WatchNext\Domain\Catalog\Command\CreateDefaultUserCatalogCommand;
-use WatchNext\WatchNext\Domain\User\Query\UserCreatedQuery;
+use WatchNext\WatchNext\Domain\Catalog\EventSubscriber\CreateDefaultUserCatalogEventSubscriber;
+use WatchNext\WatchNext\Domain\User\Query\UserCreatedEvent;
 
 class SetDefaultCatalogIfRemoved
 {
     public function __construct(
         private CatalogRepository $catalogRepository,
-        private CreateDefaultUserCatalogCommand $createDefaultUserCatalogCommand
+        private CreateDefaultUserCatalogEventSubscriber $createDefaultUserCatalogCommand
     ) {
     }
 
@@ -25,7 +25,7 @@ class SetDefaultCatalogIfRemoved
         if (!empty($userCatalogs)) {
             $this->catalogRepository->setAsDefault(new CatalogUser($userCatalogs[0]->getId(), $userId));
         } else {
-            $this->createDefaultUserCatalogCommand->execute(new UserCreatedQuery($userId));
+            $this->createDefaultUserCatalogCommand->execute(new UserCreatedEvent($userId));
         }
     }
 }

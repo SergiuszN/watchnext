@@ -1,14 +1,14 @@
 <?php
 
-namespace WatchNext\WatchNext\Domain\Catalog\Command;
+namespace WatchNext\WatchNext\Domain\Catalog\EventSubscriber;
 
-use WatchNext\Engine\Event\CommandInterface;
+use WatchNext\Engine\Event\EventSubscriberInterface;
 use WatchNext\Engine\Template\Translator;
 use WatchNext\WatchNext\Domain\Catalog\Catalog;
 use WatchNext\WatchNext\Domain\Catalog\CatalogRepository;
 use WatchNext\WatchNext\Domain\Catalog\CatalogUser;
 
-readonly class CreateDefaultUserCatalogCommand implements CommandInterface
+readonly class CreateDefaultUserCatalogEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CatalogRepository $catalogRepository,
@@ -16,15 +16,15 @@ readonly class CreateDefaultUserCatalogCommand implements CommandInterface
     ) {
     }
 
-    public function execute(object $query): void
+    public function execute(object $event): void
     {
         $catalog = Catalog::create(
             $this->language->trans('command.createDefaultUserCatalog.defaultCatalog'),
-            $query->userId
+            $event->userId
         );
 
         $this->catalogRepository->save($catalog);
-        $catalogUser = new CatalogUser($catalog->getId(), $query->userId);
+        $catalogUser = new CatalogUser($catalog->getId(), $event->userId);
 
         $this->catalogRepository->addAccess($catalogUser);
         $this->catalogRepository->setAsDefault($catalogUser);

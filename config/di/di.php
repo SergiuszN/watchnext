@@ -14,8 +14,9 @@ return [
     \WatchNext\WatchNext\Domain\Catalog\CatalogVoter::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\CatalogVoter::class),
     \WatchNext\WatchNext\Domain\Catalog\CatalogMenuLoader::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\CatalogMenuLoader::class),
 
-    \WatchNext\WatchNext\Domain\Catalog\Command\CreateDefaultUserCatalogCommand::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\Command\CreateDefaultUserCatalogCommand::class),
+    \WatchNext\WatchNext\Domain\Catalog\EventSubscriber\CreateDefaultUserCatalogEventSubscriber::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\EventSubscriber\CreateDefaultUserCatalogEventSubscriber::class),
     \WatchNext\WatchNext\Domain\Catalog\SetDefaultCatalogIfRemoved::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\SetDefaultCatalogIfRemoved::class),
     \WatchNext\WatchNext\Domain\User\Form\UserRegisterForm::class => \DI\autowire(\WatchNext\WatchNext\Domain\User\Form\UserRegisterForm::class),
     \WatchNext\WatchNext\Domain\Catalog\Form\AddEditCatalogForm::class => \DI\autowire(\WatchNext\WatchNext\Domain\Catalog\Form\AddEditCatalogForm::class),
+    \WatchNext\Engine\Event\EventDispatcherInterface::class => \DI\autowire(\WatchNext\Engine\Event\DatabaseEventDispatcher::class),
 ];

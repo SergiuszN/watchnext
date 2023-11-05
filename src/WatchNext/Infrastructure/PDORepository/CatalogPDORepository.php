@@ -68,19 +68,17 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository
      */
     public function findDefaultForUser(?int $userId): ?Catalog
     {
-        return $this->cache->get("catalog.repo.findDefaultForUser.$userId", function () use ($userId) {
-            $data = $this->database->query((new QueryBuilder())
-                ->select('c.*')
-                ->from('`catalog` as c')
-                ->addLeftJoin('`catalog_user` as cu', 'cu.catalog = c.id')
-                ->andWhere('cu.is_default = 1')
-                ->andWhere('cu.user = :user')
-                ->setParameter('user', $userId)
-                ->limit(1)
-            )->fetch();
+        $data = $this->database->query((new QueryBuilder())
+            ->select('c.*')
+            ->from('`catalog` as c')
+            ->addLeftJoin('`catalog_user` as cu', 'cu.catalog = c.id')
+            ->andWhere('cu.is_default = 1')
+            ->andWhere('cu.user = :user')
+            ->setParameter('user', $userId)
+            ->limit(1)
+        )->fetch();
 
-            return $data ? Catalog::fromDatabase($data) : null;
-        });
+        return $data ? Catalog::fromDatabase($data) : null;
     }
 
     /**
@@ -101,16 +99,14 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository
 
     public function hasAccess(CatalogUser $catalogUser): bool
     {
-        return $this->cache->get("catalog.repo.hasAccess.{$catalogUser->catalog}.{$catalogUser->user}", function () use ($catalogUser) {
-            return $this->database->query((new QueryBuilder())
-                    ->select('COUNT(*)')
-                    ->from('`catalog_user`')
-                    ->andWhere('user = :user')
-                    ->andWhere('catalog = :catalog')
-                    ->setParameters($catalogUser->toDatabase())
-                    ->limit(1)
-            )->fetchSingle() > 0;
-        });
+        return $this->database->query((new QueryBuilder())
+                ->select('COUNT(*)')
+                ->from('`catalog_user`')
+                ->andWhere('user = :user')
+                ->andWhere('catalog = :catalog')
+                ->setParameters($catalogUser->toDatabase())
+                ->limit(1)
+        )->fetchSingle() > 0;
     }
 
     public function addAccess(CatalogUser $catalogUser): void
@@ -121,8 +117,6 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository
             ->addValue('user')
             ->setParameters($catalogUser->toDatabase())
         );
-
-        $this->cache->set("catalog.repo.hasAccess.{$catalogUser->catalog}.{$catalogUser->user}", true);
     }
 
     public function removeAccess(CatalogUser $catalogUser): ?int
@@ -144,8 +138,6 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository
             ->limit(1)
             ->setParameters($catalogUser->toDatabase())
         );
-
-        $this->cache->set("catalog.repo.hasAccess.{$catalogUser->catalog}.{$catalogUser->user}", false);
 
         return $doesDefault ? (int) $catalogUser->user : null;
     }
@@ -179,8 +171,6 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository
             ->limit(1)
             ->setParameters($catalogUser->toDatabase())
         );
-
-        $this->cache->delete("catalog.repo.findDefaultForUser.{$catalogUser->user}");
     }
 
     public function remove(Catalog $catalog): array
@@ -211,10 +201,6 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository
                     ->setParameter('catalog', $catalog->getId())
                 )->fetchAll()
             );
-
-            foreach ($removedDefaultCatalogsUsers as $catalogUser) {
-                $this->cache->delete("catalog.repo.findDefaultForUser.{$catalogUser->user}");
-            }
 
             $this->database->query((new QueryBuilder())
                 ->delete('catalog_user')
