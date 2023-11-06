@@ -18,6 +18,7 @@ use WatchNext\WatchNext\Domain\Catalog\Form\AddEditCatalogForm;
 use WatchNext\WatchNext\Domain\Catalog\Form\CatalogShareWithForm;
 use WatchNext\WatchNext\Domain\Catalog\SetDefaultCatalogIfRemoved;
 use WatchNext\WatchNext\Domain\Item\ItemRepository;
+use WatchNext\WatchNext\Domain\Item\ItemTagRepository;
 use WatchNext\WatchNext\Domain\User\UserRepository;
 
 readonly class CatalogController
@@ -27,6 +28,7 @@ readonly class CatalogController
         private CatalogRepository $catalogRepository,
         private ItemRepository $itemRepository,
         private UserRepository $userRepository,
+        private ItemTagRepository $itemTagRepository,
         private CatalogVoter $catalogVoter,
         private Security $security,
         private FlashBag $flashBag,
@@ -56,6 +58,7 @@ readonly class CatalogController
         return new TemplateResponse('page/catalog/show.html.twig', [
             'catalog' => $catalog,
             'pagination' => $pagination,
+            'tags_all' => $this->itemTagRepository->findAllUniqueTagsForUser($this->security->getUserId()),
         ]);
     }
 

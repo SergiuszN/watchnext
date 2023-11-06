@@ -18,8 +18,10 @@ use WatchNext\WatchNext\Domain\Catalog\CatalogRepository;
 use WatchNext\WatchNext\Domain\Catalog\CatalogVoter;
 use WatchNext\WatchNext\Domain\Item\Form\EditItemNoteForm;
 use WatchNext\WatchNext\Domain\Item\Form\MoveOrCopyItemForm;
+use WatchNext\WatchNext\Domain\Item\Form\UpdateTagsForm;
 use WatchNext\WatchNext\Domain\Item\ItemCurlBuilder;
 use WatchNext\WatchNext\Domain\Item\ItemRepository;
+use WatchNext\WatchNext\Domain\Item\ItemTagRepository;
 use WatchNext\WatchNext\Domain\Item\ItemVoter;
 
 readonly class ItemController
@@ -28,6 +30,7 @@ readonly class ItemController
         private Request $request,
         private ItemRepository $itemRepository,
         private CatalogRepository $catalogRepository,
+        private ItemTagRepository $itemTagRepository,
         private ItemVoter $itemVoter,
         private CatalogVoter $catalogVoter,
         private Security $security,
@@ -36,6 +39,7 @@ readonly class ItemController
         private Translator $t,
         private EditItemNoteForm $editItemNoteForm,
         private MoveOrCopyItemForm $moveOrCopyItemForm,
+        private UpdateTagsForm $updateTagsForm,
     ) {
     }
 
@@ -202,5 +206,24 @@ readonly class ItemController
         return new TemplateResponse('page/item/copy.html.twig', [
             'catalogs' => $this->catalogRepository->findAllForUser($this->security->getUserId()),
         ]);
+    }
+
+    /**
+     * @throws NotFoundException|AccessDeniedException
+     */
+    public function updateTags($item): RedirectRefererResponse
+    {
+        $this->security->throwIfNotGranted('ROLE_ITEM_UPDATE_TAGS');
+        $item = $this->itemRepository->find($item);
+        $this->itemVoter->throwIfNotGranted($item, ItemVoter::VIEW);
+
+        $form = $this->updateTagsForm->load();
+
+        if ($form->isValid()) {
+            $this->itemTagRepository->updateForItem($item->getId(), $form->tags);
+            $this->flashBag->add('success', $this->t->trans('item.updateTags.success'));
+        }
+
+        return new RedirectRefererResponse();
     }
 }

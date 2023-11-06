@@ -45,31 +45,67 @@
                                     <i class="fa-regular fa-circle-check text-primary"></i>
                                 {% endif %}
                             </a>
+
                             <div class="clearfix"></div>
+
                             <a href="#item-note-{{ item.id }}" class="float-end" style="width: 10px"
                                data-bs-toggle="collapse"
                                role="button" aria-expanded="false" aria-controls="item-note-{{ item.id }}"
                             >
                                 <i class="fa-solid fa-book-bookmark"></i>
                             </a>
+
+                            {% if tags_all %}
+                                <div class="clearfix"></div>
+
+                                <a href="#item-tag-{{ item.id }}" class="float-end" style="width: 10px"
+                                   data-bs-toggle="collapse"
+                                   role="button" aria-expanded="false" aria-controls="item-tag-{{ item.id }}"
+                                >
+                                    <i class="fa-solid fa-tags"></i>
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
 
-                    <div class="collapse" id="item-note-{{ item.id }}">
-                        <div class="card card-body">
-                            <form action="{{ route.make('item_note', {item: item.id}) }}" method="post">
+                    <div class="collapse pt-3 pb-3" id="item-note-{{ item.id }}">
+                        <form action="{{ route.make('item_note', {item: item.id}) }}" method="post">
+                            {% include 'component/csfr_token.html.twig' %}
+                            <div class="mb-3">
+                                <label for="note-{{ item.id }}" class="visually-hidden">{{ t.trans('item.page.note') }}:</label>
+                                <textarea name="note" id="note-{{ item.id }}" class="form-control w-100" style="height: 200px" placeholder="{{ t.trans('item.page.note') }}">{{ item.note }}</textarea>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="mb-3">
+                                <button type="submit" class="btn btn-sm btn-primary float-end">{{ t.trans('item.page.saveNote') }}</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="clearfix"></div>
+
+                    {% if tags_all %}
+                        <div class="collapse pt-3 pb-3" id="item-tag-{{ item.id }}">
+                            <form action="{{ route.make('item_update_tags', {item: item.id}) }}" method="post">
                                 {% include 'component/csfr_token.html.twig' %}
                                 <div class="mb-3">
-                                    <label for="note-{{ item.id }}" class="visually-hidden">{{ t.trans('item.page.note') }}:</label>
-                                    <textarea name="note" id="note-{{ item.id }}" class="form-control w-100" style="height: 200px" placeholder="{{ t.trans('item.page.note') }}">{{ item.note }}</textarea>
+                                    <label for="tags-{{ item.id }}" class="visually-hidden">{{ t.trans('item.page.tags') }}</label>
+                                    <select multiple name="tags[]" id="tags-{{ item.id }}" class="select-2 s2-tags">
+                                        {% for tag in item.tags %}
+                                            <option value="{{ tag.value }}" selected>{{ tag.value }}</option>
+                                        {% endfor %}
+                                        {% for tag in item.getOtherTags(tags_all) %}
+                                            <option value="{{ tag }}">{{ tag }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                                 <div class="clearfix"></div>
                                 <div class="mb-3">
-                                    <button type="submit" class="btn btn-sm btn-primary float-end">{{ t.trans('item.page.saveNote') }}</button>
+                                    <button type="submit" class="btn btn-sm btn-primary float-end">{{ t.trans('item.page.saveTags') }}</button>
                                 </div>
                             </form>
                         </div>
-                    </div>
+                    {% endif %}
 
                     <a href="{{ item.url }}" class="btn btn-primary position-absolute" style="bottom: 10px; left: 10px; right: 10px;" target="_blank">{{ t.trans('item.page.watch') }}</a>
                 </div>

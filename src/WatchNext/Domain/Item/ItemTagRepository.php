@@ -7,7 +7,10 @@ interface ItemTagRepository
     /** @return array|string[] */
     public function findAllUniqueTagsForUser(int $userId): array;
 
-    public function save(ItemTag $tag): void;
-
-    public function remove(ItemTag $tag): void;
+    /**
+     * @param int $itemId
+     * @param string[] $tags
+     * @return void
+     */
+    public function updateForItem(int $itemId, array $tags): void;
 }

@@ -36,6 +36,7 @@ return [
             'ROLE_ITEM_DELETE',
             'ROLE_ITEM_MOVE',
             'ROLE_ITEM_COPY',
+            'ROLE_ITEM_UPDATE_TAGS',
         ],
 
         'ROLE_CATALOG_GR' => [

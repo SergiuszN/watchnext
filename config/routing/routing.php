@@ -21,6 +21,7 @@ return [
     'item_delete' => ['GET', '/item/delete/{item:\d+}', ItemController::class . '::delete'],
     'item_move' => [['GET', 'POST'], '/item/move/{item:\d+}', ItemController::class . '::move'],
     'item_copy' => [['GET', 'POST'], '/item/copy/{item:\d+}', ItemController::class . '::copy'],
+    'item_update_tags' => ['POST', '/item/update-tags/{item:\d+}', ItemController::class . '::updateTags'],
     'item_search' => ['GET', '/item/search', ItemController::class . '::search'],
     'item_search_page' => ['GET', '/item/search/{page:\d+}', ItemController::class . '::search'],
 

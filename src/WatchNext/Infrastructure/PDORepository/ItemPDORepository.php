@@ -140,17 +140,25 @@ class ItemPDORepository extends PDORepository implements ItemRepository
 
     public function remove(Item $item): void
     {
-        $this->database->query((new QueryBuilder())
-            ->delete('item_tag')
-            ->andWhere('item = :id')
-            ->setParameter('id', $item->getId())
-        );
+        try {
+            $this->database->transactionBegin();
 
-        $this->database->query((new QueryBuilder())
-            ->delete('item')
-            ->andWhere('id = :id')
-            ->setParameter('id', $item->getId())
-        );
+            $this->database->query((new QueryBuilder())
+                ->delete('item_tag')
+                ->andWhere('item = :id')
+                ->setParameter('id', $item->getId())
+            );
+
+            $this->database->query((new QueryBuilder())
+                ->delete('item')
+                ->andWhere('id = :id')
+                ->setParameter('id', $item->getId())
+            );
+
+            $this->database->transactionCommit();
+        } catch (Exception $exception) {
+            $this->database->transactionRollback();
+        }
     }
 
     /**
@@ -207,9 +215,6 @@ class ItemPDORepository extends PDORepository implements ItemRepository
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function findAllUniqueTagsForUser(int $userId): array
     {
         return array_map(fn ($row) => $row['value'], $this->database->query((new QueryBuilder())
