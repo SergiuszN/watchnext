@@ -124,4 +124,19 @@ readonly class ItemController
             'pagination' => $pagination,
         ]);
     }
+
+    /**
+     * @throws NotFoundException|AccessDeniedException
+     */
+    public function delete($item): RedirectRefererResponse
+    {
+        $this->security->throwIfNotGranted('ROLE_ITEM_DELETE');
+        $item = $this->itemRepository->find($item);
+        $this->itemVoter->throwIfNotGranted($item, ItemVoter::VIEW);
+
+        $this->itemRepository->delete($item);
+        $this->flashBag->add('success', $this->t->trans('item.delete.success'));
+
+        return new RedirectRefererResponse();
+    }
 }

@@ -17,6 +17,20 @@ class Item
     private bool $isWatched;
     private string $note;
 
+    public static function create(string $title, string $url, string $description, string $image): Item
+    {
+        $item = new Item();
+        $item->setAddedAt(new DateTimeImmutable());
+        $item->setTitle($title);
+        $item->setUrl($url);
+        $item->setDescription($description);
+        $item->setImage($image);
+        $item->setIsWatched(false);
+        $item->setNote('');
+
+        return $item;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

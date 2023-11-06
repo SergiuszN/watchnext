@@ -3,9 +3,14 @@
         <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3 mb-4">
             <div class="card h-100 position-relative pb-5">
                 <div class="item-image" style="background-image: url('{{ item.image }}');">
-                    <a href="#" class="btn btn-light border-1 border-dark btn-sm rounded-5 px-2 float-end mt-1 me-1 opacity-75">
-                        <i class="fa-solid fa-edit"></i>
-                    </a>
+                    <div class="dropdown">
+                        <button class="btn btn-light border-1 border-dark btn-sm rounded-5 px-2 float-end mt-1 me-1 opacity-75 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-edit"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route.make('item_delete', {item: item.id}) }}" onclick="return confirm('{{ t.trans('app.areYouSure') }}')">{{ t.trans('item.page.delete') }}</a></li>
+                        </ul>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">

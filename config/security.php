@@ -33,6 +33,7 @@ return [
             'ROLE_ITEM_TOGGLE_WATCHED',
             'ROLE_ITEM_NOTE',
             'ROLE_ITEM_SEARCH',
+            'ROLE_ITEM_DELETE',
         ],
 
         'ROLE_CATALOG_GR' => [

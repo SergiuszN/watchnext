@@ -10,9 +10,11 @@ use Twig\Error\SyntaxError;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
+use WatchNext\Engine\Cache\MemcachedCache;
 use WatchNext\Engine\Config;
 use WatchNext\Engine\Container;
 use WatchNext\Engine\Request\Request;
+use WatchNext\Engine\Response\CachedTemplateResponse;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Session\CSFR;
@@ -26,8 +28,11 @@ class TemplateEngine
     /**
      * @throws Exception
      */
-    public function __construct(Container $container, Config $config)
-    {
+    public function __construct(
+        Container $container,
+        Config $config,
+        private readonly MemcachedCache $memcache,
+    ) {
         if (self::$twig) {
             return;
         }
@@ -51,9 +56,17 @@ class TemplateEngine
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function render(TemplateResponse $templateResponse): string
+    public function render(TemplateResponse|CachedTemplateResponse $templateResponse): string
     {
-        return self::$twig->render($templateResponse->template, $templateResponse->params);
+        if ($templateResponse instanceof TemplateResponse || $_ENV['APP_ENV'] === 'dev') {
+            return self::$twig->render($templateResponse->template, $templateResponse->params);
+        }
+
+        return $this->memcache->get(
+            json_encode($templateResponse),
+            fn () => self::$twig->render($templateResponse->template, $templateResponse->params),
+            $templateResponse->ttl
+        );
     }
 
     public function warmup(string $template): void

@@ -17,14 +17,14 @@ class ItemPDORepository extends PDORepository implements ItemRepository
         if ($item->getId() === null) {
             $this->database->query((new QueryBuilder())
                 ->insert('item')
-                ->addSet('title')
-                ->addSet('url')
-                ->addSet('description')
-                ->addSet('image')
-                ->addSet('owner')
-                ->addSet('added_at')
-                ->addSet('is_watched')
-                ->addSet('note')
+                ->addValue('title')
+                ->addValue('url')
+                ->addValue('description')
+                ->addValue('image')
+                ->addValue('owner')
+                ->addValue('added_at')
+                ->addValue('is_watched')
+                ->addValue('note')
                 ->setParameters($item->toDatabase())
             );
 
@@ -136,5 +136,20 @@ class ItemPDORepository extends PDORepository implements ItemRepository
             $limit,
             $page
         ))->getPagination();
+    }
+
+    public function delete(Item $item): void
+    {
+        $this->database->query((new QueryBuilder())
+            ->delete('catalog_item')
+            ->andWhere('item = :id')
+            ->setParameter('id', $item->getId())
+        );
+
+        $this->database->query((new QueryBuilder())
+            ->delete('item')
+            ->andWhere('id = :id')
+            ->setParameter('id', $item->getId())
+        );
     }
 }

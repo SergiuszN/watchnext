@@ -4,15 +4,14 @@ namespace WatchNext\Engine\Cli;
 
 use WatchNext\Engine\Cli\IO\CliInput;
 use WatchNext\Engine\Cli\IO\CliOutput;
-use WatchNext\Engine\Container;
 
 class TranslatorCheckCommand implements CliCommandInterface
 {
     private string $translationsPath;
 
-    public function __construct(Container $container)
+    public function __construct()
     {
-        $this->translationsPath = $container->get('root.dir') . '/config/translations';
+        $this->translationsPath = ROOT_PATH . '/config/translations';
     }
 
     public function getHelp(): string

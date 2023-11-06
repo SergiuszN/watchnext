@@ -2,7 +2,6 @@
 
 namespace WatchNext\WatchNext\Domain\Item;
 
-use DateTimeImmutable;
 use Exception;
 
 class ItemCurlBuilder
@@ -42,8 +41,6 @@ class ItemCurlBuilder
         preg_match_all('~<\s*meta\s+property="(og:[^"]+)"\s+content="([^"]*)~i', $this->page, $matches);
         preg_match('<meta\s*name="description"\s*content="([^"]*)">', $this->page, $descriptionMatch);
 
-        $this->item = new Item();
-        $this->item->setAddedAt(new DateTimeImmutable());
         $title = $matches[2][array_search('og:title', $matches[1])] ?? '';
         $url = $matches[2][array_search('og:url', $matches[1])] ?? '';
         $descriptionOg = $matches[2][array_search('og:description', $matches[1])] ?? '';
@@ -60,10 +57,7 @@ class ItemCurlBuilder
             $image = $prefix . $image;
         }
 
-        $this->item->setTitle($title);
-        $this->item->setUrl($url);
-        $this->item->setDescription($description);
-        $this->item->setImage($image);
+        $this->item = Item::create($title, $url, $description, $image);
 
         return $this;
     }

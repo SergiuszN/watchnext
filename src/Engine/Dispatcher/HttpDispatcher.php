@@ -11,6 +11,7 @@ use WatchNext\Engine\Container;
 use WatchNext\Engine\Event\SyncEventDispatcher;
 use WatchNext\Engine\Logger;
 use WatchNext\Engine\Profiler;
+use WatchNext\Engine\Response\CachedTemplateResponse;
 use WatchNext\Engine\Response\JsonResponse;
 use WatchNext\Engine\Response\RedirectRefererResponse;
 use WatchNext\Engine\Response\RedirectResponse;
@@ -93,8 +94,9 @@ class HttpDispatcher
         $printProfile = false;
 
         switch ($responseClass) {
+            case CachedTemplateResponse::class:
             case TemplateResponse::class:
-                /** @var $response TemplateResponse */
+                /** @var $response TemplateResponse|CachedTemplateResponse */
                 echo $this->templateEngine->render($response);
 
                 $printProfile = true;

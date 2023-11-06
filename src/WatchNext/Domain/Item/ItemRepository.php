@@ -18,4 +18,6 @@ interface ItemRepository
     public function findSearchPage(int $page, int $limit, int $userId, Request $request): PaginationCollection;
 
     public function hasAccess(int $itemId, int $userId): bool;
+
+    public function delete(Item $item): void;
 }
