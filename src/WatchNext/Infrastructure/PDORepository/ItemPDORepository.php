@@ -114,12 +114,12 @@ class ItemPDORepository extends PDORepository implements ItemRepository
             ->setParameter('userId', $userId)
             ->addOrderBy('i.id', 'DESC');
 
-        if ($request->get('search')) {
+        if ($request->get('app-search')) {
             $query
                 ->andWhere('(i.title LIKE :search1 OR i.url LIKE :search2 OR i.description LIKE :search3)')
-                ->setParameter('search1', "%{$request->get('search')}%")
-                ->setParameter('search2', "%{$request->get('search')}%")
-                ->setParameter('search3', "%{$request->get('search')}%");
+                ->setParameter('search1', "%{$request->get('app-search')}%")
+                ->setParameter('search2', "%{$request->get('app-search')}%")
+                ->setParameter('search3', "%{$request->get('app-search')}%");
         }
 
         $pagination = (new PaginationQuery(
