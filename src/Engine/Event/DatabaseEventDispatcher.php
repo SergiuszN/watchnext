@@ -6,7 +6,7 @@ use Exception;
 use WatchNext\Engine\Config;
 use WatchNext\Engine\Container;
 use WatchNext\Engine\Database\Database;
-use WatchNext\Engine\Session\Security;
+use WatchNext\Engine\Security\Security;
 
 class DatabaseEventDispatcher implements EventDispatcherInterface
 {

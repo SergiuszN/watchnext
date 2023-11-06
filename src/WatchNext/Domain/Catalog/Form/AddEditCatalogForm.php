@@ -4,7 +4,7 @@ namespace WatchNext\WatchNext\Domain\Catalog\Form;
 
 use InvalidArgumentException;
 use WatchNext\Engine\Request\Form;
-use WatchNext\Engine\Session\FlashBag;
+use WatchNext\Engine\Security\FlashBag;
 use Webmozart\Assert\Assert;
 
 class AddEditCatalogForm extends Form

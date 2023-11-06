@@ -21,7 +21,7 @@ use WatchNext\Engine\Router\NotFoundException;
 use WatchNext\Engine\Router\RouteGenerator;
 use WatchNext\Engine\Router\RouterDispatcher;
 use WatchNext\Engine\Router\RouterDispatcherStatusEnum;
-use WatchNext\Engine\Session\Security;
+use WatchNext\Engine\Security\Security;
 use WatchNext\Engine\Template\TemplateEngine;
 use WatchNext\WatchNext\Application\Controller\SecurityController;
 

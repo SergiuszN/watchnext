@@ -17,9 +17,9 @@ use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Response\CachedTemplateResponse;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Router\RouteGenerator;
-use WatchNext\Engine\Session\CSFR;
-use WatchNext\Engine\Session\FlashBag;
-use WatchNext\Engine\Session\Security;
+use WatchNext\Engine\Security\CSFR;
+use WatchNext\Engine\Security\FlashBag;
+use WatchNext\Engine\Security\Security;
 
 class TemplateEngine
 {

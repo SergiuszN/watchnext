@@ -3,8 +3,8 @@
 namespace WatchNext\Engine\Request;
 
 use InvalidArgumentException;
-use WatchNext\Engine\Session\CSFR;
-use WatchNext\Engine\Session\FlashBag;
+use WatchNext\Engine\Security\CSFR;
+use WatchNext\Engine\Security\FlashBag;
 use WatchNext\Engine\Template\Translator;
 use Webmozart\Assert\Assert;
 

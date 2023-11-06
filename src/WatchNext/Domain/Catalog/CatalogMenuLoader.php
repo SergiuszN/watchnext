@@ -2,7 +2,7 @@
 
 namespace WatchNext\WatchNext\Domain\Catalog;
 
-use WatchNext\Engine\Session\Security;
+use WatchNext\Engine\Security\Security;
 
 class CatalogMenuLoader
 {

@@ -3,9 +3,10 @@
 namespace WatchNext\WatchNext\Domain\Catalog;
 
 use WatchNext\Engine\Router\NotFoundException;
-use WatchNext\Engine\Session\Security;
+use WatchNext\Engine\Security\Security;
+use WatchNext\Engine\Security\VoterInterface;
 
-readonly class CatalogVoter
+readonly class CatalogVoter implements VoterInterface
 {
     public const VIEW = 'view';
     public const EDIT = 'edit';
@@ -19,8 +20,11 @@ readonly class CatalogVoter
     /**
      * @throws NotFoundException
      */
-    public function throwIfNotGranted(?Catalog $catalog, string $action): void
+    public function throwIfNotGranted($model, string $action): void
     {
+        /** @var Catalog $catalog */
+        $catalog = $model;
+
         if (!$this->isGranted($catalog, $action)) {
             throw new NotFoundException();
         }
@@ -29,8 +33,11 @@ readonly class CatalogVoter
     /**
      * @throws NotFoundException
      */
-    public function isGranted(?Catalog $catalog, string $action): bool
+    public function isGranted($model, string $action): bool
     {
+        /** @var Catalog $catalog */
+        $catalog = $model;
+
         if (!$catalog) {
             throw new NotFoundException();
         }

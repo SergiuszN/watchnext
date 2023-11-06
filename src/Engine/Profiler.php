@@ -6,7 +6,7 @@ use WatchNext\Engine\Cache\ApcuCache;
 use WatchNext\Engine\Database\Database;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Router\DispatchedRoute;
-use WatchNext\Engine\Session\Security;
+use WatchNext\Engine\Security\Security;
 use WatchNext\WatchNext\Domain\User\User;
 
 class Profiler

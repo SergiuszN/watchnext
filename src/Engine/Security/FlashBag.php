@@ -1,6 +1,6 @@
 <?php
 
-namespace WatchNext\Engine\Session;
+namespace WatchNext\Engine\Security;
 
 use InvalidArgumentException;
 

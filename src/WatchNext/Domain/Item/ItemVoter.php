@@ -3,9 +3,10 @@
 namespace WatchNext\WatchNext\Domain\Item;
 
 use WatchNext\Engine\Router\NotFoundException;
-use WatchNext\Engine\Session\Security;
+use WatchNext\Engine\Security\Security;
+use WatchNext\Engine\Security\VoterInterface;
 
-class ItemVoter
+class ItemVoter implements VoterInterface
 {
     public const VIEW = 'view';
 
@@ -18,8 +19,11 @@ class ItemVoter
     /**
      * @throws NotFoundException
      */
-    public function throwIfNotGranted(?Item $item, string $action): void
+    public function throwIfNotGranted($model, string $action): void
     {
+        /** @var Item $item */
+        $item = $model;
+
         if (!$this->isGranted($item, $action)) {
             throw new NotFoundException();
         }
@@ -28,8 +32,11 @@ class ItemVoter
     /**
      * @throws NotFoundException
      */
-    public function isGranted(?Item $item, string $action): bool
+    public function isGranted($model, string $action): bool
     {
+        /** @var Item $item */
+        $item = $model;
+
         if (!$item) {
             throw new NotFoundException();
         }
