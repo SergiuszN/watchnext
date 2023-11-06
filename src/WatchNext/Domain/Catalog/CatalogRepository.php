@@ -12,8 +12,6 @@ interface CatalogRepository
 
     public function removeAccess(CatalogUser $catalogUser): ?int;
 
-    public function addItem(CatalogItem $catalogItem): void;
-
     public function find(int $catalogId): ?Catalog;
 
     public function findDefaultForUser(?int $userId): ?Catalog;

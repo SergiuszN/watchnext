@@ -22,6 +22,7 @@ class ItemPDORepository extends PDORepository implements ItemRepository
                 ->addValue('description')
                 ->addValue('image')
                 ->addValue('owner')
+                ->addValue('catalog')
                 ->addValue('added_at')
                 ->addValue('is_watched')
                 ->addValue('note')
@@ -37,6 +38,7 @@ class ItemPDORepository extends PDORepository implements ItemRepository
                 ->addSet('description')
                 ->addSet('image')
                 ->addSet('owner')
+                ->addSet('catalog')
                 ->addSet('added_at')
                 ->addSet('is_watched')
                 ->addSet('note')
@@ -77,19 +79,17 @@ class ItemPDORepository extends PDORepository implements ItemRepository
     public function findCatalogPage(int $page, int $limit, int $catalog, Request $request): PaginationCollection
     {
         $query = (new QueryBuilder())
-            ->from('item as i')
-            ->addLeftJoin('catalog_item as ci', 'ci.item = i.id')
-            ->addLeftJoin('catalog as c', 'c.id = ci.catalog')
-            ->andWhere('c.id = :catalog')
+            ->from('item')
+            ->andWhere('catalog = :catalog')
             ->setParameter('catalog', $catalog)
-            ->addOrderBy('i.id', 'DESC');
+            ->addOrderBy('added_at', 'DESC');
 
         return (new PaginationQuery(
             $this->database,
             $query,
             Item::class,
-            'i.*',
-            'COUNT(i.id)',
+            '*',
+            'COUNT(id)',
             $limit,
             $page
         ))->getPagination();
@@ -100,8 +100,7 @@ class ItemPDORepository extends PDORepository implements ItemRepository
         return $this->database->query((new QueryBuilder())
             ->select('COUNT(i.id)')
             ->from('item as i')
-            ->addLeftJoin('catalog_item as ci', 'i.id = ci.item')
-            ->addLeftJoin('catalog_user as cu', 'ci.catalog = cu.catalog')
+            ->addLeftJoin('catalog_user as cu', 'i.catalog = cu.catalog')
             ->andWhere('i.id = :itemId')
             ->andWhere('cu.user = :userId')
             ->setParameter('itemId', $itemId)
@@ -113,8 +112,7 @@ class ItemPDORepository extends PDORepository implements ItemRepository
     {
         $query = (new QueryBuilder())
             ->from('item as i')
-            ->addLeftJoin('catalog_item as ci', 'ci.item = i.id')
-            ->addLeftJoin('catalog_user as cu', 'ci.catalog = cu.catalog')
+            ->addLeftJoin('catalog_user as cu', 'i.catalog = cu.catalog')
             ->andWhere('cu.user = :userId')
             ->setParameter('userId', $userId)
             ->addOrderBy('i.id', 'DESC');
@@ -140,12 +138,6 @@ class ItemPDORepository extends PDORepository implements ItemRepository
 
     public function delete(Item $item): void
     {
-        $this->database->query((new QueryBuilder())
-            ->delete('catalog_item')
-            ->andWhere('item = :id')
-            ->setParameter('id', $item->getId())
-        );
-
         $this->database->query((new QueryBuilder())
             ->delete('item')
             ->andWhere('id = :id')

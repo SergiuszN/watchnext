@@ -16,8 +16,10 @@ class m_1698062904_Item extends Migration
                 `description` TEXT NOT NULL,
                 `image` VARCHAR(255) NOT NULL,
                 `owner` INT NOT NULL,
+                `catalog` INT NOT NULL,
                 `added_at` DATETIME NOT NULL DEFAULT NOW(),
-                CONSTRAINT `fk_item_user` FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
+                CONSTRAINT `fk_item_user` FOREIGN KEY (`owner`) REFERENCES `user`(`id`),
+                CONSTRAINT `fk_item_catalog` FOREIGN KEY (`catalog`) REFERENCES `catalog`(`id`)
             )'
         );
     }

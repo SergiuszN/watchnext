@@ -18,26 +18,12 @@ class m_1698085465_Catalog extends Migration
                 CONSTRAINT `fk_catalog_user` FOREIGN KEY (`owner`) REFERENCES `user`(`id`)
             )'
         );
-
-        $this->database->execute(
-            'CREATE TABLE `catalog_item` (
-                `catalog` INT NOT NULL,
-                `item` INT NOT NULL ,
-                PRIMARY KEY (`catalog`, `item`),
-                CONSTRAINT `fk_catalog_item_catalog` FOREIGN KEY (`catalog`) REFERENCES `catalog`(`id`),
-                CONSTRAINT `fk_catalog_item_item` FOREIGN KEY (`item`) REFERENCES `item`(`id`)
-            )'
-        );
     }
 
     public function down(): void
     {
         $this->database->execute(
             'DROP TABLE `catalog`;'
-        );
-
-        $this->database->execute(
-            'DROP TABLE `catalog_item`;'
         );
     }
 }

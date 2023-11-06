@@ -1,0 +1,22 @@
+{% extends 'app.html.twig' %}
+
+{% block body %}
+    <h1>{{ t.trans('item.copy.header') }}</h1>
+
+    {% include 'component/flash.html.twig' %}
+
+    <form action="" method="post">
+        {% include 'component/csfr_token.html.twig' %}
+        <div class="mb-3">
+            <label for="catalog" class="form-label">{{ t.trans('item.copy.form.catalog') }}</label>
+            <select name="catalog" id="catalog" class="form-control">
+                {% for catalog in catalogs %}
+                    <option value="{{ catalog.id }}">{{ catalog.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">{{ t.trans('item.copy.form.submit') }}</button>
+        </div>
+    </form>
+{% endblock %}

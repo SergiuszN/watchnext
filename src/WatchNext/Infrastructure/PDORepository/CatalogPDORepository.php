@@ -3,22 +3,17 @@
 namespace WatchNext\WatchNext\Infrastructure\PDORepository;
 
 use Exception;
-use WatchNext\Engine\Cache\CacheInterface;
 use WatchNext\Engine\Database\Database;
 use WatchNext\Engine\Database\QueryBuilder;
 use WatchNext\WatchNext\Domain\Catalog\Catalog;
-use WatchNext\WatchNext\Domain\Catalog\CatalogItem;
 use WatchNext\WatchNext\Domain\Catalog\CatalogRepository;
 use WatchNext\WatchNext\Domain\Catalog\CatalogUser;
 
 class CatalogPDORepository extends PDORepository implements CatalogRepository
 {
-    private CacheInterface $cache;
-
-    public function __construct(Database $database, CacheInterface $cache)
+    public function __construct(Database $database)
     {
         parent::__construct($database);
-        $this->cache = $cache;
     }
 
     public function save(Catalog $catalog): void
@@ -139,17 +134,7 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository
             ->setParameters($catalogUser->toDatabase())
         );
 
-        return $doesDefault ? (int) $catalogUser->user : null;
-    }
-
-    public function addItem(CatalogItem $catalogItem): void
-    {
-        $this->database->query((new QueryBuilder())
-            ->insert('`catalog_item`')
-            ->addValue('catalog')
-            ->addValue('item')
-            ->setParameters($catalogItem->toDatabase())
-        );
+        return $doesDefault ? $catalogUser->user : null;
     }
 
     public function setAsDefault(CatalogUser $catalogUser): void
@@ -173,6 +158,9 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository
         );
     }
 
+    /**
+     * @throws Exception
+     */
     public function remove(Catalog $catalog): array
     {
         $this->database->transactionBegin();
@@ -180,13 +168,7 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository
         try {
             $this->database->query((new QueryBuilder())
                 ->delete('item')
-                ->andWhere('id IN (SELECT item FROM catalog_item WHERE catalog=:catalog)')
-                ->setParameter('catalog', $catalog->getId())
-            );
-
-            $this->database->query((new QueryBuilder())
-                ->delete('catalog_item')
-                ->andWhere('catalog=:catalog')
+                ->andWhere('catalog = :catalog')
                 ->setParameter('catalog', $catalog->getId())
             );
 

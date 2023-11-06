@@ -2,6 +2,7 @@
 
 namespace WatchNext\WatchNext\Application\Controller;
 
+use DateTimeImmutable;
 use Exception;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Response\RedirectRefererResponse;
@@ -13,9 +14,10 @@ use WatchNext\Engine\Security\CSFR;
 use WatchNext\Engine\Security\FlashBag;
 use WatchNext\Engine\Security\Security;
 use WatchNext\Engine\Template\Translator;
-use WatchNext\WatchNext\Domain\Catalog\CatalogItem;
 use WatchNext\WatchNext\Domain\Catalog\CatalogRepository;
+use WatchNext\WatchNext\Domain\Catalog\CatalogVoter;
 use WatchNext\WatchNext\Domain\Item\Form\EditItemNoteForm;
+use WatchNext\WatchNext\Domain\Item\Form\MoveOrCopyItemForm;
 use WatchNext\WatchNext\Domain\Item\ItemCurlBuilder;
 use WatchNext\WatchNext\Domain\Item\ItemRepository;
 use WatchNext\WatchNext\Domain\Item\ItemVoter;
@@ -27,11 +29,13 @@ readonly class ItemController
         private ItemRepository $itemRepository,
         private CatalogRepository $catalogRepository,
         private ItemVoter $itemVoter,
+        private CatalogVoter $catalogVoter,
         private Security $security,
         private CSFR $csfr,
         private FlashBag $flashBag,
         private Translator $t,
         private EditItemNoteForm $editItemNoteForm,
+        private MoveOrCopyItemForm $moveOrCopyItemForm,
     ) {
     }
 
@@ -48,13 +52,13 @@ readonly class ItemController
 
             $item = (new ItemCurlBuilder($this->request->post('url')))
                 ->load()
+                ->setCatalog($this->request->post('catalog'))
+                ->setOwner($userId)
                 ->parse()
                 ->getItem()
                 ->setOwner($userId);
 
             $this->itemRepository->save($item);
-            $this->catalogRepository->addItem(new CatalogItem($item->getId(), $this->request->post('catalog')));
-
             $this->flashBag->add('success', 'New item added to your library');
 
             return new RedirectResponse('homepage_app');
@@ -138,5 +142,65 @@ readonly class ItemController
         $this->flashBag->add('success', $this->t->trans('item.delete.success'));
 
         return new RedirectRefererResponse();
+    }
+
+    /**
+     * @throws NotFoundException|AccessDeniedException
+     */
+    public function move($item): TemplateResponse|RedirectResponse
+    {
+        $this->security->throwIfNotGranted('ROLE_ITEM_MOVE');
+        $item = $this->itemRepository->find($item);
+        $this->itemVoter->throwIfNotGranted($item, ItemVoter::VIEW);
+
+        $form = $this->moveOrCopyItemForm->load();
+
+        if ($form->isValid()) {
+            $toCatalog = $this->catalogRepository->find($form->catalog);
+            $this->catalogVoter->throwIfNotGranted($toCatalog, CatalogVoter::VIEW);
+
+            $item->setCatalog($toCatalog->getId());
+            $item->setAddedAt(new DateTimeImmutable());
+            $this->itemRepository->save($item);
+
+            $this->flashBag->add('success', $this->t->trans('item.move.success'));
+
+            return new RedirectResponse('catalog_show', ['catalog' => $toCatalog->getId()]);
+        }
+
+        return new TemplateResponse('page/item/move.html.twig', [
+            'catalogs' => $this->catalogRepository->findAllForUser($this->security->getUserId()),
+        ]);
+    }
+
+    /**
+     * @throws NotFoundException|AccessDeniedException
+     */
+    public function copy($item): TemplateResponse|RedirectResponse
+    {
+        $this->security->throwIfNotGranted('ROLE_ITEM_COPY');
+        $item = $this->itemRepository->find($item);
+        $this->itemVoter->throwIfNotGranted($item, ItemVoter::VIEW);
+
+        $form = $this->moveOrCopyItemForm->load();
+
+        if ($form->isValid()) {
+            $toCatalog = $this->catalogRepository->find($form->catalog);
+            $this->catalogVoter->throwIfNotGranted($toCatalog, CatalogVoter::VIEW);
+
+            $copyItem = clone $item;
+            $copyItem->setId(null);
+            $copyItem->setCatalog($toCatalog->getId());
+            $copyItem->setAddedAt(new DateTimeImmutable());
+            $this->itemRepository->save($copyItem);
+
+            $this->flashBag->add('success', $this->t->trans('item.copy.success'));
+
+            return new RedirectResponse('catalog_show', ['catalog' => $toCatalog->getId()]);
+        }
+
+        return new TemplateResponse('page/item/copy.html.twig', [
+            'catalogs' => $this->catalogRepository->findAllForUser($this->security->getUserId()),
+        ]);
     }
 }

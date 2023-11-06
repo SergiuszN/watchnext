@@ -13,11 +13,12 @@ class Item
     private string $description;
     private string $image;
     private int $owner;
+    private int $catalog;
     private DateTimeImmutable $addedAt;
     private bool $isWatched;
     private string $note;
 
-    public static function create(string $title, string $url, string $description, string $image): Item
+    public static function create(string $title, string $url, string $description, string $image, int $catalog, int $owner): Item
     {
         $item = new Item();
         $item->setAddedAt(new DateTimeImmutable());
@@ -27,6 +28,8 @@ class Item
         $item->setImage($image);
         $item->setIsWatched(false);
         $item->setNote('');
+        $item->setCatalog($catalog);
+        $item->setOwner($owner);
 
         return $item;
     }
@@ -110,6 +113,18 @@ class Item
         return $this;
     }
 
+    public function getCatalog(): int
+    {
+        return $this->catalog;
+    }
+
+    public function setCatalog(int $catalog): Item
+    {
+        $this->catalog = $catalog;
+
+        return $this;
+    }
+
     public function getAddedAt(): DateTimeImmutable
     {
         return $this->addedAt;
@@ -165,6 +180,7 @@ class Item
         $model->description = $item['description'];
         $model->image = $item['image'];
         $model->owner = $item['owner'];
+        $model->catalog = $item['catalog'];
         $model->addedAt = new DateTimeImmutable($item['added_at']);
         $model->isWatched = (bool) $item['is_watched'];
         $model->note = $item['note'];
@@ -180,6 +196,7 @@ class Item
             'description' => $this->description,
             'image' => $this->image,
             'owner' => $this->owner,
+            'catalog' => $this->catalog,
             'added_at' => $this->addedAt->format('Y-m-d H:i:s'),
             'is_watched' => $this->isWatched ? 1 : 0,
             'note' => $this->note,

@@ -7,8 +7,9 @@ use Exception;
 class ItemCurlBuilder
 {
     private string $page;
-
     private Item $item;
+    private int $catalog;
+    private int $owner;
 
     public function __construct(private string $url)
     {
@@ -35,6 +36,20 @@ class ItemCurlBuilder
         return $this;
     }
 
+    public function setCatalog(int $catalog): self
+    {
+        $this->catalog = $catalog;
+
+        return $this;
+    }
+
+    public function setOwner(int $owner): self
+    {
+        $this->owner = $owner;
+
+        return $this;
+    }
+
     public function parse(): self
     {
         [$matches, $descriptionMatch] = [[], []];
@@ -57,7 +72,7 @@ class ItemCurlBuilder
             $image = $prefix . $image;
         }
 
-        $this->item = Item::create($title, $url, $description, $image);
+        $this->item = Item::create($title, $url, $description, $image, $this->catalog, $this->owner);
 
         return $this;
     }
