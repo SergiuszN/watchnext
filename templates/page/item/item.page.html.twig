@@ -18,6 +18,24 @@
                     <div class="row">
                         <div class="col-10">
                             <h2 class="card-title h5">{{ item.title }}</h2>
+
+                            {% if item.catalogModel %}
+                                <p>
+                                    <a href="{{ route.make('catalog_show', {catalog: item.catalogModel.id}) }}">{{ item.catalogModel.name }}</a>
+                                </p>
+                            {% endif %}
+
+                            {% if item.tags is not empty %}
+                                <p>
+                                    {% for tag in item.tags %}
+                                        <span class="badge text-bg-primary">{{ tag.value }}</span>
+                                    {% endfor %}
+                                </p>
+                            {% endif %}
+
+                            <p class="card-text">
+                                {{ item.slugDescription }}
+                            </p>
                         </div>
                         <div class="col-2">
                             <a href="{{ route.make('item_toggle_watched', {item: item.id}) }}" class="float-end" style="width: 10px">
@@ -36,10 +54,6 @@
                             </a>
                         </div>
                     </div>
-
-                    <p class="card-text">
-                        {{ item.slugDescription }}
-                    </p>
 
                     <div class="collapse" id="item-note-{{ item.id }}">
                         <div class="card card-body">

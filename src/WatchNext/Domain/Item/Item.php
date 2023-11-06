@@ -4,6 +4,7 @@ namespace WatchNext\WatchNext\Domain\Item;
 
 use DateTimeImmutable;
 use Exception;
+use WatchNext\WatchNext\Domain\Catalog\Catalog;
 
 class Item
 {
@@ -13,10 +14,13 @@ class Item
     private string $description;
     private string $image;
     private int $owner;
+    private ?Catalog $catalogModel = null;
     private int $catalog;
     private DateTimeImmutable $addedAt;
     private bool $isWatched;
     private string $note;
+    /** @var ItemTag[] */
+    private array $tags = [];
 
     public static function create(string $title, string $url, string $description, string $image, int $catalog, int $owner): Item
     {
@@ -164,6 +168,33 @@ class Item
     public function setNote(string $note): Item
     {
         $this->note = $note;
+
+        return $this;
+    }
+
+    public function setTags(array $tags): Item
+    {
+        $this->tags = $tags;
+
+        return $this;
+    }
+
+    /**
+     * @return ItemTag[]
+     */
+    public function getTags(): array
+    {
+        return $this->tags;
+    }
+
+    public function getCatalogModel(): ?Catalog
+    {
+        return $this->catalogModel;
+    }
+
+    public function setCatalogModel(Catalog $catalog): Item
+    {
+        $this->catalogModel = $catalog;
 
         return $this;
     }

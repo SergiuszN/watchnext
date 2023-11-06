@@ -15,6 +15,8 @@ class Profiler
     private static string $id = '';
     private static array $data = [];
 
+    private const DISPLAY_COUNT = 5;
+
     public function __construct(
         private readonly ApcuCache $storage,
         private readonly Database $database,
@@ -83,6 +85,7 @@ class Profiler
 
         $requests = $this->storage->read('profiler.storage', []);
         $requests[self::$id] = self::$data;
+        $requests = array_slice($requests, (self::DISPLAY_COUNT) * -1);
         $this->storage->set('profiler.storage', $requests);
 
         if ($render) {

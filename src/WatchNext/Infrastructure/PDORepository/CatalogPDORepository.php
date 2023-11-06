@@ -167,6 +167,13 @@ class CatalogPDORepository extends PDORepository implements CatalogRepository
 
         try {
             $this->database->query((new QueryBuilder())
+                ->delete('item_tag as it', 'it')
+                ->addLeftJoin('item as i', 'i.id = it.item')
+                ->andWhere('i.catalog = :catalog')
+                ->setParameter('catalog', $catalog->getId())
+            );
+
+            $this->database->query((new QueryBuilder())
                 ->delete('item')
                 ->andWhere('catalog = :catalog')
                 ->setParameter('catalog', $catalog->getId())

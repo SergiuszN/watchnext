@@ -7,8 +7,10 @@ use WatchNext\Engine\Database\PaginationQuery;
 use WatchNext\Engine\Database\QueryBuilder;
 use WatchNext\Engine\Request\Request;
 use WatchNext\Engine\Template\PaginationCollection;
+use WatchNext\WatchNext\Domain\Catalog\Catalog;
 use WatchNext\WatchNext\Domain\Item\Item;
 use WatchNext\WatchNext\Domain\Item\ItemRepository;
+use WatchNext\WatchNext\Domain\Item\ItemTag;
 
 class ItemPDORepository extends PDORepository implements ItemRepository
 {
@@ -64,18 +66,6 @@ class ItemPDORepository extends PDORepository implements ItemRepository
     /**
      * @throws Exception
      */
-    public function findAllForUser(?int $owner): array
-    {
-        $data = $this->database->prepare('SELECT * FROM `item` WHERE owner=:owner ORDER BY id DESC')
-            ->execute(['owner' => $owner])
-            ->fetchAll();
-
-        return array_map(fn (array $item) => Item::fromDatabase($item), $data);
-    }
-
-    /**
-     * @throws Exception
-     */
     public function findCatalogPage(int $page, int $limit, int $catalog, Request $request): PaginationCollection
     {
         $query = (new QueryBuilder())
@@ -84,7 +74,7 @@ class ItemPDORepository extends PDORepository implements ItemRepository
             ->setParameter('catalog', $catalog)
             ->addOrderBy('added_at', 'DESC');
 
-        return (new PaginationQuery(
+        $pagination = (new PaginationQuery(
             $this->database,
             $query,
             Item::class,
@@ -93,6 +83,10 @@ class ItemPDORepository extends PDORepository implements ItemRepository
             $limit,
             $page
         ))->getPagination();
+
+        $this->loadTags($pagination->items);
+
+        return $pagination;
     }
 
     public function hasAccess(int $itemId, int $userId): bool
@@ -108,6 +102,9 @@ class ItemPDORepository extends PDORepository implements ItemRepository
         )->fetchSingle() > 0;
     }
 
+    /**
+     * @throws Exception
+     */
     public function findSearchPage(int $page, int $limit, int $userId, Request $request): PaginationCollection
     {
         $query = (new QueryBuilder())
@@ -125,7 +122,7 @@ class ItemPDORepository extends PDORepository implements ItemRepository
                 ->setParameter('search3', "%{$request->get('search')}%");
         }
 
-        return (new PaginationQuery(
+        $pagination = (new PaginationQuery(
             $this->database,
             $query,
             Item::class,
@@ -134,14 +131,94 @@ class ItemPDORepository extends PDORepository implements ItemRepository
             $limit,
             $page
         ))->getPagination();
+
+        $this->loadTags($pagination->items);
+        $this->loadCatalogs($pagination->items);
+
+        return $pagination;
     }
 
-    public function delete(Item $item): void
+    public function remove(Item $item): void
     {
+        $this->database->query((new QueryBuilder())
+            ->delete('item_tag')
+            ->andWhere('item = :id')
+            ->setParameter('id', $item->getId())
+        );
+
         $this->database->query((new QueryBuilder())
             ->delete('item')
             ->andWhere('id = :id')
             ->setParameter('id', $item->getId())
         );
+    }
+
+    /**
+     * @param array|Item[] $items
+     *
+     * @throws Exception
+     */
+    private function loadTags(array $items): void
+    {
+        if (empty($items)) {
+            return;
+        }
+
+        $ids = implode(', ', array_map(fn (Item $item) => (int) $item->getId(), $items));
+
+        $tags = array_map(fn ($tag) => ItemTag::fromDatabase($tag), $this->database->query((new QueryBuilder())
+            ->select('*')
+            ->from('item_tag')
+            ->andWhere("item IN ({$ids})")
+        )->fetchAll());
+
+        foreach ($items as $item) {
+            $item->setTags(array_values(array_filter($tags, fn (ItemTag $tag) => $tag->getItem() === $item->getId())));
+        }
+    }
+
+    /**
+     * @param array|Item[] $items
+     *
+     * @throws Exception
+     */
+    private function loadCatalogs(array $items): void
+    {
+        if (empty($items)) {
+            return;
+        }
+
+        $ids = implode(', ', array_map(fn (Item $item) => (int) $item->getCatalog(), $items));
+
+        $catalogs = $this->database->query((new QueryBuilder())
+            ->select('*')
+            ->from('catalog')
+            ->andWhere("id IN ({$ids})")
+        )->fetchAll();
+
+        $catalogMap = [];
+
+        foreach ($catalogs as $catalog) {
+            $catalogMap[$catalog['id']] = Catalog::fromDatabase($catalog);
+        }
+
+        foreach ($items as $item) {
+            $item->setCatalogModel($catalogMap[$item->getCatalog()] ?? null);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findAllUniqueTagsForUser(int $userId): array
+    {
+        return array_map(fn ($row) => $row['value'], $this->database->query((new QueryBuilder())
+            ->select('it.value as value')
+            ->from('item_tag as it')
+            ->addLeftJoin('item as i', 'i.id = it.item')
+            ->addLeftJoin('catalog_user as cu', 'i.catalog = cu.catalog')
+            ->andWhere('cu.user = :userId')
+            ->addGroupBy('it.value')
+        )->fetchAll());
     }
 }

@@ -138,7 +138,7 @@ readonly class ItemController
         $item = $this->itemRepository->find($item);
         $this->itemVoter->throwIfNotGranted($item, ItemVoter::VIEW);
 
-        $this->itemRepository->delete($item);
+        $this->itemRepository->remove($item);
         $this->flashBag->add('success', $this->t->trans('item.delete.success'));
 
         return new RedirectRefererResponse();

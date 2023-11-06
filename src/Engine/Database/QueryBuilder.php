@@ -158,10 +158,10 @@ class QueryBuilder
         return $this;
     }
 
-    public function delete(string $delete): self
+    public function delete(string $delete, string $withFrom = ''): self
     {
         /** @noinspection SqlWithoutWhere */
-        $this->_delete = "DELETE FROM $delete";
+        $this->_delete = !$withFrom ? "DELETE FROM $delete" : "DELETE $withFrom FROM $delete";
 
         return $this;
     }
@@ -254,6 +254,10 @@ class QueryBuilder
     private function buildDelete(): string
     {
         $sql = $this->_delete . "\n";
+
+        if (!empty($this->_joins)) {
+            $sql .= implode("\n", $this->_joins) . "\n";
+        }
 
         /** @noinspection DuplicatedCode */
         if (!empty($this->_andWheres)) {
