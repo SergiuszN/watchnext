@@ -14,7 +14,7 @@ class UpdateTagsForm extends Form
     public function load(): UpdateTagsForm
     {
         if ($this->isPost) {
-            $this->tags = $this->request->post('tags');
+            $this->tags = $this->request->post('tags', []);
         }
 
         return $this;
