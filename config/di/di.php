@@ -19,4 +19,9 @@ return [
     \WatchNext\WatchNext\Domain\Item\ItemTagRepository::class => \DI\autowire(\WatchNext\WatchNext\Infrastructure\PDORepository\ItemTagPDORepository::class),
     \WatchNext\WatchNext\Domain\Item\Form\UpdateTagsForm::class => \DI\autowire(\WatchNext\WatchNext\Domain\Item\Form\UpdateTagsForm::class),
     \WatchNext\WatchNext\Domain\Item\Form\MoveOrCopyItemForm::class => \DI\autowire(\WatchNext\WatchNext\Domain\Item\Form\MoveOrCopyItemForm::class),
+    \WatchNext\WatchNext\Domain\Item\Form\AddItemFromUrlForm::class => \DI\autowire(\WatchNext\WatchNext\Domain\Item\Form\AddItemFromUrlForm::class),
+    \WatchNext\WatchNext\Domain\Item\Form\AddItemManuallyForm::class => \DI\autowire(\WatchNext\WatchNext\Domain\Item\Form\AddItemManuallyForm::class),
+    \WatchNext\WatchNext\Domain\Item\Form\EditItemForm::class => \DI\autowire(\WatchNext\WatchNext\Domain\Item\Form\EditItemForm::class),
+    \WatchNext\WatchNext\Domain\Item\Form\EditItemNoteForm::class => \DI\autowire(\WatchNext\WatchNext\Domain\Item\Form\EditItemNoteForm::class),
+    \WatchNext\WatchNext\Domain\Item\ItemVoter::class => \DI\autowire(\WatchNext\WatchNext\Domain\Item\ItemVoter::class),
 ];

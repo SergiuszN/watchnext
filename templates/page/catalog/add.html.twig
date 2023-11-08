@@ -1,7 +1,11 @@
 {% extends 'app.html.twig' %}
 
+{% block title %}{{ t.trans('catalog.add.title') }} | {{ t.trans('app.title') }}{% endblock %}
+
 {% block body %}
     {% include 'component/flash.html.twig' %}
+
+    <h1>{{ t.trans('catalog.add.title') }}</h1>
 
     <form action="" method="post">
         {% include 'component/csfr_token.html.twig' %}

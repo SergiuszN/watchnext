@@ -1,5 +1,7 @@
 {% extends 'index.html.twig' %}
 
+{% block title %}{{ t.trans('security.notFound.header') }} | {{ t.trans('app.title') }}{% endblock %}
+
 {% block body %}
     <div class="container mt-5">
         <h1>{{ t.trans('security.notFound.header')|raw }}</h1>

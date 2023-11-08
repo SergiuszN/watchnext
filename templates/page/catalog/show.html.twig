@@ -1,5 +1,7 @@
 {% extends 'app.html.twig' %}
 
+{% block title %}{{ catalog.name }} | {{ t.trans('app.title') }}{% endblock %}
+
 {% block body %}
     {% include 'component/flash.html.twig' %}
 

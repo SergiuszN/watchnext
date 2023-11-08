@@ -1,5 +1,7 @@
 {% extends 'app.html.twig' %}
 
+{% block title %}{{ t.trans('item.search.found', {'%search%': request.get('app-search'), '%count%': pagination.total}) }} | {{ t.trans('app.title') }}{% endblock %}
+
 {% block body %}
     {% include 'component/flash.html.twig' %}
 
