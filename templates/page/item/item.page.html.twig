@@ -8,9 +8,10 @@
                             <i class="fa-solid fa-edit"></i>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ route.make('item_delete', {item: item.id}) }}" onclick="return confirm('{{ t.trans('app.areYouSure') }}')">{{ t.trans('item.page.delete') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route.make('item_edit', {item: item.id}) }}">{{ t.trans('item.page.edit') }}</a></li>
                             <li><a class="dropdown-item" href="{{ route.make('item_copy', {item: item.id}) }}">{{ t.trans('item.page.copy') }}</a></li>
                             <li><a class="dropdown-item" href="{{ route.make('item_move', {item: item.id}) }}">{{ t.trans('item.page.move') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route.make('item_delete', {item: item.id}) }}" onclick="return confirm('{{ t.trans('app.areYouSure') }}')">{{ t.trans('item.page.delete') }}</a></li>
                         </ul>
                     </div>
                 </div>

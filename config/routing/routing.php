@@ -17,6 +17,7 @@ return [
 
     'item_add' => [['GET', 'POST'], '/item/add', ItemController::class . '::add'],
     'item_add_manually' => [['GET', 'POST'], '/item/add-manually', ItemController::class . '::addManually'],
+    'item_edit' => [['GET', 'POST'], '/item/edit/{item:\d+}', ItemController::class . '::edit'],
     'item_toggle_watched' => ['GET', '/item/toggle-watched/{item:\d+}', ItemController::class . '::toggleWatched'],
     'item_note' => ['POST', '/item/note/{item:\d+}', ItemController::class . '::note'],
     'item_delete' => ['GET', '/item/delete/{item:\d+}', ItemController::class . '::delete'],

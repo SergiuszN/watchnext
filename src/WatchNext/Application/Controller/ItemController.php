@@ -17,6 +17,7 @@ use WatchNext\WatchNext\Domain\Catalog\CatalogRepository;
 use WatchNext\WatchNext\Domain\Catalog\CatalogVoter;
 use WatchNext\WatchNext\Domain\Item\Form\AddItemFromUrlForm;
 use WatchNext\WatchNext\Domain\Item\Form\AddItemManuallyForm;
+use WatchNext\WatchNext\Domain\Item\Form\EditItemForm;
 use WatchNext\WatchNext\Domain\Item\Form\EditItemNoteForm;
 use WatchNext\WatchNext\Domain\Item\Form\MoveOrCopyItemForm;
 use WatchNext\WatchNext\Domain\Item\Form\UpdateTagsForm;
@@ -43,6 +44,7 @@ readonly class ItemController
         private UpdateTagsForm $updateTagsForm,
         private AddItemFromUrlForm $addItemFromUrlForm,
         private AddItemManuallyForm $addItemManuallyForm,
+        private EditItemForm $editItemForm,
     ) {
     }
 
@@ -111,6 +113,34 @@ readonly class ItemController
 
         return new TemplateResponse('page/item/add.manually.html.twig', [
             'catalogs' => $this->catalogRepository->findAllForUser($userId),
+        ]);
+    }
+
+    /**
+     * @throws AccessDeniedException|NotFoundException
+     */
+    public function edit($item): TemplateResponse|RedirectResponse
+    {
+        $this->security->throwIfNotGranted('ROLE_ITEM_EDIT');
+        $item = $this->itemRepository->find($item);
+        $this->itemVoter->throwIfNotGranted($item, ItemVoter::VIEW);
+
+        $form = $this->editItemForm->load();
+
+        if ($form->isValid()) {
+            $item->setTitle($form->title);
+            $item->setUrl($form->url);
+            $item->setDescription($form->description);
+            $item->setImage($form->image);
+
+            $this->itemRepository->save($item);
+            $this->flashBag->add('success', $this->t->trans('item.edit.success'));
+
+            return new RedirectResponse('catalog_show', ['catalog' => $item->getCatalog()]);
+        }
+
+        return new TemplateResponse('page/item/edit.html.twig', [
+            'item' => $item,
         ]);
     }
 

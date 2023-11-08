@@ -1,0 +1,30 @@
+{% extends 'app.html.twig' %}
+
+{% block body %}
+    <h1>{{ t.trans('item.edit.header') }}</h1>
+
+    {% include 'component/flash.html.twig' %}
+
+    <form action="" method="post">
+        {% include 'component/csfr_token.html.twig' %}
+        <div class="mb-3">
+            <label for="title" class="form-label">{{ t.trans('item.edit.form.title') }}</label>
+            <input type="text" class="form-control" required name="title" id="title" value="{{ item.title }}">
+        </div>
+        <div class="mb-3">
+            <label for="url" class="form-label">{{ t.trans('item.edit.form.url') }}</label>
+            <input type="url" class="form-control" required name="url" id="url" value="{{ item.url }}">
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">{{ t.trans('item.edit.form.description') }}</label>
+            <textarea class="form-control" name="description" id="description">{{ item.description }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="image" class="form-label">{{ t.trans('item.edit.form.image') }}</label>
+            <input type="url" class="form-control" required name="image" id="image" value="{{ item.image }}">
+        </div>
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">{{ t.trans('item.edit.form.submit') }}</button>
+        </div>
+    </form>
+{% endblock %}
