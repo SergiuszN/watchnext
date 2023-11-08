@@ -8,10 +8,15 @@ class FlashBag
 {
     private const KEY = 'main.flash.bag';
 
+    public function __construct()
+    {
+        if (!isset($_SESSION[self::KEY])) {
+            $_SESSION[self::KEY] = [];
+        }
+    }
+
     public function add(string $label, string $message): void
     {
-        $this->init();
-
         $_SESSION[self::KEY][] = ['label' => $label, 'message' => $message];
     }
 
@@ -23,8 +28,6 @@ class FlashBag
 
     public function getAll(): array
     {
-        $this->init();
-
         $flashes = $_SESSION[self::KEY];
         $_SESSION[self::KEY] = [];
 
@@ -33,8 +36,6 @@ class FlashBag
 
     public function getAllByLabel(string $label): array
     {
-        $this->init();
-
         $flashes = [];
 
         foreach ($_SESSION[self::KEY] as $key => $flash) {
@@ -47,10 +48,21 @@ class FlashBag
         return $flashes;
     }
 
+    public function get(string $label, string $default = ''): string
+    {
+        foreach ($_SESSION[self::KEY] as $key => $flash) {
+            if ($flash['label'] === $label) {
+                unset($_SESSION[self::KEY][$key]);
+
+                return $flash['message'];
+            }
+        }
+
+        return $default;
+    }
+
     public function getAllByLabels(array $labels): array
     {
-        $this->init();
-
         $flashes = [];
 
         foreach ($_SESSION[self::KEY] as $key => $flash) {
@@ -61,12 +73,5 @@ class FlashBag
         }
 
         return $flashes;
-    }
-
-    private function init(): void
-    {
-        if (!isset($_SESSION[self::KEY])) {
-            $_SESSION[self::KEY] = [];
-        }
     }
 }

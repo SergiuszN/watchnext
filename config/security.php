@@ -30,6 +30,7 @@ return [
 
         'ROLE_ITEM_GR' => [
             'ROLE_ITEM_ADD',
+            'ROLE_ITEM_ADD_MANUALLY',
             'ROLE_ITEM_TOGGLE_WATCHED',
             'ROLE_ITEM_NOTE',
             'ROLE_ITEM_SEARCH',

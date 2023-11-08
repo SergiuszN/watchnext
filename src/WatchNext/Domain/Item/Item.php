@@ -190,6 +190,7 @@ class Item
     public function getOtherTags(array $allTags): array
     {
         $ownedTags = array_map(fn (ItemTag $tag) => $tag->getValue(), $this->tags);
+
         return array_diff($allTags, $ownedTags);
     }
 

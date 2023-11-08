@@ -87,6 +87,6 @@ class RouteGenerator
 
     public function startsFrom(string $patch): bool
     {
-        return str_starts_with($patch, $_SERVER['REQUEST_ROUTE']);
+        return str_starts_with($_SERVER['REQUEST_ROUTE'], $patch);
     }
 }

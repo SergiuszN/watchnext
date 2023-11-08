@@ -57,13 +57,13 @@ class ItemCurlBuilder
         preg_match('<meta\s*name="description"\s*content="([^"]*)">', $this->page, $descriptionMatch);
 
         $title = $matches[2][array_search('og:title', $matches[1])] ?? '';
-        $url = $matches[2][array_search('og:url', $matches[1])] ?? '';
+        $url = $this->url;
         $descriptionOg = $matches[2][array_search('og:description', $matches[1])] ?? '';
         $descriptionMeta = $descriptionMatch[1] ?? '';
         $description = mb_strlen($descriptionMeta) > mb_strlen($descriptionOg) ? $descriptionMeta : $descriptionOg;
         $image = $matches[2][array_search('og:image', $matches[1])] ?? '';
 
-        if ($title === '' || $url === '' || $description === '' || $image === '') {
+        if ($title === '' || $description === '' || $image === '') {
             throw new Exception('Cant parse url :(. Please contact with as for adding selected site');
         }
 

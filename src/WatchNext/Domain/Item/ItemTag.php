@@ -20,6 +20,7 @@ class ItemTag
     public function setId(int $id): ItemTag
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -31,6 +32,7 @@ class ItemTag
     public function setItem(int $item): ItemTag
     {
         $this->item = $item;
+
         return $this;
     }
 
@@ -42,6 +44,7 @@ class ItemTag
     public function setValue(string $value): ItemTag
     {
         $this->value = $value;
+
         return $this;
     }
 
@@ -53,6 +56,7 @@ class ItemTag
     public function setCreatedAt(DateTimeImmutable $createdAt): ItemTag
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 

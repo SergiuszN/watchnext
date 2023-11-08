@@ -85,7 +85,7 @@ class Profiler
 
         $requests = $this->storage->read('profiler.storage', []);
         $requests[self::$id] = self::$data;
-        $requests = array_slice($requests, (self::DISPLAY_COUNT) * -1);
+        $requests = array_slice($requests, self::DISPLAY_COUNT * -1);
         $this->storage->set('profiler.storage', $requests);
 
         if ($render) {

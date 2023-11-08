@@ -10,15 +10,17 @@ use WatchNext\Engine\Response\RedirectResponse;
 use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Router\AccessDeniedException;
 use WatchNext\Engine\Router\NotFoundException;
-use WatchNext\Engine\Security\CSFR;
 use WatchNext\Engine\Security\FlashBag;
 use WatchNext\Engine\Security\Security;
 use WatchNext\Engine\Template\Translator;
 use WatchNext\WatchNext\Domain\Catalog\CatalogRepository;
 use WatchNext\WatchNext\Domain\Catalog\CatalogVoter;
+use WatchNext\WatchNext\Domain\Item\Form\AddItemFromUrlForm;
+use WatchNext\WatchNext\Domain\Item\Form\AddItemManuallyForm;
 use WatchNext\WatchNext\Domain\Item\Form\EditItemNoteForm;
 use WatchNext\WatchNext\Domain\Item\Form\MoveOrCopyItemForm;
 use WatchNext\WatchNext\Domain\Item\Form\UpdateTagsForm;
+use WatchNext\WatchNext\Domain\Item\Item;
 use WatchNext\WatchNext\Domain\Item\ItemCurlBuilder;
 use WatchNext\WatchNext\Domain\Item\ItemRepository;
 use WatchNext\WatchNext\Domain\Item\ItemTagRepository;
@@ -34,12 +36,13 @@ readonly class ItemController
         private ItemVoter $itemVoter,
         private CatalogVoter $catalogVoter,
         private Security $security,
-        private CSFR $csfr,
         private FlashBag $flashBag,
         private Translator $t,
         private EditItemNoteForm $editItemNoteForm,
         private MoveOrCopyItemForm $moveOrCopyItemForm,
         private UpdateTagsForm $updateTagsForm,
+        private AddItemFromUrlForm $addItemFromUrlForm,
+        private AddItemManuallyForm $addItemManuallyForm,
     ) {
     }
 
@@ -51,24 +54,62 @@ readonly class ItemController
         $this->security->throwIfNotGranted('ROLE_ITEM_ADD');
         $userId = $this->security->getUserId();
 
-        if ($this->request->isPost()) {
-            $this->csfr->throwIfNotValid($this->request->post('csfr'));
+        $form = $this->addItemFromUrlForm->load();
 
-            $item = (new ItemCurlBuilder($this->request->post('url')))
-                ->load()
-                ->setCatalog($this->request->post('catalog'))
-                ->setOwner($userId)
-                ->parse()
-                ->getItem()
-                ->setOwner($userId);
+        if ($form->isValid()) {
+            try {
+                $item = (new ItemCurlBuilder($form->url))
+                    ->load()
+                    ->setCatalog($form->catalog)
+                    ->setOwner($userId)
+                    ->parse()
+                    ->getItem()
+                    ->setOwner($userId);
+            } catch (Exception $exception) {
+                $this->flashBag->add('error', $this->t->trans('item.add.error'));
+                $this->flashBag->add('item.add.last.url', $form->url);
+
+                return new RedirectResponse('item_add_manually');
+            }
 
             $this->itemRepository->save($item);
-            $this->flashBag->add('success', 'New item added to your library');
+            $this->flashBag->add('success', $this->t->trans('item.add.success'));
 
-            return new RedirectResponse('homepage_app');
+            return new RedirectResponse('catalog_show', ['catalog' => $form->catalog]);
         }
 
         return new TemplateResponse('page/item/add.html.twig', [
+            'catalogs' => $this->catalogRepository->findAllForUser($userId),
+        ]);
+    }
+
+    /**
+     * @throws AccessDeniedException
+     */
+    public function addManually(): TemplateResponse|RedirectResponse
+    {
+        $this->security->throwIfNotGranted('ROLE_ITEM_ADD_MANUALLY');
+        $userId = $this->security->getUserId();
+
+        $form = $this->addItemManuallyForm->load();
+
+        if ($form->isValid()) {
+            $item = Item::create(
+                $form->title,
+                $form->url,
+                $form->description,
+                $form->image,
+                $form->catalog,
+                $userId
+            );
+
+            $this->itemRepository->save($item);
+            $this->flashBag->add('success', $this->t->trans('item.add.success'));
+
+            return new RedirectResponse('catalog_show', ['catalog' => $form->catalog]);
+        }
+
+        return new TemplateResponse('page/item/add.manually.html.twig', [
             'catalogs' => $this->catalogRepository->findAllForUser($userId),
         ]);
     }
