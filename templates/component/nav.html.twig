@@ -10,8 +10,9 @@
                 </li>
             </ul>
             <form class="ms-auto d-flex" role="search" action="{{ route.make('item_search') }}">
-                <input class="form-control" type="search" placeholder="Search..." aria-label="Search" name="app-search" value="{{ request.get('app-search', '') }}">
+                <input class="form-control" type="search" placeholder="{{ t.trans('app.nav.search') }}" aria-label="Search" name="app-search" value="{{ request.get('app-search', '') }}">
             </form>
+            {% include 'component/language_switcher.html.twig' %}
             <ul class="navbar-nav mb-2 mb-lg-0">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="profile-menu-dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">

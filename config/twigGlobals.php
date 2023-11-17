@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'catalogMenu' => \WatchNext\WatchNext\Domain\Catalog\CatalogMenuLoader::class
+    'catalogMenu' => \WatchNext\WatchNext\Domain\Catalog\CatalogMenuLoader::class,
 ];

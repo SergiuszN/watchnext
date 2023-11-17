@@ -8,6 +8,8 @@ use WatchNext\WatchNext\Domain\User\UserRepository;
 
 readonly class Auth
 {
+    public const AUTH_SESSION_KEY = 'main.auth.user';
+
     public function __construct(
         private UserRepository $userRepository
     ) {
@@ -18,7 +20,7 @@ readonly class Auth
      */
     public function authorize(User $user, bool $rememberMe = false): void
     {
-        $_SESSION['main.auth.user'] = serialize($user);
+        $_SESSION[Auth::AUTH_SESSION_KEY] = serialize($user);
 
         if ($rememberMe) {
             $key = bin2hex(random_bytes(8));
@@ -35,7 +37,7 @@ readonly class Auth
 
     public function unauthorize(): void
     {
-        unset($_SESSION['main.auth.user']);
+        unset($_SESSION[Auth::AUTH_SESSION_KEY]);
         setcookie('rmmbr.key', '', -1);
         setcookie('rmmbr.token', '', -1);
     }
@@ -45,7 +47,7 @@ readonly class Auth
      */
     public function tryAuthorizeFromCookie(): void
     {
-        if (isset($_SESSION['main.auth.user']) || !isset($_COOKIE['rmmbr.key'])) {
+        if (isset($_SESSION[Auth::AUTH_SESSION_KEY]) || !isset($_COOKIE['rmmbr.key'])) {
             return;
         }
 
@@ -58,5 +60,12 @@ readonly class Auth
         if (password_verify($_COOKIE['rmmbr.token'] ?? null, $user->getRememberMeToken())) {
             $this->authorize($user);
         }
+    }
+
+    public function refresh(): void
+    {
+        $user = unserialize($_SESSION[Auth::AUTH_SESSION_KEY]);
+        $user = $this->userRepository->find($user->getId());
+        $_SESSION[Auth::AUTH_SESSION_KEY] = serialize($user);
     }
 }

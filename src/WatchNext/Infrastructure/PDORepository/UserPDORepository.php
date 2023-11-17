@@ -15,6 +15,7 @@ class UserPDORepository extends PDORepository implements UserRepository
                 INSERT INTO `user` (
                     `login`, 
                     `password`,
+                    `language`,
                     `created_at`,
                     `remember_me_key`,
                     `remember_me_token`, 
@@ -23,6 +24,7 @@ class UserPDORepository extends PDORepository implements UserRepository
                 VALUES (
                     :login, 
                     :password, 
+                    :language, 
                     :created_at, 
                     :remember_me_key, 
                     :remember_me_token, 
@@ -35,6 +37,7 @@ class UserPDORepository extends PDORepository implements UserRepository
                 UPDATE `user` SET
                     `login` = :login,
                     `password` = :password,
+                    `language` = :language,
                     `created_at` = :created_at,
                     `remember_me_key` = :remember_me_key,
                     `remember_me_token` = :remember_me_token,

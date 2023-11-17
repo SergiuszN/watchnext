@@ -8,45 +8,36 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    <a class="nav-link" href="#">Pricing</a>
-                    <a class="nav-link" href="#">TOCs</a>
-                    <a class="nav-link" href="#">About</a>
+                    <a class="nav-link active" aria-current="page" href="{{ route.make('homepage_index') }}">{{ t.trans('homepage.index.menu.home') }}</a>
+                    {% if security.isAuth %}
+                        <a class="nav-link" href="{{ route.make('homepage_app') }}">{{ t.trans('homepage.index.menu.app') }}</a>
+                    {% endif %}
                 </div>
                 <div class="navbar-nav ms-auto">
-                    <a class="nav-link" href="{{ route.make('security_login') }}">Login</a>
-                    <a class="nav-link" href="{{ route.make('security_register') }}">Sign up</a>
+                    {% if security.isAuth %}
+
+                        <a class="nav-link" href="{{ route.make('security_logout') }}">{{ t.trans('homepage.index.menu.logout') }}</a>
+                    {% else %}
+                        <a class="nav-link" href="{{ route.make('security_login') }}">{{ t.trans('homepage.index.menu.login') }}</a>
+                        <a class="nav-link" href="{{ route.make('security_register') }}">{{ t.trans('homepage.index.menu.signup') }}</a>
+                    {% endif %}
+
                 </div>
+                {% include 'component/language_switcher.html.twig' %}
             </div>
         </div>
     </nav>
 
-    <header class="py-3 mb-4 border-bottom">
-        <div class="container d-flex flex-wrap justify-content-center">
-            <a href="/" class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto text-dark text-decoration-none">
-                <span class="fs-4"><i class="fa-brands fa-watchman-monitoring"></i> WatchNext</span>
-            </a>
-            <form class="col-12 col-lg-auto mb-3 mb-lg-0" method="get" action="https://www.google.com/search">
-                <input type="search" name="q" class="form-control" placeholder="Search..." aria-label="Search">
-            </form>
-        </div>
-    </header>
-
     <div class="container my-5">
-        <div class="p-5 text-center bg-body-tertiary rounded-3">
-            <i class="fa-brands fa-watchman-monitoring h1 mt-4 mb-3"></i>
-            <h1 class="text-body-emphasis">Jumbotron with icon</h1>
+        <div class="p-5 text-center bg-body-tertiary rounded-3 pb-4">
+            <h1 class="text-body-emphasis">{{ t.trans('app.name') }}</h1>
             <p class="col-lg-8 mx-auto fs-5 text-muted">
-                This is a custom jumbotron featuring an SVG image at the top, some longer text that wraps early thanks to a responsive <code>.col-*</code> class, and a customized call to action.
+                {{ t.trans('homepage.index.jumbotron.text') }}
             </p>
             <div class="d-inline-flex gap-2 mb-5">
-                <button class="d-inline-flex align-items-center btn btn-primary btn-lg px-4 rounded-pill" type="button">
-                    Call to action
-                    <svg class="bi ms-2" width="24" height="24"><use xlink:href="#arrow-right-short"></use></svg>
-                </button>
-                <button class="btn btn-outline-secondary btn-lg px-4 rounded-pill" type="button">
-                    Secondary link
-                </button>
+                <a href="{{ route.make('security_login') }}" class="d-inline-flex align-items-center btn btn-primary btn-lg px-4 rounded-pill" type="button">
+                    {{ t.trans('homepage.index.jumbotron.cta') }}
+                </a>
             </div>
         </div>
     </div>
@@ -54,51 +45,30 @@
     <div class="container px-4 py-5 pt-0">
         <div class="row row-cols-1 row-cols-md-2 align-items-md-center g-5 py-5">
             <div class="col d-flex flex-column align-items-start gap-2">
-                <h2 class="fw-bold text-body-emphasis">Left-aligned title explaining these awesome features</h2>
-                <p class="text-body-secondary">Paragraph of text beneath the heading to explain the heading. We'll add onto it with another sentence and probably just keep going until we run out of words.</p>
-                <a href="#" class="btn btn-primary btn-lg">Primary button</a>
+                <h2 class="fw-bold text-body-emphasis">{{ t.trans('homepage.index.feature.main.header') }}</h2>
+                <p class="text-body-secondary">{{ t.trans('homepage.index.feature.main.text') }}</p>
             </div>
 
             <div class="col">
-                <div class="row row-cols-1 row-cols-sm-2 g-4">
-                    <div class="col d-flex flex-column gap-2">
-                        <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3">
-                            <svg class="bi" width="1em" height="1em">
-                                <use xlink:href="#collection"></use>
-                            </svg>
-                        </div>
-                        <h4 class="fw-semibold mb-0 text-body-emphasis">Featured title</h4>
-                        <p class="text-body-secondary">Paragraph of text beneath the heading to explain the heading.</p>
+                <div class="row g-4">
+                    <div class="col-12 gap-2">
+                        <h4 class="fw-semibold mb-0 text-body-emphasis">{{ t.trans('homepage.index.feature.1.header') }}</h4>
+                        <p class="text-body-secondary">{{ t.trans('homepage.index.feature.1.text') }}</p>
                     </div>
 
-                    <div class="col d-flex flex-column gap-2">
-                        <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3">
-                            <svg class="bi" width="1em" height="1em">
-                                <use xlink:href="#gear-fill"></use>
-                            </svg>
-                        </div>
-                        <h4 class="fw-semibold mb-0 text-body-emphasis">Featured title</h4>
-                        <p class="text-body-secondary">Paragraph of text beneath the heading to explain the heading.</p>
+                    <div class="col-12 gap-2">
+                        <h4 class="fw-semibold mb-0 text-body-emphasis">{{ t.trans('homepage.index.feature.2.header') }}</h4>
+                        <p class="text-body-secondary">{{ t.trans('homepage.index.feature.2.text') }}</p>
                     </div>
 
-                    <div class="col d-flex flex-column gap-2">
-                        <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3">
-                            <svg class="bi" width="1em" height="1em">
-                                <use xlink:href="#speedometer"></use>
-                            </svg>
-                        </div>
-                        <h4 class="fw-semibold mb-0 text-body-emphasis">Featured title</h4>
-                        <p class="text-body-secondary">Paragraph of text beneath the heading to explain the heading.</p>
+                    <div class="col-12 gap-2">
+                        <h4 class="fw-semibold mb-0 text-body-emphasis">{{ t.trans('homepage.index.feature.3.header') }}</h4>
+                        <p class="text-body-secondary">{{ t.trans('homepage.index.feature.3.text') }}</p>
                     </div>
 
-                    <div class="col d-flex flex-column gap-2">
-                        <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3">
-                            <svg class="bi" width="1em" height="1em">
-                                <use xlink:href="#table"></use>
-                            </svg>
-                        </div>
-                        <h4 class="fw-semibold mb-0 text-body-emphasis">Featured title</h4>
-                        <p class="text-body-secondary">Paragraph of text beneath the heading to explain the heading.</p>
+                    <div class="col-12 gap-2">
+                        <h4 class="fw-semibold mb-0 text-body-emphasis">{{ t.trans('homepage.index.feature.4.header') }}</h4>
+                        <p class="text-body-secondary">{{ t.trans('homepage.index.feature.4.text') }}</p>
                     </div>
                 </div>
             </div>
@@ -107,18 +77,14 @@
 
     <div class="container">
         <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-            <p class="col-md-4 mb-0 text-body-secondary">© {{ 'now'|date('Y') }} WatchNext</p>
+            <p class="col-md-4 mb-0 text-body-secondary">© {{ 'now'|date('Y') }} {{ t.trans('app.name') }}</p>
 
             <a href="/" class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
                 <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
             </a>
 
             <ul class="nav col-md-4 justify-content-end">
-                <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Home</a></li>
-                <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Features</a></li>
-                <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">Pricing</a></li>
-                <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">FAQs</a></li>
-                <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">About</a></li>
+                <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">{{ t.trans('homepage.index.menu.home') }}</a></li>
             </ul>
         </footer>
     </div>

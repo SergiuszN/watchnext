@@ -2,8 +2,8 @@
 
 namespace WatchNext\WatchNext\Application\Controller;
 
-use WatchNext\Engine\Response\CachedTemplateResponse;
 use WatchNext\Engine\Response\RedirectResponse;
+use WatchNext\Engine\Response\TemplateResponse;
 use WatchNext\Engine\Router\AccessDeniedException;
 use WatchNext\Engine\Security\Security;
 use WatchNext\WatchNext\Domain\Catalog\CatalogRepository;
@@ -16,9 +16,9 @@ readonly class HomepageController
     ) {
     }
 
-    public function index(): CachedTemplateResponse
+    public function index(): TemplateResponse
     {
-        return new CachedTemplateResponse('page/homepage/index.html.twig');
+        return new TemplateResponse('page/homepage/index.html.twig');
     }
 
     /**

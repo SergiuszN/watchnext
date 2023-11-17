@@ -1,0 +1,14 @@
+<ul class="navbar-nav mb-2 mb-lg-0">
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="profile-menu-dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ t.getLangEmoji }} {{ t.getLang }}
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="profile-menu-dropdown" style="left: -120px">
+            {% for lang in t.getAvailableLangs %}
+                <li>
+                    <a class="dropdown-item language-switch-link" href="#" data-lang="{{ lang.value }}">{{ lang.getEmoji() }} {{ lang.value }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </li>
+</ul>

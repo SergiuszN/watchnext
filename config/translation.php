@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'defaultLanguage' => 'en'
+    'defaultLanguage' => 'en',
 ];

@@ -30,6 +30,11 @@ class Profiler
         $this->enabled = ENV === 'dev';
     }
 
+    public function setEnabled(bool $enabled): void
+    {
+        $this->enabled = $enabled;
+    }
+
     public function start($event, mixed $data = null): void
     {
         if (!$this->enabled) {

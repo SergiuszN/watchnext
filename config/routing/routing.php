@@ -8,6 +8,7 @@ use WatchNext\WatchNext\Application\Controller\SecurityController;
 return [
     'homepage_index' => ['GET', '/', HomepageController::class . '::index'],
     'homepage_app' => ['GET', '/app', HomepageController::class . '::app'],
+    'homepage_app' => ['GET', '/app/change-', HomepageController::class . '::app'],
 
     'security_register' => [['GET', 'POST'], '/register', SecurityController::class . '::register'],
     'security_login' => [['GET', 'POST'], '/login', SecurityController::class . '::login'],

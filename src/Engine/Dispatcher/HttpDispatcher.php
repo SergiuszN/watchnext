@@ -23,9 +23,10 @@ use WatchNext\Engine\Router\RouterDispatcher;
 use WatchNext\Engine\Router\RouterDispatcherStatusEnum;
 use WatchNext\Engine\Security\Security;
 use WatchNext\Engine\Template\TemplateEngine;
+use WatchNext\Engine\Template\Translator;
 use WatchNext\WatchNext\Application\Controller\SecurityController;
 
-class HttpDispatcher
+readonly class HttpDispatcher
 {
     public function __construct(
         private Profiler $profiler,
@@ -33,6 +34,7 @@ class HttpDispatcher
         private RouterDispatcher $routerDispatcher,
         private SecurityController $securityController,
         private TemplateEngine $templateEngine,
+        private Translator $translator,
         private RouteGenerator $routeGenerator,
         private Container $container,
         private Logger $logger
@@ -47,6 +49,7 @@ class HttpDispatcher
         $this->profiler->start('kernel.booted');
 
         $this->security->init();
+        $this->translator->init($this->security->getUser());
         $this->profiler->add('security.booted');
 
         $route = $this->routerDispatcher->dispatch();

@@ -3,6 +3,9 @@
 namespace WatchNext\Engine\Template;
 
 use WatchNext\Engine\Config;
+use WatchNext\WatchNext\Domain\User\LanguageEnum;
+use WatchNext\WatchNext\Domain\User\User;
+use WatchNext\WatchNext\Domain\User\UserRepository;
 
 class Translator
 {
@@ -10,14 +13,38 @@ class Translator
     private static array $translations = [];
     private static string $lang;
 
-    public function __construct(private readonly Config $config)
+    public function __construct(private readonly Config $config, private readonly UserRepository $userRepository)
     {
         if (self::$translationConfig !== null) {
             return;
         }
 
         self::$translationConfig = $config->get('translation.php');
-        $this->setLang($_SESSION['kernel.lang'] ?? self::$translationConfig['defaultLanguage']);
+    }
+
+    public function init(?User $user): void
+    {
+        $userLang = $user?->getLanguage()?->value;
+        $cookieLang = $_COOKIE['lang'] ?? null;
+        $defaultLang = self::$translationConfig['defaultLanguage'];
+
+        if ($cookieLang && $userLang && $cookieLang !== $userLang) {
+            $user->setLanguage(LanguageEnum::from($cookieLang));
+            $this->userRepository->save($user);
+            $userLang = $cookieLang;
+        }
+
+        if ($userLang) {
+            $this->setLang($userLang);
+            return;
+        }
+
+        if ($cookieLang) {
+            $this->setLang($cookieLang);
+            return;
+        }
+
+        $this->setLang($defaultLang);
     }
 
     public function setLang(string $lang): void
@@ -40,5 +67,15 @@ class Translator
     public function getLang(): string
     {
         return self::$lang;
+    }
+
+    public function getLangEmoji(): string
+    {
+        return LanguageEnum::from(self::$lang)->getEmoji();
+    }
+
+    public function getAvailableLangs(): array
+    {
+        return array_filter(LanguageEnum::cases(), fn (LanguageEnum $lang) => $lang->value !== self::$lang);
     }
 }

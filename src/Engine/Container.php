@@ -100,6 +100,7 @@ class Container
             'rootDir' => ROOT_PATH,
 
             Container::class => autowire(Container::class),
+            Security::class => autowire(Security::class),
             HttpDispatcher::class => autowire(HttpDispatcher::class),
             Database::class => autowire(Database::class),
             TemplateEngine::class => autowire(TemplateEngine::class),
@@ -110,7 +111,6 @@ class Container
             Translator::class => autowire(Translator::class),
             FlashBag::class => autowire(FlashBag::class),
             Auth::class => autowire(Auth::class),
-            Security::class => autowire(Security::class),
             Firewall::class => autowire(Firewall::class),
             SyncEventDispatcher::class => autowire(SyncEventDispatcher::class),
             DatabaseEventDispatcher::class => autowire(DatabaseEventDispatcher::class),

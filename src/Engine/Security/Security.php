@@ -11,6 +11,8 @@ class Security
     private static ?User $user = null;
     private static ?int $userId = null;
 
+    private static bool $inited = false;
+
     public function __construct(
         readonly private Auth $auth,
         readonly private Firewall $firewall,
@@ -19,15 +21,23 @@ class Security
 
     public function init(): void
     {
-        session_start();
+        if (!self::$inited) {
+            session_start();
+        }
 
         $_SESSION[CSFR::TOKEN_KEY] = $_SESSION[CSFR::TOKEN_KEY] ?? bin2hex(random_bytes(20));
-        $this->tryAuthorizeFromCookie();
 
-        self::$user = isset($_SESSION['main.auth.user']) ? unserialize($_SESSION['main.auth.user']) : null;
+        if (isset($_SESSION[Auth::AUTH_SESSION_KEY])) {
+            $this->auth->refresh();
+        } else {
+            $this->tryAuthorizeFromCookie();
+        }
+
+        self::$user = isset($_SESSION[Auth::AUTH_SESSION_KEY]) ? unserialize($_SESSION[Auth::AUTH_SESSION_KEY]) : null;
         self::$userId = self::$user?->getId();
 
         $this->firewall->buildTree(self::$user);
+        self::$inited = true;
     }
 
     public function getUser(): ?User
