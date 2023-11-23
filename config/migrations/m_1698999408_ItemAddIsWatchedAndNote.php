@@ -9,10 +9,10 @@ class m_1698999408_ItemAddIsWatchedAndNote extends Migration
     public function up(): void
     {
         $this->database->execute(
-            "ALTER TABLE `item` 
+            'ALTER TABLE `item` 
                  ADD COLUMN is_watched TINYINT(1) NOT NULL DEFAULT 0,
-                 ADD COLUMN note TEXT NOT NULL DEFAULT ''
-        ");
+                 ADD COLUMN note TEXT NULL
+        ');
     }
 
     public function down(): void
