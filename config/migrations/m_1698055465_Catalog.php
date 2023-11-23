@@ -4,7 +4,7 @@ namespace Migrations;
 
 use WatchNext\Engine\Database\Migration;
 
-class m_1698085465_Catalog extends Migration
+class m_1698055465_Catalog extends Migration
 {
     public function up(): void
     {
