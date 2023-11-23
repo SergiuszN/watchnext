@@ -11,6 +11,7 @@ use WatchNext\Engine\Security\Security;
 use WatchNext\Engine\Template\Translator;
 use WatchNext\WatchNext\Domain\User\Form\UserLoginForm;
 use WatchNext\WatchNext\Domain\User\Form\UserRegisterForm;
+use WatchNext\WatchNext\Domain\User\LanguageEnum;
 use WatchNext\WatchNext\Domain\User\Query\UserCreatedEvent;
 use WatchNext\WatchNext\Domain\User\User;
 use WatchNext\WatchNext\Domain\User\UserRepository;
@@ -34,7 +35,7 @@ readonly class SecurityController
 
         if ($form->isValid($this->userRepository)) {
             $password = password_hash($form->password, PASSWORD_DEFAULT);
-            $user = new User($form->login, $password, ['ROLE_USER']);
+            $user = new User($form->login, $password, LanguageEnum::from($this->language->getLang()), ['ROLE_USER']);
             $this->userRepository->save($user);
 
             $this->eventManager->dispatch(new UserCreatedEvent($user->getId()));
