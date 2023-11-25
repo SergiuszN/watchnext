@@ -5,6 +5,7 @@ namespace WatchNext\Engine;
 use DI\Container as DIContainer;
 use DI\ContainerBuilder;
 use Exception;
+use Integration\IntegrationBootstrap;
 use WatchNext\Engine\Cache\ApcuCache;
 use WatchNext\Engine\Cache\MemcachedCache;
 use WatchNext\Engine\Cli\CacheClearCommand;
@@ -26,6 +27,7 @@ use WatchNext\Engine\Template\Asset;
 use WatchNext\Engine\Template\TemplateEngine;
 use WatchNext\Engine\Template\Translator;
 
+use WatchNext\Engine\Test\Client;
 use function DI\autowire;
 
 class Container
@@ -121,6 +123,7 @@ class Container
             DatabaseEventWorker::class => autowire(DatabaseEventWorker::class),
             MemcachedCache::class => autowire(MemcachedCache::class),
             ApcuCache::class => autowire(ApcuCache::class),
+            Client::class => autowire(Client::class),
         ];
     }
 }

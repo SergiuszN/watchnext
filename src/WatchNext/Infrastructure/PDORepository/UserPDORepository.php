@@ -99,4 +99,24 @@ class UserPDORepository extends PDORepository implements UserRepository
             ->andWhere('cu.user != c.owner')
         )->fetchAll());
     }
+
+    public function remove(User $user): void
+    {
+        $id = $user->getId();
+
+        $this->database->prepare("DELETE FROM `item_tag` WHERE item IN (SELECT id FROM item WHERE owner = {$id})")
+            ->execute();
+
+        $this->database->prepare("DELETE FROM `item` WHERE owner = {$id}")
+            ->execute();
+
+        $this->database->prepare("DELETE FROM `catalog_user` WHERE user = {$id}")
+            ->execute();
+
+        $this->database->prepare("DELETE FROM `catalog` WHERE owner = {$id}")
+            ->execute();
+
+        $this->database->prepare("DELETE FROM `user` WHERE id = {$id}")
+            ->execute();
+    }
 }

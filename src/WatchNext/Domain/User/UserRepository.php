@@ -16,4 +16,6 @@ interface UserRepository
 
     /** @return User[] */
     public function findSharedWithUsersForCatalog(int $catalogId): array;
+
+    public function remove(User $user): void;
 }

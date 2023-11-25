@@ -11,19 +11,20 @@ class UserLoginForm
     public readonly string $password;
     public readonly bool $rememberMe;
 
-    public function __construct(Request $request)
+    public function __construct(private readonly Request $request)
     {
-        $this->isPost = $request->isPost();
-
-        if ($this->isPost) {
-            $this->login = $request->post('login', '');
-            $this->password = $request->post('password', '');
-            $this->rememberMe = (bool) $request->post('remember-me', false);
-        }
     }
 
     public function isValid(): bool
     {
+        $this->isPost = $this->request->isPost();
+
+        if ($this->isPost) {
+            $this->login = $this->request->post('login', '');
+            $this->password = $this->request->post('password', '');
+            $this->rememberMe = (bool) $this->request->post('remember-me', false);
+        }
+
         return $this->isPost;
     }
 }

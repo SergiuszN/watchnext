@@ -67,19 +67,25 @@ readonly class HttpDispatcher
 
                 $this->render($response);
             } catch (AccessDeniedException $accessDeniedException) {
+                http_response_code(401);
                 $this->render($this->securityController->accessDenied());
 
-                exit;
+                return;
             } catch (NotFoundException $notFoundException) {
+                http_response_code(404);
                 $this->render($this->securityController->notFound());
 
-                exit;
+                return;
             } catch (Throwable $throwable) {
+                http_response_code(500);
                 $this->logger->error($throwable);
-                throw $throwable;
+
+                if ($_ENV['APP_ENV'] === 'dev') {
+                    throw $throwable;
+                }
             }
 
-            exit;
+            return;
         } else {
             $this->render($this->securityController->notFound());
         }
@@ -100,6 +106,7 @@ readonly class HttpDispatcher
             case CachedTemplateResponse::class:
             case TemplateResponse::class:
                 /** @var $response TemplateResponse|CachedTemplateResponse */
+                http_response_code(200);
                 echo $this->templateEngine->render($response);
 
                 $printProfile = true;
@@ -107,11 +114,14 @@ readonly class HttpDispatcher
             case RedirectResponse::class:
                 /** @var $response RedirectResponse */
                 $location = $this->routeGenerator->make($response->route, $response->params);
+
+                http_response_code(302);
                 header("Location: $location");
 
                 break;
             case RedirectRefererResponse::class:
                 /** @var $response RedirectRefererResponse */
+                http_response_code(302);
                 header("Location: $response->uri");
 
                 break;

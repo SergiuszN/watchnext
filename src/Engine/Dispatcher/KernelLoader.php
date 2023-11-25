@@ -11,11 +11,16 @@ class KernelLoader
     /**
      * @throws Exception
      */
-    public function load(): Container
+    public function load(string $env = null): Container
     {
         define('ROOT_PATH', realpath(__DIR__ . '/../../../'));
 
         (new Env())->load();
+
+        if ($env !== null) {
+            $_ENV['APP_ENV'] = $env;
+        }
+
         define('ENV', $_ENV['APP_ENV']);
 
         $this->createVarDirectory();

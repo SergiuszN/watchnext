@@ -24,4 +24,5 @@ return [
     \WatchNext\WatchNext\Domain\Item\Form\EditItemForm::class => \DI\autowire(\WatchNext\WatchNext\Domain\Item\Form\EditItemForm::class),
     \WatchNext\WatchNext\Domain\Item\Form\EditItemNoteForm::class => \DI\autowire(\WatchNext\WatchNext\Domain\Item\Form\EditItemNoteForm::class),
     \WatchNext\WatchNext\Domain\Item\ItemVoter::class => \DI\autowire(\WatchNext\WatchNext\Domain\Item\ItemVoter::class),
+    \WatchNext\WatchNext\Domain\User\UserCreator::class => \DI\autowire(\WatchNext\WatchNext\Domain\User\UserCreator::class),
 ];

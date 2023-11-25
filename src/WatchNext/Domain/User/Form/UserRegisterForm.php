@@ -18,11 +18,12 @@ class UserRegisterForm
 
     public function __construct(private readonly Request $request, private readonly Translator $t)
     {
-        $this->isPost = $this->request->isPost();
     }
 
     public function load(): self
     {
+        $this->isPost = $this->request->isPost();
+
         if ($this->isPost) {
             $this->login = $this->request->post('login', '');
             $this->password = $this->request->post('password', '');

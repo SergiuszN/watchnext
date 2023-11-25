@@ -37,7 +37,7 @@ readonly class CliDispatcher
                 echo "\t$commandName\n";
             }
 
-            exit;
+            return;
         }
 
         [$input, $output] = [new CliInput(), new CliOutput()];
@@ -56,12 +56,11 @@ readonly class CliDispatcher
                     echo "\n";
                 }
 
-                exit;
+                return;
             }
         }
 
         echo "There no command with name '$selectedCommandName'\n";
-        exit;
     }
 
     private function getKernelCliCommands(): array
